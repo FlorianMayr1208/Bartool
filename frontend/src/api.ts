@@ -60,6 +60,14 @@ export async function searchRecipes(q: string) {
   return res.json();
 }
 
+export async function getRecipe(id: number) {
+  const res = await fetch(`${API_BASE}/recipes/${id}`);
+  if (!res.ok) {
+    throw new Error('Recipe not found');
+  }
+  return res.json();
+}
+
 export async function createRecipe(data: { name: string }) {
   const res = await fetch(`${API_BASE}/recipes/`, {
     method: 'POST',

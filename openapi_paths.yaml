@@ -39,6 +39,15 @@ paths:
             type: integer
     post:
       summary: Add recipe from CocktailDB
+  /recipes/{recipe_id}:
+    get:
+      summary: Get recipe
+      parameters:
+        - in: path
+          name: recipe_id
+          required: true
+          schema:
+            type: integer
   /inventory/{id}:
     get:
       summary: Get inventory item
