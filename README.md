@@ -29,7 +29,8 @@ npm install
 npm run dev
 ```
 
-Afterwards open `http://localhost:5173` in your browser.  The app will call the backend at `http://localhost:8000` by default.
+Afterwards open `http://localhost:5173` in your browser.  If the backend runs on a different port, set the environment variable `VITE_API_BASE` when starting the
+frontend, e.g. `VITE_API_BASE=http://localhost:8000 npm run dev`.
 
 ---
 
