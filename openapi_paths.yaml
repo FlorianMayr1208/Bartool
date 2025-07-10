@@ -1,0 +1,50 @@
+openapi: 3.0.0
+info:
+  title: Bar Management API
+  version: '0.1'
+paths:
+  /ingredients:
+    get:
+      summary: List ingredients
+      parameters:
+        - in: query
+          name: skip
+          schema:
+            type: integer
+        - in: query
+          name: limit
+          schema:
+            type: integer
+    post:
+      summary: Create ingredient
+  /recipes:
+    get:
+      summary: List recipes
+      parameters:
+        - in: query
+          name: skip
+          schema:
+            type: integer
+        - in: query
+          name: limit
+          schema:
+            type: integer
+    post:
+      summary: Add recipe from CocktailDB
+  /inventory/{id}:
+    get:
+      summary: Get inventory item
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+    patch:
+      summary: Update inventory item
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer

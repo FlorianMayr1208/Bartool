@@ -1,6 +1,21 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, Request, HTTPException
+from fastapi.responses import JSONResponse
+import logging
+
+from .api import ingredients, recipes, inventory
 
 app = FastAPI(title="Bar Management")
+
+
+@app.middleware("http")
+async def error_middleware(request: Request, call_next):
+    try:
+        return await call_next(request)
+    except HTTPException as exc:
+        return JSONResponse(status_code=exc.status_code, content={"detail": exc.detail})
+    except Exception:
+        logging.exception("Unhandled error")
+        return JSONResponse(status_code=500, content={"detail": "Internal Server Error"})
 
 @app.get("/healthz")
 async def health_check():
@@ -10,4 +25,9 @@ async def health_check():
 @app.get("/")
 async def root():
     return {"message": "hello world"}
+
+
+app.include_router(ingredients.router, prefix="/ingredients")
+app.include_router(recipes.router, prefix="/recipes")
+app.include_router(inventory.router, prefix="/inventory")
 

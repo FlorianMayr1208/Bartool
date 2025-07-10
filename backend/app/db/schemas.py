@@ -36,6 +36,10 @@ class InventoryItemBase(BaseModel):
 class InventoryItemCreate(InventoryItemBase):
     pass
 
+class InventoryItemUpdate(BaseModel):
+    quantity: Optional[int] = None
+    status: Optional[str] = None
+
 class InventoryItem(InventoryItemBase):
     id: int
 
