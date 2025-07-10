@@ -49,3 +49,22 @@ export async function lookupBarcode(ean: string) {
   if (!res.ok) return null;
   return res.json();
 }
+
+export async function listRecipes() {
+  const res = await fetch(`${API_BASE}/recipes/`);
+  return res.json();
+}
+
+export async function searchRecipes(q: string) {
+  const res = await fetch(`${API_BASE}/recipes/search?q=${encodeURIComponent(q)}`);
+  return res.json();
+}
+
+export async function createRecipe(data: { name: string }) {
+  const res = await fetch(`${API_BASE}/recipes/`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(data),
+  });
+  return res.json();
+}
