@@ -1,9 +1,13 @@
 import { useEffect, useState } from 'react';
 import { listRecipes, searchRecipes, createRecipe } from '../api';
+import { Link } from 'react-router-dom';
 
 interface Recipe {
-  name: string;
   id?: number;
+  name: string;
+  alcoholic?: string | null;
+  instructions?: string | null;
+  thumb?: string | null;
 }
 
 export default function Recipes() {
@@ -49,14 +53,22 @@ export default function Recipes() {
           <h2 className="font-semibold">Results</h2>
           <ul className="list-disc pl-5">
             {results.map((r) => (
-              <li key={r.name} className="my-1 flex items-center space-x-2">
-                <span>{r.name}</span>
-                <button
-                  onClick={() => save(r.name)}
-                  className="rounded bg-green-500 px-1 text-white"
-                >
-                  Add
-                </button>
+              <li key={r.name} className="my-1 space-y-1">
+                <div className="flex items-center space-x-2">
+                  <span className="font-semibold">{r.name}</span>
+                  <button
+                    onClick={() => save(r.name)}
+                    className="rounded bg-green-500 px-1 text-white"
+                  >
+                    Add
+                  </button>
+                </div>
+                {r.thumb && (
+                  <img src={r.thumb} alt={r.name} className="w-32" />
+                )}
+                {r.instructions && (
+                  <p className="text-sm text-gray-700">{r.instructions}</p>
+                )}
               </li>
             ))}
           </ul>
@@ -67,7 +79,15 @@ export default function Recipes() {
           <h2 className="font-semibold">Saved Recipes</h2>
           <ul className="list-disc pl-5">
             {saved.map((s) => (
-              <li key={s.id || s.name}>{s.name}</li>
+              <li key={s.id || s.name}>
+                {s.id ? (
+                  <Link to={`/recipes/${s.id}`} className="text-blue-600 underline">
+                    {s.name}
+                  </Link>
+                ) : (
+                  s.name
+                )}
+              </li>
             ))}
           </ul>
         </div>

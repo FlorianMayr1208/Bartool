@@ -82,18 +82,57 @@ async def test_create_recipe(monkeypatch, async_client):
 
 
 @pytest.mark.asyncio
+async def test_get_recipe(monkeypatch, async_client):
+    async def fake_fetch(name: str):
+        return {
+            "name": "Mojito",
+            "alcoholic": "Alcoholic",
+            "instructions": "Mix it",
+            "thumb": "http://example.com/mojito.jpg",
+            "tags": ["Classic"],
+            "categories": ["Cocktail"],
+            "ibas": ["New Era"],
+            "ingredients": [{"name": "Rum", "measure": "2 oz"}],
+        }
+
+    monkeypatch.setattr(
+        "backend.app.services.cocktaildb.fetch_recipe_details", fake_fetch
+    )
+    resp = await async_client.post("/recipes/", json={"name": "mojito"})
+    recipe_id = resp.json()["id"]
+
+    resp = await async_client.get(f"/recipes/{recipe_id}")
+    assert resp.status_code == 200
+    assert resp.json()["name"] == "Mojito"
+
+
+@pytest.mark.asyncio
 async def test_recipe_search(monkeypatch, async_client):
     async def fake_search(name: str):
-        return ["Margarita", "Blue Margarita"]
+        return [
+            {
+                "name": "Margarita",
+                "alcoholic": "Alcoholic",
+                "instructions": "Mix",
+                "thumb": "http://example.com/margarita.jpg",
+            },
+            {
+                "name": "Blue Margarita",
+                "alcoholic": "Alcoholic",
+                "instructions": "Mix blue",
+                "thumb": "http://example.com/blue.jpg",
+            },
+        ]
 
-    monkeypatch.setattr("backend.app.services.cocktaildb.search_recipes", fake_search)
-    monkeypatch.setattr("backend.app.api.recipes.search_recipes", fake_search)
+    monkeypatch.setattr(
+        "backend.app.services.cocktaildb.search_recipes_details", fake_search
+    )
+    monkeypatch.setattr(
+        "backend.app.api.recipes.search_recipes_details", fake_search
+    )
     resp = await async_client.get("/recipes/search", params={"q": "margarita"})
     assert resp.status_code == 200
-    assert resp.json() == [
-        {"name": "Margarita", "alcoholic": None, "instructions": None, "thumb": None},
-        {"name": "Blue Margarita", "alcoholic": None, "instructions": None, "thumb": None},
-    ]
+    assert resp.json() == await fake_search("")
 
 
 @pytest.mark.asyncio

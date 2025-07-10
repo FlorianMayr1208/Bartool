@@ -27,6 +27,28 @@ async def search_recipes(name: str) -> list[str]:
         return [d.get("strDrink") for d in drinks if d.get("strDrink")]
 
 
+async def search_recipes_details(name: str) -> list[dict]:
+    """Return basic recipe information for matches."""
+    url = f"{API_BASE}/search.php"
+    params = {"s": name}
+    async with httpx.AsyncClient() as client:
+        resp = await client.get(url, params=params, timeout=10)
+        resp.raise_for_status()
+        data = resp.json()
+        drinks = data.get("drinks") or []
+        results = []
+        for d in drinks:
+            results.append(
+                {
+                    "name": d.get("strDrink"),
+                    "alcoholic": d.get("strAlcoholic"),
+                    "instructions": d.get("strInstructions"),
+                    "thumb": d.get("strDrinkThumb"),
+                }
+            )
+        return results
+
+
 async def fetch_recipe_details(name: str) -> dict | None:
     """Fetch detailed recipe information for the first matching drink."""
     url = f"{API_BASE}/search.php"

@@ -2,19 +2,32 @@ from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 
 from ..db import crud, schemas, session
-from ..services.cocktaildb import fetch_recipe_details, search_recipes
+from ..services.cocktaildb import (
+    fetch_recipe_details,
+    search_recipes,
+    search_recipes_details,
+)
 
 router = APIRouter()
 
 
 @router.get("/search", response_model=list[schemas.RecipeBase])
 async def search_recipes_endpoint(q: str):
-    names = await search_recipes(q)
-    return [{"name": n} for n in names]
+    return await search_recipes_details(q)
 
 @router.get("/", response_model=list[schemas.Recipe])
 def list_recipes(skip: int = 0, limit: int = 100, db: Session = Depends(session.get_db)):
     return crud.list_recipes(db, skip=skip, limit=limit)
+
+
+@router.get("/{recipe_id}", response_model=schemas.Recipe)
+def get_recipe(recipe_id: int, db: Session = Depends(session.get_db)):
+    recipe = crud.get_recipe(db, recipe_id)
+    if not recipe:
+        from fastapi import HTTPException
+
+        raise HTTPException(status_code=404, detail="Recipe not found")
+    return recipe
 
 
 @router.post("/", response_model=schemas.Recipe, status_code=201)
