@@ -10,3 +10,4 @@ async def health_check():
 @app.get("/")
 async def root():
     return {"message": "hello world"}
+
