@@ -90,3 +90,25 @@ async def test_inventory_patch(async_client):
     resp = await async_client.patch(f"/inventory/{item.id}", json={"quantity": 5})
     assert resp.status_code == 200
     assert resp.json()["quantity"] == 5
+
+
+@pytest.mark.asyncio
+async def test_barcode_lookup(monkeypatch, async_client):
+    async def fake_lookup(ean: str):
+        return {"name": "Test"}
+
+    monkeypatch.setattr("backend.app.services.barcode.fetch_barcode", fake_lookup)
+    resp = await async_client.get("/barcode/123456")
+    assert resp.status_code == 200
+    assert resp.json()["name"] == "Test"
+
+
+@pytest.mark.asyncio
+async def test_inventory_create_delete(async_client):
+    resp = await async_client.post("/ingredients/", json={"name": "Tequila"})
+    ing_id = resp.json()["id"]
+    resp = await async_client.post("/inventory/", json={"ingredient_id": ing_id, "quantity": 2})
+    assert resp.status_code == 201
+    item_id = resp.json()["id"]
+    resp = await async_client.delete(f"/inventory/{item_id}")
+    assert resp.status_code == 204

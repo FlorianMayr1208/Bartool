@@ -45,3 +45,7 @@ class InventoryItem(InventoryItemBase):
 
     class Config:
         orm_mode = True
+
+
+class InventoryItemWithIngredient(InventoryItem):
+    ingredient: Ingredient

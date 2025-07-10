@@ -61,3 +61,23 @@ def update_inventory_item(db: Session, item_id: int, item_update: schemas.Invent
     db.commit()
     db.refresh(db_obj)
     return db_obj
+
+
+def list_inventory_items(db: Session, skip: int = 0, limit: int = 100):
+    from sqlalchemy.orm import selectinload
+    return (
+        db.query(models.InventoryItem)
+        .options(selectinload(models.InventoryItem.ingredient))
+        .offset(skip)
+        .limit(limit)
+        .all()
+    )
+
+
+def delete_inventory_item(db: Session, item_id: int) -> bool:
+    item = get_inventory_item(db, item_id)
+    if not item:
+        return False
+    db.delete(item)
+    db.commit()
+    return True
