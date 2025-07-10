@@ -29,6 +29,18 @@ npm install
 npm run dev
 ```
 
+## Database initialization
+
+Before using the app you can create the local SQLite database with a small
+seeding script:
+
+```bash
+python backend/app/db/seed_db.py
+```
+
+This will generate `data/seed.sqlite` and insert a few example records so the
+API has initial data to work with.
+
 Afterwards open `http://localhost:5173` in your browser.  If the backend runs on a different port, set the environment variable `VITE_API_BASE` when starting the
 frontend, e.g. `VITE_API_BASE=http://localhost:8000 npm run dev`.
 
