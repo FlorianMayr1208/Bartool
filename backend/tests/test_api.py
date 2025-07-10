@@ -73,6 +73,18 @@ async def test_create_recipe(monkeypatch, async_client):
 
 
 @pytest.mark.asyncio
+async def test_recipe_search(monkeypatch, async_client):
+    async def fake_search(name: str):
+        return ["Margarita", "Blue Margarita"]
+
+    monkeypatch.setattr("backend.app.services.cocktaildb.search_recipes", fake_search)
+    monkeypatch.setattr("backend.app.api.recipes.search_recipes", fake_search)
+    resp = await async_client.get("/recipes/search", params={"q": "margarita"})
+    assert resp.status_code == 200
+    assert resp.json() == [{"name": "Margarita"}, {"name": "Blue Margarita"}]
+
+
+@pytest.mark.asyncio
 async def test_inventory_patch(async_client):
     # seed ingredient and item
     resp = await async_client.post("/ingredients/", json={"name": "Vodka"})

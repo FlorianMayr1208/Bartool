@@ -17,6 +17,14 @@ paths:
             type: integer
     post:
       summary: Create ingredient
+  /recipes/search:
+    get:
+      summary: Search recipes from CocktailDB
+      parameters:
+        - in: query
+          name: q
+          schema:
+            type: string
   /recipes:
     get:
       summary: List recipes
