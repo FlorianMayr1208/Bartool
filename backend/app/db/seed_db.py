@@ -1,7 +1,7 @@
 from sqlalchemy.orm import Session
 
-from .models import Base, Ingredient, Recipe, InventoryItem
-from .session import engine
+from models import Base, Ingredient, Recipe, InventoryItem
+from session import engine
 
 
 def run():
