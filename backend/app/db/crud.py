@@ -16,6 +16,10 @@ def create_ingredient(db: Session, ingredient: schemas.IngredientCreate):
     return db_obj
 
 
+def list_ingredients(db: Session, skip: int = 0, limit: int = 100):
+    return db.query(models.Ingredient).offset(skip).limit(limit).all()
+
+
 # Recipe CRUD
 
 def get_recipe(db: Session, recipe_id: int):
@@ -30,6 +34,10 @@ def create_recipe(db: Session, recipe: schemas.RecipeCreate):
     return db_obj
 
 
+def list_recipes(db: Session, skip: int = 0, limit: int = 100):
+    return db.query(models.Recipe).offset(skip).limit(limit).all()
+
+
 # InventoryItem CRUD
 
 def get_inventory_item(db: Session, item_id: int):
@@ -39,6 +47,17 @@ def get_inventory_item(db: Session, item_id: int):
 def create_inventory_item(db: Session, item: schemas.InventoryItemCreate):
     db_obj = models.InventoryItem(**item.model_dump())
     db.add(db_obj)
+    db.commit()
+    db.refresh(db_obj)
+    return db_obj
+
+
+def update_inventory_item(db: Session, item_id: int, item_update: schemas.InventoryItemUpdate):
+    db_obj = get_inventory_item(db, item_id)
+    if not db_obj:
+        return None
+    for field, value in item_update.model_dump(exclude_unset=True).items():
+        setattr(db_obj, field, value)
     db.commit()
     db.refresh(db_obj)
     return db_obj
