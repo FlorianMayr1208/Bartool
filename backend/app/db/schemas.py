@@ -1,5 +1,5 @@
 from pydantic import BaseModel
-from typing import Optional
+from typing import Optional, List
 
 class IngredientBase(BaseModel):
     name: str
@@ -18,12 +18,57 @@ class Ingredient(IngredientBase):
 
 class RecipeBase(BaseModel):
     name: str
+    alcoholic: Optional[str] = None
+    instructions: Optional[str] = None
+    thumb: Optional[str] = None
+
+class RecipeIngredientBase(BaseModel):
+    name: str
+    measure: Optional[str] = None
+
+class RecipeIngredientCreate(RecipeIngredientBase):
+    pass
+
+class RecipeIngredient(RecipeIngredientBase):
+    id: int
+
+    class Config:
+        orm_mode = True
+
+class Tag(BaseModel):
+    id: int
+    name: str
+
+    class Config:
+        orm_mode = True
+
+class Category(BaseModel):
+    id: int
+    name: str
+
+    class Config:
+        orm_mode = True
+
+class Iba(BaseModel):
+    id: int
+    name: str
+
+    class Config:
+        orm_mode = True
+
 
 class RecipeCreate(RecipeBase):
-    pass
+    tags: List[str] = []
+    categories: List[str] = []
+    ibas: List[str] = []
+    ingredients: List[RecipeIngredientCreate] = []
 
 class Recipe(RecipeBase):
     id: int
+    tags: List[Tag] = []
+    categories: List[Category] = []
+    ibas: List[Iba] = []
+    ingredients: List[RecipeIngredient] = []
 
     class Config:
         orm_mode = True
