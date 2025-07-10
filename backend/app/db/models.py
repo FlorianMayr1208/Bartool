@@ -18,6 +18,55 @@ class Recipe(Base):
 
     id = Column(Integer, primary_key=True, index=True)
     name = Column(String, nullable=False)
+    alcoholic = Column(String, nullable=True)
+    instructions = Column(String, nullable=True)
+    thumb = Column(String, nullable=True)
+
+    tags = relationship("Tag", back_populates="recipe", cascade="all, delete-orphan")
+    categories = relationship("Category", back_populates="recipe", cascade="all, delete-orphan")
+    ibas = relationship("Iba", back_populates="recipe", cascade="all, delete-orphan")
+    ingredients = relationship("RecipeIngredient", back_populates="recipe", cascade="all, delete-orphan")
+
+
+class Tag(Base):
+    __tablename__ = "tags"
+
+    id = Column(Integer, primary_key=True, index=True)
+    name = Column(String, nullable=False)
+    recipe_id = Column(Integer, ForeignKey("recipes.id"), nullable=False)
+
+    recipe = relationship("Recipe", back_populates="tags")
+
+
+class Category(Base):
+    __tablename__ = "categories"
+
+    id = Column(Integer, primary_key=True, index=True)
+    name = Column(String, nullable=False)
+    recipe_id = Column(Integer, ForeignKey("recipes.id"), nullable=False)
+
+    recipe = relationship("Recipe", back_populates="categories")
+
+
+class Iba(Base):
+    __tablename__ = "ibas"
+
+    id = Column(Integer, primary_key=True, index=True)
+    name = Column(String, nullable=False)
+    recipe_id = Column(Integer, ForeignKey("recipes.id"), nullable=False)
+
+    recipe = relationship("Recipe", back_populates="ibas")
+
+
+class RecipeIngredient(Base):
+    __tablename__ = "recipe_ingredients"
+
+    id = Column(Integer, primary_key=True, index=True)
+    recipe_id = Column(Integer, ForeignKey("recipes.id"), nullable=False)
+    name = Column(String, nullable=False)
+    measure = Column(String, nullable=True)
+
+    recipe = relationship("Recipe", back_populates="ingredients")
 
 
 class InventoryItem(Base):

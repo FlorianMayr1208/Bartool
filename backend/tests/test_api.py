@@ -64,9 +64,18 @@ async def test_create_and_list_ingredient(async_client):
 @pytest.mark.asyncio
 async def test_create_recipe(monkeypatch, async_client):
     async def fake_fetch(name: str):
-        return "Mojito"
+        return {
+            "name": "Mojito",
+            "alcoholic": "Alcoholic",
+            "instructions": "Mix it",
+            "thumb": "http://example.com/mojito.jpg",
+            "tags": ["Classic"],
+            "categories": ["Cocktail"],
+            "ibas": ["New Era"],
+            "ingredients": [{"name": "Rum", "measure": "2 oz"}],
+        }
 
-    monkeypatch.setattr("backend.app.services.cocktaildb.fetch_recipe_name", fake_fetch)
+    monkeypatch.setattr("backend.app.services.cocktaildb.fetch_recipe_details", fake_fetch)
     resp = await async_client.post("/recipes/", json={"name": "mojito"})
     assert resp.status_code == 201
     assert resp.json()["name"] == "Mojito"
@@ -81,7 +90,10 @@ async def test_recipe_search(monkeypatch, async_client):
     monkeypatch.setattr("backend.app.api.recipes.search_recipes", fake_search)
     resp = await async_client.get("/recipes/search", params={"q": "margarita"})
     assert resp.status_code == 200
-    assert resp.json() == [{"name": "Margarita"}, {"name": "Blue Margarita"}]
+    assert resp.json() == [
+        {"name": "Margarita", "alcoholic": None, "instructions": None, "thumb": None},
+        {"name": "Blue Margarita", "alcoholic": None, "instructions": None, "thumb": None},
+    ]
 
 
 @pytest.mark.asyncio

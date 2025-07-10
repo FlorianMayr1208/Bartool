@@ -27,7 +27,12 @@ def get_recipe(db: Session, recipe_id: int):
 
 
 def create_recipe(db: Session, recipe: schemas.RecipeCreate):
-    db_obj = models.Recipe(**recipe.model_dump())
+    data = recipe.model_dump(exclude={"tags", "categories", "ibas", "ingredients"})
+    db_obj = models.Recipe(**data)
+    db_obj.tags = [models.Tag(name=t) for t in recipe.tags]
+    db_obj.categories = [models.Category(name=c) for c in recipe.categories]
+    db_obj.ibas = [models.Iba(name=i) for i in recipe.ibas]
+    db_obj.ingredients = [models.RecipeIngredient(name=i.name, measure=i.measure) for i in recipe.ingredients]
     db.add(db_obj)
     db.commit()
     db.refresh(db_obj)
