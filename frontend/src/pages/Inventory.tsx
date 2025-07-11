@@ -74,7 +74,7 @@ export default function Inventory() {
           </button>
         </div>
       ) : (
-        <button onClick={() => setScanning(true)} className="rounded bg-gray-200 px-2 py-1">
+        <button onClick={() => setScanning(true)} className="button-send">
           Scan Barcode
         </button>
       )}
@@ -91,7 +91,7 @@ export default function Inventory() {
           onChange={(e) => setQuantity(parseInt(e.target.value))}
           className="w-20 border p-1"
         />
-        <button onClick={submit} className="rounded bg-blue-500 px-2 py-1 text-white">
+        <button onClick={submit} className="button-search">
           Add
         </button>
       </div>
@@ -116,7 +116,7 @@ export default function Inventory() {
                 />
               </td>
               <td className="px-2 py-1">
-                <button onClick={() => remove(it.id)} className="text-red-600">
+                <button onClick={() => remove(it.id)} className="button-search">
                   Delete
                 </button>
               </td>
