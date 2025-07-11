@@ -1,3 +1,20 @@
+:root {
+  --bg-primary:   #0E0E0F;
+  --bg-elevated:  #1A1B1D;
+  --border:       #2C2D30;
+  --text-primary: #E6E6E8;
+  --text-muted:   #9A9A9F;
+  --accent:       #FFB248;
+  --success:      #27C192;
+  --danger:       #FF5160;
+  --highlight:    #725AF0;
+}
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+body {
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+}
