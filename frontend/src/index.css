@@ -1,5 +1,5 @@
 :root {
-  --bg-primary:   #1A1B1D;
+  --bg-primary:   #242527;
   --bg-elevated:  #242526;
   --border:       #2C2D30;
   --text-primary: #E6E6E8;
@@ -11,6 +11,7 @@
   --brand-radius: 6px;
   --brand-shadow: 0 4px 12px rgba(0,0,0,.40);
   --space-4: 16px;
+  --space-2: 8px;
   --font-display: "Playfair Display", serif;
   --font-sans: "Inter", "Helvetica Neue", sans-serif;
 }
@@ -34,4 +35,13 @@ body {
   border-radius: var(--brand-radius);
   box-shadow: var(--brand-shadow);
   padding: var(--space-4);
+}
+
+.button-search {
+  background-color: var(--highlight);
+  color: var(--high);
+  border-radius: var(--brand-radius);
+  padding: var(--space-2) var(--space-4);
+  border: none;
+  cursor: pointer;
 }
