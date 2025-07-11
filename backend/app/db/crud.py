@@ -14,7 +14,7 @@ def get_ingredient(db: Session, ingredient_id: int):
 def create_ingredient(db: Session, ingredient: schemas.IngredientCreate):
     canonical = synonyms.canonical_name(ingredient.name)
     existing = db.query(models.Ingredient).filter(
-        func.lower(models.Ingredient.name) == canonical
+        func.lower(models.Ingredient.name) == canonical.lower()
     ).first()
     if existing:
         return existing
@@ -34,7 +34,7 @@ def list_ingredients(db: Session, skip: int = 0, limit: int = 100):
 def get_ingredient_by_name(db: Session, name: str):
     canonical = synonyms.canonical_name(name)
     return db.query(models.Ingredient).filter(
-        func.lower(models.Ingredient.name) == canonical
+        func.lower(models.Ingredient.name) == canonical.lower()
     ).first()
 
 
@@ -51,13 +51,25 @@ def get_recipe(db: Session, recipe_id: int):
     return db.query(models.Recipe).filter(models.Recipe.id == recipe_id).first()
 
 
+def _get_or_create_by_name(db: Session, model, name: str):
+    obj = db.query(model).filter(func.lower(model.name) == name.lower()).first()
+    if obj:
+        return obj
+    obj = model(name=name)
+    db.add(obj)
+    db.flush()
+    return obj
+
+
 def create_recipe(db: Session, recipe: schemas.RecipeCreate):
     data = recipe.model_dump(exclude={"tags", "categories", "ibas", "ingredients"})
     db_obj = models.Recipe(**data)
-    db_obj.tags = [models.Tag(name=t) for t in recipe.tags]
-    db_obj.categories = [models.Category(name=c) for c in recipe.categories]
-    db_obj.ibas = [models.Iba(name=i) for i in recipe.ibas]
+
+    db_obj.tags = [_get_or_create_by_name(db, models.Tag, t) for t in recipe.tags]
+    db_obj.categories = [_get_or_create_by_name(db, models.Category, c) for c in recipe.categories]
+    db_obj.ibas = [_get_or_create_by_name(db, models.Iba, i) for i in recipe.ibas]
     db_obj.ingredients = [models.RecipeIngredient(name=i.name, measure=i.measure) for i in recipe.ingredients]
+
     db.add(db_obj)
     db.commit()
     db.refresh(db_obj)
