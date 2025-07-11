@@ -80,7 +80,7 @@ export default function Recipes() {
                 return (
                   <li key={key}>
                     <div
-                      className="flex items-center gap-2 p-2 cursor-pointer"
+                      className="flex items-center gap-2 p-4 cursor-pointer mb-[5px] mt-[5px]"
                       onClick={() =>
                         setExpanded(expandedKey ? null : key)
                       }
@@ -136,7 +136,7 @@ export default function Recipes() {
                 return (
                   <li key={key}>
                     <div
-                      className="flex items-center gap-2 p-2 cursor-pointer"
+                      className="flex items-center gap-2 p-4 cursor-pointer mb-[5px] mt-[5px]"
                       onClick={() =>
                         setExpanded(expandedKey ? null : key)
                       }
@@ -146,15 +146,17 @@ export default function Recipes() {
                         {s.name}
                       </span>
                       {/* Link to recipe detail page if id exists */}
-                      {s.id && (
-                        <Link
-                          to={`/recipes/${s.id}`}
-                          onClick={(e) => e.stopPropagation()}
-                          className="text-sm underline text-[var(--highlight)]"
+                        {s.id && (
+                        <button
+                          onClick={(e) => {
+                          e.stopPropagation();
+                          window.location.href = `/recipes/${s.id}`;
+                          }}
+                          className="button-search"
                         >
                           Open
-                        </Link>
-                      )}
+                        </button>
+                        )}
                     </div>
                     {/* Expanded saved recipe details */}
                     {expandedKey && (
