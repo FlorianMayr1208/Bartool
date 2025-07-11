@@ -8,6 +8,11 @@
   --success:      #27C192;
   --danger:       #FF5160;
   --highlight:    #725AF0;
+  --brand-radius: 6px;
+  --brand-shadow: 0 4px 12px rgba(0,0,0,.40);
+  --space-4: 16px;
+  --font-display: "Playfair Display", serif;
+  --font-sans: "Inter", "Helvetica Neue", sans-serif;
 }
 
 @tailwind base;
@@ -17,4 +22,16 @@
 body {
   background-color: var(--bg-primary);
   color: var(--text-primary);
+  font-family: var(--font-sans);
+}
+
+.font-display {
+  font-family: var(--font-display);
+}
+
+.card {
+  background: var(--bg-elevated);
+  border-radius: var(--brand-radius);
+  box-shadow: var(--brand-shadow);
+  padding: var(--space-4);
 }
