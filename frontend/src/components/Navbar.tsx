@@ -2,13 +2,16 @@ import { NavLink } from 'react-router-dom';
 
 export default function Navbar() {
   const linkClass = ({ isActive }: { isActive: boolean }) =>
-    isActive
-      ? 'text-[var(--accent)] font-semibold'
-      : 'text-[var(--text-muted)] hover:text-[var(--text-primary)]';
+    [
+      'px-3 py-2 rounded-brand font-medium transition-colors',
+      isActive
+        ? 'bg-[var(--accent)] text-black'
+        : 'text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-primary)]',
+    ].join(' ');
 
   return (
     <header className="bg-[var(--bg-elevated)] border-b border-[var(--border)] text-[var(--text-primary)]">
-      <nav className="container mx-auto flex items-center space-x-4 p-4">
+      <nav className="container mx-auto flex flex-wrap items-center gap-4 p-4">
         <NavLink to="/" className={linkClass} end>
           Dashboard
         </NavLink>
