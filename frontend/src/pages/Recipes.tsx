@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { listRecipes, searchRecipes, createRecipe } from '../api';
 import { Link } from 'react-router-dom';
+import { Search } from 'lucide-react';
 
 interface Recipe {
   id?: number;
@@ -41,71 +42,117 @@ export default function Recipes() {
   return (
     <div className="space-y-4">
       <h1 className="text-2xl font-bold">Recipes</h1>
-      <div className="space-x-2">
+      <div className="flex max-w-md items-center overflow-hidden rounded border">
         <input
           value={query}
           onChange={(e) => setQuery(e.target.value)}
           placeholder="Search cocktails"
-          className="border p-1"
+          className="w-full bg-transparent p-2 focus:outline-none"
         />
-        <button onClick={runSearch} className="rounded bg-blue-500 px-2 py-1 text-white">
-          Search
+        <button
+          onClick={runSearch}
+          className="px-3 py-2 hover:bg-[var(--bg-elevated)]"
+          aria-label="Search"
+        >
+          <Search size={20} />
         </button>
       </div>
       {results.length > 0 && (
-        <div>
-          <h2 className="font-semibold">Results</h2>
-          <ul className="list-disc pl-5">
-            {results.map((r) => (
-              <li key={r.name} className="my-1 space-y-1">
-                <div className="flex items-center space-x-2">
-                  <button
-                    type="button"
-                    onClick={() =>
-                      setExpanded(expanded === r.name ? null : r.name)
-                    }
-                    className="font-semibold underline"
-                  >
-                    {r.name}
-                  </button>
-                  <button
-                    onClick={() => save(r.name)}
-                    className="rounded bg-green-500 px-1 text-white"
-                  >
-                    Add
-                  </button>
-                </div>
-                {expanded === r.name && (
-                  <div className="space-y-1">
-                    {r.thumb && (
-                      <img src={r.thumb} alt={r.name} className="w-32" />
+        <div className="space-y-2">
+          <h2 className="font-semibold">
+            Results ({results.length})
+          </h2>
+          <div className="card p-0">
+            <ul className="divide-y divide-[var(--border)]">
+              {results.map((r) => {
+                const key = `search-${r.name}`;
+                const expandedKey = expanded === key;
+                return (
+                  <li key={key}>
+                    <div
+                      className="flex items-center gap-2 p-2 cursor-pointer"
+                      onClick={() =>
+                        setExpanded(expandedKey ? null : key)
+                      }
+                    >
+                      {r.thumb && (
+                        <img
+                          src={r.thumb}
+                          alt={r.name}
+                          className="h-8 w-8 rounded object-cover"
+                        />
+                      )}
+                      <span className="flex-1 truncate font-semibold">
+                        {r.name}
+                      </span>
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          save(r.name);
+                        }}
+                        className="rounded bg-green-500 px-2 py-1 text-sm text-black"
+                      >
+                        Add
+                      </button>
+                    </div>
+                    {expandedKey && (
+                      <div className="space-y-1 p-2 text-sm text-[var(--text-muted)]">
+                        {r.instructions && <p>{r.instructions}</p>}
+                      </div>
                     )}
-                    {r.instructions && (
-                      <p className="text-sm text-gray-700">{r.instructions}</p>
-                    )}
-                  </div>
-                )}
-              </li>
-            ))}
-          </ul>
+                  </li>
+                );
+              })}
+            </ul>
+          </div>
         </div>
       )}
       {saved.length > 0 && (
-        <div>
+        <div className="space-y-2">
           <h2 className="font-semibold">Saved Recipes</h2>
-          <ul className="list-disc pl-5">
-            {saved.map((s) => (
-              <li key={s.id || s.name}>
-                {s.id ? (
-                  <Link to={`/recipes/${s.id}`} className="text-blue-600 underline">
-                    {s.name}
-                  </Link>
-                ) : (
-                  s.name
-                )}
-              </li>
-            ))}
-          </ul>
+          <div className="card p-0">
+            <ul className="divide-y divide-[var(--border)]">
+              {saved.map((s) => {
+                const key = `saved-${s.id || s.name}`;
+                const expandedKey = expanded === key;
+                return (
+                  <li key={key}>
+                    <div
+                      className="flex items-center gap-2 p-2 cursor-pointer"
+                      onClick={() =>
+                        setExpanded(expandedKey ? null : key)
+                      }
+                    >
+                      {s.thumb && (
+                        <img
+                          src={s.thumb}
+                          alt={s.name}
+                          className="h-8 w-8 rounded object-cover"
+                        />
+                      )}
+                      <span className="flex-1 truncate font-semibold">
+                        {s.name}
+                      </span>
+                      {s.id && (
+                        <Link
+                          to={`/recipes/${s.id}`}
+                          onClick={(e) => e.stopPropagation()}
+                          className="text-sm underline text-[var(--highlight)]"
+                        >
+                          Open
+                        </Link>
+                      )}
+                    </div>
+                    {expandedKey && (
+                      <div className="space-y-1 p-2 text-sm text-[var(--text-muted)]">
+                        {s.instructions && <p>{s.instructions}</p>}
+                      </div>
+                    )}
+                  </li>
+                );
+              })}
+            </ul>
+          </div>
         </div>
       )}
     </div>
