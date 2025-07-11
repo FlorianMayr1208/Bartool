@@ -79,7 +79,7 @@ export default function Recipes() {
                         <img
                           src={r.thumb}
                           alt={r.name}
-                          className="h-8 w-8 rounded object-cover"
+                          className="h-6 w-6 rounded object-cover"
                         />
                       )}
                       <span className="flex-1 truncate font-semibold">
@@ -97,6 +97,7 @@ export default function Recipes() {
                     </div>
                     {expandedKey && (
                       <div className="space-y-1 p-2 text-sm text-[var(--text-muted)]">
+                        {r.alcoholic && <p>{r.alcoholic}</p>}
                         {r.instructions && <p>{r.instructions}</p>}
                       </div>
                     )}
@@ -127,7 +128,7 @@ export default function Recipes() {
                         <img
                           src={s.thumb}
                           alt={s.name}
-                          className="h-8 w-8 rounded object-cover"
+                          className="h-6 w-6 rounded object-cover"
                         />
                       )}
                       <span className="flex-1 truncate font-semibold">
@@ -145,6 +146,7 @@ export default function Recipes() {
                     </div>
                     {expandedKey && (
                       <div className="space-y-1 p-2 text-sm text-[var(--text-muted)]">
+                        {s.alcoholic && <p>{s.alcoholic}</p>}
                         {s.instructions && <p>{s.instructions}</p>}
                       </div>
                     )}
