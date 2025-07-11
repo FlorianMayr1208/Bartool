@@ -55,8 +55,16 @@ paths:
         - in: path
           name: id
           required: true
-          schema:
-            type: integer
+      schema:
+        type: integer
+  /synonyms:
+    get:
+      summary: List synonyms
+    post:
+      summary: Create synonym
+  /synonyms/{alias}:
+    delete:
+      summary: Delete synonym
     patch:
       summary: Update inventory item
       parameters:

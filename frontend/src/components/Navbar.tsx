@@ -22,6 +22,9 @@ export default function Navbar() {
         <NavLink to="/stats" className={linkClass}>
           Stats
         </NavLink>
+        <NavLink to="/synonyms" className={linkClass}>
+          Synonyms
+        </NavLink>
       </nav>
     </header>
   );

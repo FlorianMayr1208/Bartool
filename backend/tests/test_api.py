@@ -225,3 +225,26 @@ async def test_ingredient_deduplication(monkeypatch, async_client):
     names = [i["name"] for i in ingredients]
     assert "Dark Rum" not in names
     assert "Rum" in names
+
+
+@pytest.mark.asyncio
+async def test_synonym_crud(async_client):
+    resp = await async_client.get("/synonyms/")
+    assert resp.status_code == 200
+    initial = len(resp.json())
+
+    resp = await async_client.post(
+        "/synonyms/",
+        json={"alias": "whisky", "canonical": "Whiskey"},
+    )
+    assert resp.status_code == 201
+    assert resp.json()["canonical"] == "Whiskey"
+
+    resp = await async_client.get("/synonyms/")
+    assert len(resp.json()) == initial + 1
+
+    resp = await async_client.delete("/synonyms/whisky")
+    assert resp.status_code == 204
+
+    resp = await async_client.get("/synonyms/")
+    assert len(resp.json()) == initial
