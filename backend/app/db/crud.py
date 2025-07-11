@@ -148,3 +148,43 @@ def delete_inventory_item(db: Session, item_id: int) -> bool:
     db.delete(item)
     db.commit()
     return True
+
+
+def recipe_missing_count(db: Session, recipe: models.Recipe) -> int:
+    """Return how many ingredients of the recipe are missing in the inventory."""
+    missing = 0
+    for r_ing in recipe.ingredients:
+        canonical = synonyms.canonical_name(r_ing.name)
+        ing = get_ingredient_by_name(db, canonical)
+        if not ing:
+            missing += 1
+            continue
+        item = get_inventory_by_ingredient(db, ing.id)
+        if not item or item.quantity <= 0:
+            missing += 1
+    return missing
+
+
+def search_local_recipes(
+    db: Session,
+    query: str | None = None,
+    available_only: bool = False,
+    order_missing: bool = False,
+    skip: int = 0,
+    limit: int = 100,
+):
+    """Search recipes stored in the DB with optional inventory filters."""
+    q = db.query(models.Recipe)
+    if query:
+        q = q.filter(models.Recipe.name.ilike(f"%{query}%"))
+    q = q.offset(skip).limit(limit)
+    recipes = q.all()
+    results: list[tuple[models.Recipe, int]] = []
+    for recipe in recipes:
+        missing = recipe_missing_count(db, recipe)
+        if available_only and missing > 0:
+            continue
+        results.append((recipe, missing))
+    if order_missing:
+        results.sort(key=lambda t: t[1])
+    return [r for r, _ in results]

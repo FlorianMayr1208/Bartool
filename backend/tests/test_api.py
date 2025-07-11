@@ -76,6 +76,11 @@ async def test_create_recipe(monkeypatch, async_client):
         }
 
     monkeypatch.setattr("backend.app.services.cocktaildb.fetch_recipe_details", fake_fetch)
+    monkeypatch.setattr("backend.app.api.recipes.fetch_recipe_details", fake_fetch)
+    monkeypatch.setattr("backend.app.api.recipes.fetch_recipe_details", fake_fetch)
+    monkeypatch.setattr("backend.app.api.recipes.fetch_recipe_details", fake_fetch)
+    monkeypatch.setattr("backend.app.api.recipes.fetch_recipe_details", fake_fetch)
+    monkeypatch.setattr("backend.app.api.recipes.fetch_recipe_details", fake_fetch)
     resp = await async_client.post("/recipes/", json={"name": "mojito"})
     assert resp.status_code == 201
     assert resp.json()["name"] == "Mojito"
@@ -248,3 +253,59 @@ async def test_synonym_crud(async_client):
 
     resp = await async_client.get("/synonyms/")
     assert len(resp.json()) == initial
+
+
+@pytest.mark.asyncio
+async def test_recipe_find_inventory(monkeypatch, async_client):
+    from backend.app.db import crud, schemas
+    async def fake_fetch(name: str):
+        if name == "vodka only":
+            return {
+                "name": "Vodka Only",
+                "alcoholic": "Alcoholic",
+                "instructions": "Mix",
+                "thumb": "http://example.com/vodka.jpg",
+                "tags": [],
+                "categories": [],
+                "ibas": [],
+                "ingredients": [{"name": "Vodka", "measure": "2 oz"}],
+            }
+        return {
+            "name": "Vodka Gin",
+            "alcoholic": "Alcoholic",
+            "instructions": "Mix",
+            "thumb": "http://example.com/vg.jpg",
+            "tags": [],
+            "categories": [],
+            "ibas": [],
+            "ingredients": [
+                {"name": "Vodka", "measure": "2 oz"},
+                {"name": "Gin", "measure": "1 oz"},
+            ],
+        }
+
+    monkeypatch.setattr("backend.app.api.recipes.fetch_recipe_details", fake_fetch)
+    monkeypatch.setattr("backend.app.services.cocktaildb.fetch_recipe_details", fake_fetch)
+
+    # ensure vodka inventory with quantity > 0
+    db = next(override_get_db())
+    ing = crud.get_or_create_ingredient(db, schemas.IngredientCreate(name="Vodka"))
+    if not crud.get_inventory_by_ingredient(db, ing.id):
+        crud.create_inventory_item(db, schemas.InventoryItemCreate(ingredient_id=ing.id, quantity=1))
+    else:
+        crud.update_inventory_item(db, crud.get_inventory_by_ingredient(db, ing.id).id, schemas.InventoryItemUpdate(quantity=1))
+    db.close()
+
+    await async_client.post("/recipes/", json={"name": "vodka only"})
+    await async_client.post("/recipes/", json={"name": "vodka gin"})
+
+    resp = await async_client.get("/recipes/find", params={"available_only": True, "q": "vodka"})
+    assert resp.status_code == 200
+    names = [r["name"] for r in resp.json()]
+    assert "Vodka Only" in names
+    assert "Vodka Gin" not in names
+
+    resp = await async_client.get("/recipes/find", params={"order_missing": True, "q": "vodka"})
+    assert resp.status_code == 200
+    names = [r["name"] for r in resp.json()]
+    assert names[0] == "Vodka Only"
