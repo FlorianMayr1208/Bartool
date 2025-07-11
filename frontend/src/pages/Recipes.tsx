@@ -14,6 +14,7 @@ export default function Recipes() {
   const [query, setQuery] = useState('');
   const [results, setResults] = useState<Recipe[]>([]);
   const [saved, setSaved] = useState<Recipe[]>([]);
+  const [expanded, setExpanded] = useState<string | null>(null);
 
   const refresh = () => {
     listRecipes().then(setSaved);
@@ -26,12 +27,15 @@ export default function Recipes() {
   const runSearch = async () => {
     if (!query) return;
     const res = await searchRecipes(query);
-    setResults(res);
+    // Filter out recipes that are already saved
+    setResults(res.filter((r: Recipe) => !saved.some((s) => s.name === r.name)));
   };
 
   const save = async (name: string) => {
     await createRecipe({ name });
     refresh();
+    // Remove the recipe from search results after adding
+    setResults((prev) => prev.filter((r) => r.name !== name));
   };
 
   return (
@@ -55,7 +59,15 @@ export default function Recipes() {
             {results.map((r) => (
               <li key={r.name} className="my-1 space-y-1">
                 <div className="flex items-center space-x-2">
-                  <span className="font-semibold">{r.name}</span>
+                  <button
+                    type="button"
+                    onClick={() =>
+                      setExpanded(expanded === r.name ? null : r.name)
+                    }
+                    className="font-semibold underline"
+                  >
+                    {r.name}
+                  </button>
                   <button
                     onClick={() => save(r.name)}
                     className="rounded bg-green-500 px-1 text-white"
@@ -63,11 +75,15 @@ export default function Recipes() {
                     Add
                   </button>
                 </div>
-                {r.thumb && (
-                  <img src={r.thumb} alt={r.name} className="w-32" />
-                )}
-                {r.instructions && (
-                  <p className="text-sm text-gray-700">{r.instructions}</p>
+                {expanded === r.name && (
+                  <div className="space-y-1">
+                    {r.thumb && (
+                      <img src={r.thumb} alt={r.name} className="w-32" />
+                    )}
+                    {r.instructions && (
+                      <p className="text-sm text-gray-700">{r.instructions}</p>
+                    )}
+                  </div>
                 )}
               </li>
             ))}
