@@ -51,16 +51,16 @@ export default function Recipes() {
       {/* Page title */}
       <h1 className="text-2xl font-bold">Recipes</h1>
       {/* Search bar */}
-      <div className="flex max-w-md items-center overflow-hidden rounded border">
+      <div className="flex max-w-md items-center overflow-hidden rounded border border-[var(--highlight)]">
         <input
           value={query}
           onChange={(e) => setQuery(e.target.value)}
           placeholder="Search cocktails"
-          className="w-full bg-transparent p-2 focus:outline-none text-[var(--text-primary)]"
+          className="w-full bg-transparent p-2 focus:outline-none text-[var(--text-primary)] border-none"
         />
         <button
           onClick={runSearch}
-          className="px-3 py-2 hover:bg-[var(--bg-elevated)]"
+          className="button-send"
           aria-label="Search"
         >
           <Search size={20} />
@@ -146,21 +146,19 @@ export default function Recipes() {
                         {s.name}
                       </span>
                       {/* Link to recipe detail page if id exists */}
-                        {s.id && (
-                        <button
-                          onClick={(e) => {
-                          e.stopPropagation();
-                          window.location.href = `/recipes/${s.id}`;
-                          }}
+                      {s.id && (
+                        <Link
+                          to={`/recipes/${s.id}`}
+                          onClick={(e) => e.stopPropagation()}
                           className="button-search"
                         >
                           Open
-                        </button>
-                        )}
+                        </Link>
+                      )}
                     </div>
                     {/* Expanded saved recipe details */}
                     {expandedKey && (
-                      <div className="space-y-1 p-2 text-sm text-[var(--text-muted)]">
+                      <div className="h-2 w-2 space-y-1 p-2 text-sm text-[var(--text-muted)]">
                         {/* Recipe thumbnail */}
                         {s.thumb && (
                         <img

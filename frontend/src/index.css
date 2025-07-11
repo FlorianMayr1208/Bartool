@@ -45,3 +45,12 @@ body {
   border: none;
   cursor: pointer;
 }
+
+.button-send {
+  background-color: var(--accent);
+  color: var(--high);
+  border-radius: var(--brand-radius);
+  padding: var(--space-2) var(--space-4);
+  border: none;
+  cursor: pointer;
+}
