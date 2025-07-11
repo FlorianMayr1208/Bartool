@@ -25,6 +25,30 @@ paths:
           name: q
           schema:
             type: string
+  /recipes/find:
+    get:
+      summary: Search local recipes
+      parameters:
+        - in: query
+          name: q
+          schema:
+            type: string
+        - in: query
+          name: available_only
+          schema:
+            type: boolean
+        - in: query
+          name: order_missing
+          schema:
+            type: boolean
+        - in: query
+          name: skip
+          schema:
+            type: integer
+        - in: query
+          name: limit
+          schema:
+            type: integer
   /recipes:
     get:
       summary: List recipes

@@ -15,6 +15,26 @@ router = APIRouter()
 async def search_recipes_endpoint(q: str):
     return await search_recipes_details(q)
 
+
+@router.get("/find", response_model=list[schemas.Recipe])
+def find_recipes(
+    q: str | None = None,
+    available_only: bool = False,
+    order_missing: bool = False,
+    skip: int = 0,
+    limit: int = 100,
+    db: Session = Depends(session.get_db),
+):
+    """Search recipes stored locally with optional inventory filters."""
+    return crud.search_local_recipes(
+        db,
+        query=q,
+        available_only=available_only,
+        order_missing=order_missing,
+        skip=skip,
+        limit=limit,
+    )
+
 @router.get("/", response_model=list[schemas.Recipe])
 def list_recipes(skip: int = 0, limit: int = 100, db: Session = Depends(session.get_db)):
     return crud.list_recipes(db, skip=skip, limit=limit)
