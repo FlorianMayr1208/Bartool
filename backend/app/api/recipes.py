@@ -35,4 +35,6 @@ async def create_recipe(recipe: schemas.RecipeCreate, db: Session = Depends(sess
     details = await fetch_recipe_details(recipe.name)
     if details:
         recipe = schemas.RecipeCreate(**details)
-    return crud.create_recipe(db, recipe)
+    db_recipe = crud.create_recipe(db, recipe)
+    crud.ensure_inventory_for_ingredients(db, recipe.ingredients)
+    return db_recipe

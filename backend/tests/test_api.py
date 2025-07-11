@@ -175,3 +175,53 @@ async def test_inventory_create_delete(async_client):
     item_id = resp.json()["id"]
     resp = await async_client.delete(f"/inventory/{item_id}")
     assert resp.status_code == 204
+
+
+@pytest.mark.asyncio
+async def test_recipe_import_adds_inventory(monkeypatch, async_client):
+    async def fake_fetch(name: str):
+        return {
+            "name": "Mule",
+            "alcoholic": "Alcoholic",
+            "instructions": "Mix",
+            "thumb": "http://example.com/mule.jpg",
+            "tags": [],
+            "categories": [],
+            "ibas": [],
+            "ingredients": [{"name": "Vodka", "measure": "2 oz"}],
+        }
+
+    monkeypatch.setattr("backend.app.services.cocktaildb.fetch_recipe_details", fake_fetch)
+    resp = await async_client.post("/recipes/", json={"name": "mule"})
+    assert resp.status_code == 201
+    resp = await async_client.get("/inventory/")
+    items = resp.json()
+    vodka_items = [i for i in items if i["ingredient"]["name"] == "Vodka"]
+    assert vodka_items
+
+
+@pytest.mark.asyncio
+async def test_ingredient_deduplication(monkeypatch, async_client):
+    resp = await async_client.post("/ingredients/", json={"name": "Rum"})
+    assert resp.status_code == 201
+
+    async def fake_fetch(name: str):
+        return {
+            "name": "Dark Drink",
+            "alcoholic": "Alcoholic",
+            "instructions": "Mix",
+            "thumb": "http://example.com/dark.jpg",
+            "tags": [],
+            "categories": [],
+            "ibas": [],
+            "ingredients": [{"name": "Dark Rum", "measure": "1 oz"}],
+        }
+
+    monkeypatch.setattr("backend.app.services.cocktaildb.fetch_recipe_details", fake_fetch)
+    resp = await async_client.post("/recipes/", json={"name": "dark drink"})
+    assert resp.status_code == 201
+    resp = await async_client.get("/ingredients/")
+    ingredients = resp.json()
+    names = [i["name"] for i in ingredients]
+    assert "Dark Rum" not in names
+    assert "Rum" in names
