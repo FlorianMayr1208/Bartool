@@ -11,7 +11,7 @@ export default function BarcodeScanner({ onDetected }: { onDetected: (code: stri
         inputStream: { type: 'LiveStream', target: ref.current },
         decoder: { readers: ['ean_reader'] }
       },
-      (err) => {
+      (err: unknown) => {
         if (err) {
           console.error(err)
           return
@@ -19,7 +19,7 @@ export default function BarcodeScanner({ onDetected }: { onDetected: (code: stri
         Quagga.start()
       }
     )
-    Quagga.onDetected((res) => {
+    Quagga.onDetected((res: any) => {
       onDetected(res.codeResult.code)
       Quagga.stop()
     })

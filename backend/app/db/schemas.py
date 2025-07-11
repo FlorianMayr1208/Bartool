@@ -94,3 +94,8 @@ class InventoryItem(InventoryItemBase):
 
 class InventoryItemWithIngredient(InventoryItem):
     ingredient: Ingredient
+
+
+class Synonym(BaseModel):
+    alias: str
+    canonical: str

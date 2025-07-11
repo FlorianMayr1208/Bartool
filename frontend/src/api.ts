@@ -76,3 +76,23 @@ export async function createRecipe(data: { name: string }) {
   });
   return res.json();
 }
+
+export async function listSynonyms() {
+  const res = await fetch(`${API_BASE}/synonyms/`);
+  return res.json();
+}
+
+export async function addSynonym(alias: string, canonical: string) {
+  const res = await fetch(`${API_BASE}/synonyms/`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ alias, canonical }),
+  });
+  return res.json();
+}
+
+export async function deleteSynonym(alias: string) {
+  await fetch(`${API_BASE}/synonyms/${encodeURIComponent(alias)}`, {
+    method: 'DELETE',
+  });
+}

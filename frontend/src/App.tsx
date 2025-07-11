@@ -6,6 +6,7 @@ import Recipes from './pages/Recipes';
 import RecipeDetail from './pages/RecipeDetail';
 import ShoppingList from './pages/ShoppingList';
 import Stats from './pages/Stats';
+import Synonyms from './pages/Synonyms';
 import { healthCheck } from './api';
 import Navbar from './components/Navbar';
 import './App.css';
@@ -32,6 +33,7 @@ export default function App() {
           <Route path="/recipes/:id" element={<RecipeDetail />} />
           <Route path="/shopping-list" element={<ShoppingList />} />
           <Route path="/stats" element={<Stats />} />
+          <Route path="/synonyms" element={<Synonyms />} />
         </Routes>
       </main>
     </Router>
