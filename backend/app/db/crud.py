@@ -1,4 +1,7 @@
 from sqlalchemy.orm import Session
+from sqlalchemy import func
+
+from ..services import synonyms
 
 from . import models, schemas
 
@@ -9,7 +12,15 @@ def get_ingredient(db: Session, ingredient_id: int):
 
 
 def create_ingredient(db: Session, ingredient: schemas.IngredientCreate):
-    db_obj = models.Ingredient(**ingredient.model_dump())
+    canonical = synonyms.canonical_name(ingredient.name)
+    existing = db.query(models.Ingredient).filter(
+        func.lower(models.Ingredient.name) == canonical
+    ).first()
+    if existing:
+        return existing
+    data = ingredient.model_dump()
+    data["name"] = canonical
+    db_obj = models.Ingredient(**data)
     db.add(db_obj)
     db.commit()
     db.refresh(db_obj)
@@ -18,6 +29,20 @@ def create_ingredient(db: Session, ingredient: schemas.IngredientCreate):
 
 def list_ingredients(db: Session, skip: int = 0, limit: int = 100):
     return db.query(models.Ingredient).offset(skip).limit(limit).all()
+
+
+def get_ingredient_by_name(db: Session, name: str):
+    canonical = synonyms.canonical_name(name)
+    return db.query(models.Ingredient).filter(
+        func.lower(models.Ingredient.name) == canonical
+    ).first()
+
+
+def get_or_create_ingredient(db: Session, ingredient: schemas.IngredientCreate):
+    existing = get_ingredient_by_name(db, ingredient.name)
+    if existing:
+        return existing
+    return create_ingredient(db, ingredient)
 
 
 # Recipe CRUD
@@ -49,12 +74,37 @@ def get_inventory_item(db: Session, item_id: int):
     return db.query(models.InventoryItem).filter(models.InventoryItem.id == item_id).first()
 
 
+def get_inventory_by_ingredient(db: Session, ingredient_id: int):
+    return (
+        db.query(models.InventoryItem)
+        .filter(models.InventoryItem.ingredient_id == ingredient_id)
+        .first()
+    )
+
+
 def create_inventory_item(db: Session, item: schemas.InventoryItemCreate):
     db_obj = models.InventoryItem(**item.model_dump())
     db.add(db_obj)
     db.commit()
     db.refresh(db_obj)
     return db_obj
+
+
+def ensure_inventory_for_ingredients(
+    db: Session, ingredients: list[schemas.RecipeIngredientCreate]
+) -> None:
+    """Add missing ingredients to inventory with quantity 0."""
+    for ing in ingredients:
+        db_ing = get_or_create_ingredient(db, schemas.IngredientCreate(name=ing.name))
+        if not get_inventory_by_ingredient(db, db_ing.id):
+            db.add(
+                models.InventoryItem(
+                    ingredient_id=db_ing.id,
+                    quantity=0,
+                    status="available",
+                )
+            )
+    db.commit()
 
 
 def update_inventory_item(db: Session, item_id: int, item_update: schemas.InventoryItemUpdate):
