@@ -120,4 +120,15 @@
 - Tests direkt auf Pi machen (Leistung, Speicher, Netzwerk)
 - Für Kamera/Barcode: Test mit Smartphone-Webcam im Browser, erst dann native Pi-Cam
 
+## 8. Suchlogik
 
+### Funktionen
+
+- Suche bei Name
+- Suche bei Basisalkohol
+- Vorschläge mit Inventar
+
+### Vorschläge mit Inventar
+
+- Alkohole müssen mehr Gewichtung haben, da sie teurer und schwieriger zu ersetzen sind
+- Kategorie für nicht alkohole?
