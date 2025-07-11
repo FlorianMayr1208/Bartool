@@ -20,8 +20,8 @@ A concise but complete set of tokens, scales, and component rules for building t
 
 ```css
 /* Core surfaces */
---bg-primary:       #0E0E0F;
---bg-elevated:      #1A1B1D;
+--bg-primary:       #1A1B1D;
+--bg-elevated:      #242526;
 --border:           #2C2D30;
 
 /* Text */
@@ -168,8 +168,8 @@ module.exports = {
   theme: {
     extend: {
       colors: {
-        'bg-primary':  '#0E0E0F',
-        'bg-elevated': '#1A1B1D',
+        'bg-primary':  '#1A1B1D',
+        'bg-elevated': '#242526',
         border:        '#2C2D30',
         accent:        '#FFB248',
         success:       '#27C192',
