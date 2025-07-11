@@ -1,16 +1,95 @@
-from sqlalchemy import Column, Integer, String, ForeignKey
+from __future__ import annotations
+
+from sqlalchemy import Column, Integer, String, ForeignKey, Float, Table
 from sqlalchemy.orm import declarative_base, relationship
 
 Base = declarative_base()
+
+# Association tables for many-to-many relations
+recipe_tag = Table(
+    "recipe_tag",
+    Base.metadata,
+    Column("recipe_id", ForeignKey("recipes.id"), primary_key=True),
+    Column("tag_id", ForeignKey("tags.id"), primary_key=True),
+)
+
+recipe_category = Table(
+    "recipe_category",
+    Base.metadata,
+    Column("recipe_id", ForeignKey("recipes.id"), primary_key=True),
+    Column("category_id", ForeignKey("categories.id"), primary_key=True),
+)
+
+recipe_iba = Table(
+    "recipe_iba",
+    Base.metadata,
+    Column("recipe_id", ForeignKey("recipes.id"), primary_key=True),
+    Column("iba_id", ForeignKey("ibas.id"), primary_key=True),
+)
+
+
+class Category(Base):
+    __tablename__ = "categories"
+
+    id = Column(Integer, primary_key=True, index=True)
+    name = Column(String, unique=True, nullable=False)
+
+    recipes = relationship(
+        "Recipe",
+        secondary=recipe_category,
+        back_populates="categories",
+    )
+
+
+class Unit(Base):
+    __tablename__ = "units"
+
+    id = Column(Integer, primary_key=True, index=True)
+    name = Column(String, unique=True, nullable=False)
+    symbol = Column(String, unique=True, nullable=False)
+
 
 class Ingredient(Base):
     __tablename__ = "ingredients"
 
     id = Column(Integer, primary_key=True, index=True)
-    name = Column(String, nullable=False)
+    name = Column(String, unique=True, nullable=False)
     type = Column(String, nullable=True)
     barcode = Column(String, nullable=True)
     notes = Column(String, nullable=True)
+    category_id = Column(Integer, ForeignKey("categories.id"), nullable=True)
+    default_unit_id = Column(Integer, ForeignKey("units.id"), nullable=True)
+
+    category = relationship("Category")
+    unit = relationship("Unit")
+    synonyms = relationship(
+        "IngredientSynonym",
+        back_populates="ingredient",
+        cascade="all, delete-orphan",
+    )
+
+
+class IngredientSynonym(Base):
+    __tablename__ = "ingredient_synonyms"
+
+    id = Column(Integer, primary_key=True, index=True)
+    ingredient_id = Column(Integer, ForeignKey("ingredients.id"), nullable=False)
+    name = Column(String, unique=True, nullable=False)
+
+    ingredient = relationship("Ingredient", back_populates="synonyms")
+
+
+class Tag(Base):
+    __tablename__ = "tags"
+
+    id = Column(Integer, primary_key=True, index=True)
+    name = Column(String, unique=True, nullable=False)
+
+    recipes = relationship(
+        "Recipe",
+        secondary=recipe_tag,
+        back_populates="tags",
+    )
 
 
 class Recipe(Base):
@@ -22,40 +101,39 @@ class Recipe(Base):
     instructions = Column(String, nullable=True)
     thumb = Column(String, nullable=True)
 
-    tags = relationship("Tag", back_populates="recipe", cascade="all, delete-orphan")
-    categories = relationship("Category", back_populates="recipe", cascade="all, delete-orphan")
-    ibas = relationship("Iba", back_populates="recipe", cascade="all, delete-orphan")
-    ingredients = relationship("RecipeIngredient", back_populates="recipe", cascade="all, delete-orphan")
-
-
-class Tag(Base):
-    __tablename__ = "tags"
-
-    id = Column(Integer, primary_key=True, index=True)
-    name = Column(String, nullable=False)
-    recipe_id = Column(Integer, ForeignKey("recipes.id"), nullable=False)
-
-    recipe = relationship("Recipe", back_populates="tags")
-
-
-class Category(Base):
-    __tablename__ = "categories"
-
-    id = Column(Integer, primary_key=True, index=True)
-    name = Column(String, nullable=False)
-    recipe_id = Column(Integer, ForeignKey("recipes.id"), nullable=False)
-
-    recipe = relationship("Recipe", back_populates="categories")
+    tags = relationship(
+        "Tag",
+        secondary=recipe_tag,
+        back_populates="recipes",
+    )
+    categories = relationship(
+        "Category",
+        secondary=recipe_category,
+        back_populates="recipes",
+    )
+    ibas = relationship(
+        "Iba",
+        secondary=recipe_iba,
+        back_populates="recipes",
+    )
+    ingredients = relationship(
+        "RecipeIngredient",
+        back_populates="recipe",
+        cascade="all, delete-orphan",
+    )
 
 
 class Iba(Base):
     __tablename__ = "ibas"
 
     id = Column(Integer, primary_key=True, index=True)
-    name = Column(String, nullable=False)
-    recipe_id = Column(Integer, ForeignKey("recipes.id"), nullable=False)
+    name = Column(String, unique=True, nullable=False)
 
-    recipe = relationship("Recipe", back_populates="ibas")
+    recipes = relationship(
+        "Recipe",
+        secondary=recipe_iba,
+        back_populates="ibas",
+    )
 
 
 class RecipeIngredient(Base):
