@@ -48,6 +48,12 @@ class Unit(Base):
     name = Column(String, unique=True, nullable=False)
     symbol = Column(String, unique=True, nullable=False)
 
+    synonyms = relationship(
+        "UnitSynonym",
+        back_populates="unit",
+        cascade="all, delete-orphan",
+    )
+
 
 class Ingredient(Base):
     __tablename__ = "ingredients"
@@ -77,6 +83,16 @@ class IngredientSynonym(Base):
     name = Column(String, unique=True, nullable=False)
 
     ingredient = relationship("Ingredient", back_populates="synonyms")
+
+
+class UnitSynonym(Base):
+    __tablename__ = "unit_synonyms"
+
+    id = Column(Integer, primary_key=True, index=True)
+    unit_id = Column(Integer, ForeignKey("units.id"), nullable=False)
+    name = Column(String, unique=True, nullable=False)
+
+    unit = relationship("Unit", back_populates="synonyms")
 
 
 class Tag(Base):

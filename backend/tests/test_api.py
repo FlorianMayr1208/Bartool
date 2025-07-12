@@ -206,6 +206,11 @@ async def test_recipe_import_adds_inventory(monkeypatch, async_client):
     items = resp.json()
     vodka_items = [i for i in items if i["ingredient"]["name"] == "Vodka"]
     assert vodka_items
+    db = next(override_get_db())
+    units = db.query(models.Unit).all()
+    db.close()
+    names = [u.name for u in units]
+    assert "oz" in names
 
 
 @pytest.mark.asyncio
@@ -256,6 +261,28 @@ async def test_synonym_crud(async_client):
 
     resp = await async_client.get("/synonyms/")
     assert len(resp.json()) == initial
+
+
+@pytest.mark.asyncio
+async def test_unit_synonym_handled(monkeypatch, async_client):
+    async def fake_fetch(name: str):
+        return {
+            "name": "Test Drink",
+            "alcoholic": "Alcoholic",
+            "instructions": "Mix",
+            "thumb": "http://example.com/test.jpg",
+            "tags": [],
+            "categories": [],
+            "ibas": [],
+            "ingredients": [{"name": "Vodka", "measure": "2 ounces"}],
+        }
+
+    monkeypatch.setattr("backend.app.services.cocktaildb.fetch_recipe_details", fake_fetch)
+    await async_client.post("/recipes/", json={"name": "test drink"})
+    db = next(override_get_db())
+    units = [u.name for u in db.query(models.Unit).all()]
+    db.close()
+    assert "oz" in units
 
 
 @pytest.mark.asyncio
