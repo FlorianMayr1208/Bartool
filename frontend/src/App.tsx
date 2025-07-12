@@ -1,22 +1,23 @@
-import { useEffect, useState } from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import Dashboard from './pages/Dashboard';
-import Inventory from './pages/Inventory';
-import Recipes from './pages/Recipes';
-import RecipeDetail from './pages/RecipeDetail';
-import ShoppingList from './pages/ShoppingList';
-import Stats from './pages/Stats';
-import Synonyms from './pages/Synonyms';
-import { healthCheck } from './api';
-import Navbar from './components/Navbar';
-import './App.css';
+import { useEffect, useState } from "react";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import Dashboard from "./pages/Dashboard";
+import Inventory from "./pages/Inventory";
+import Recipes from "./pages/Recipes";
+import FindRecipes from "./pages/FindRecipes";
+import RecipeDetail from "./pages/RecipeDetail";
+import ShoppingList from "./pages/ShoppingList";
+import Stats from "./pages/Stats";
+import Synonyms from "./pages/Synonyms";
+import { healthCheck } from "./api";
+import Navbar from "./components/Navbar";
+import "./App.css";
 
 export default function App() {
   const [health, setHealth] = useState<string | null>(null);
   useEffect(() => {
     healthCheck()
       .then((res) => setHealth(res.status))
-      .catch(() => setHealth('error'));
+      .catch(() => setHealth("error"));
   }, []);
 
   return (
@@ -30,6 +31,7 @@ export default function App() {
           <Route path="/" element={<Dashboard />} />
           <Route path="/inventory" element={<Inventory />} />
           <Route path="/recipes" element={<Recipes />} />
+          <Route path="/recipes/find" element={<FindRecipes />} />
           <Route path="/recipes/:id" element={<RecipeDetail />} />
           <Route path="/shopping-list" element={<ShoppingList />} />
           <Route path="/stats" element={<Stats />} />
