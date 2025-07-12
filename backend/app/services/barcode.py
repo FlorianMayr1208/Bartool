@@ -17,6 +17,11 @@ async def fetch_barcode(ean: str) -> Optional[Dict]:
         data = resp.json()
         if data.get("status") != 1:
             return None
-        result = {"name": data.get("product", {}).get("product_name")}
+        product = data.get("product", {})
+        result = {
+            "name": product.get("product_name"),
+            "brand": product.get("brands"),
+            "image_url": product.get("image_front_url"),
+        }
         _cache[ean] = result
         return result

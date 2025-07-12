@@ -97,3 +97,12 @@ paths:
           required: true
           schema:
             type: integer
+  /barcode/{ean}:
+    get:
+      summary: Lookup product information from Open Food Facts
+      parameters:
+        - in: path
+          name: ean
+          required: true
+          schema:
+            type: string

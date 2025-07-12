@@ -50,7 +50,13 @@ export async function deleteInventory(id: number) {
   await fetch(`${API_BASE}/inventory/${id}`, { method: "DELETE" });
 }
 
-export async function lookupBarcode(ean: string) {
+export interface BarcodeResult {
+  name: string | null
+  brand?: string | null
+  image_url?: string | null
+}
+
+export async function lookupBarcode(ean: string): Promise<BarcodeResult | null> {
   const res = await fetch(`${API_BASE}/barcode/${ean}`);
   if (!res.ok) return null;
   return res.json();
