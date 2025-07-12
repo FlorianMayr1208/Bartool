@@ -26,6 +26,8 @@ export default function Inventory() {
   const [items, setItems] = useState<InventoryItem[]>([])
   const [scanning, setScanning] = useState(false)
   const [name, setName] = useState('')
+  const [brand, setBrand] = useState('')
+  const [image, setImage] = useState('')
   const [quantity, setQuantity] = useState(1)
 
   const refresh = () => {
@@ -41,6 +43,8 @@ export default function Inventory() {
     const res = await lookupBarcode(code)
     if (res?.name) {
       setName(res.name)
+      setBrand(res.brand || '')
+      setImage(res.image_url || '')
     }
   }
 
@@ -49,6 +53,8 @@ export default function Inventory() {
     const ing = await createIngredient({ name })
     await createInventory({ ingredient_id: ing.id, quantity })
     setName('')
+    setBrand('')
+    setImage('')
     setQuantity(1)
     refresh()
   }
@@ -85,6 +91,10 @@ export default function Inventory() {
           onChange={(e) => setName(e.target.value)}
           className="border p-1"
         />
+        {brand && <span className="text-sm text-gray-500">{brand}</span>}
+        {image && (
+          <img src={image} alt="product" className="inline-block h-8" />
+        )}
         <input
           type="number"
           value={quantity}
