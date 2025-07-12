@@ -1,7 +1,17 @@
 from sqlalchemy.orm import Session
 from sqlalchemy import func
 
-from ..services import synonyms
+from ..services import synonyms, unit_synonyms
+import re
+
+
+def _extract_unit(measure: str | None) -> str | None:
+    if not measure:
+        return None
+    parts = measure.strip().split()
+    if len(parts) < 2:
+        return None
+    return " ".join(parts[1:]).strip()
 
 from . import models, schemas
 
@@ -45,6 +55,40 @@ def get_or_create_ingredient(db: Session, ingredient: schemas.IngredientCreate):
     return create_ingredient(db, ingredient)
 
 
+# Unit CRUD
+
+def get_unit_by_name(db: Session, name: str):
+    canonical = unit_synonyms.canonical_name(name)
+    return db.query(models.Unit).filter(
+        func.lower(models.Unit.name) == canonical.lower()
+    ).first()
+
+
+def create_unit(db: Session, unit: schemas.UnitCreate):
+    canonical = unit_synonyms.canonical_name(unit.name)
+    existing = db.query(models.Unit).filter(
+        func.lower(models.Unit.name) == canonical.lower()
+    ).first()
+    if existing:
+        return existing
+    data = unit.model_dump()
+    data["name"] = canonical
+    if not data.get("symbol"):
+        data["symbol"] = canonical
+    db_obj = models.Unit(**data)
+    db.add(db_obj)
+    db.commit()
+    db.refresh(db_obj)
+    return db_obj
+
+
+def get_or_create_unit(db: Session, unit: schemas.UnitCreate):
+    existing = get_unit_by_name(db, unit.name)
+    if existing:
+        return existing
+    return create_unit(db, unit)
+
+
 # Recipe CRUD
 
 def get_recipe(db: Session, recipe_id: int):
@@ -69,6 +113,11 @@ def create_recipe(db: Session, recipe: schemas.RecipeCreate):
     db_obj.categories = [_get_or_create_by_name(db, models.Category, c) for c in recipe.categories]
     db_obj.ibas = [_get_or_create_by_name(db, models.Iba, i) for i in recipe.ibas]
     db_obj.ingredients = [models.RecipeIngredient(name=i.name, measure=i.measure) for i in recipe.ingredients]
+
+    for ing in recipe.ingredients:
+        unit_name = _extract_unit(ing.measure)
+        if unit_name:
+            get_or_create_unit(db, schemas.UnitCreate(name=unit_name))
 
     db.add(db_obj)
     db.commit()

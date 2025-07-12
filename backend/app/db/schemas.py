@@ -1,6 +1,21 @@
 from pydantic import BaseModel
 from typing import Optional, List
 
+class UnitBase(BaseModel):
+    name: str
+    symbol: Optional[str] = None
+
+
+class UnitCreate(UnitBase):
+    pass
+
+
+class Unit(UnitBase):
+    id: int
+
+    class Config:
+        orm_mode = True
+
 class IngredientBase(BaseModel):
     name: str
     type: Optional[str] = None
