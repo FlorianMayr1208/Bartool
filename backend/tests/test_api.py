@@ -301,11 +301,19 @@ async def test_recipe_find_inventory(monkeypatch, async_client):
 
     resp = await async_client.get("/recipes/find", params={"available_only": True, "q": "vodka"})
     assert resp.status_code == 200
-    names = [r["name"] for r in resp.json()]
+    data = resp.json()
+    names = [r["name"] for r in data]
     assert "Vodka Only" in names
     assert "Vodka Gin" not in names
+    vo = next(r for r in data if r["name"] == "Vodka Only")
+    assert vo["available_count"] == 1
+    assert vo["missing_count"] == 0
 
     resp = await async_client.get("/recipes/find", params={"order_missing": True, "q": "vodka"})
     assert resp.status_code == 200
-    names = [r["name"] for r in resp.json()]
+    data = resp.json()
+    names = [r["name"] for r in data]
     assert names[0] == "Vodka Only"
+    vg = next(r for r in data if r["name"] == "Vodka Gin")
+    assert vg["available_count"] == 1
+    assert vg["missing_count"] == 1

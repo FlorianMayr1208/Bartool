@@ -16,7 +16,7 @@ async def search_recipes_endpoint(q: str):
     return await search_recipes_details(q)
 
 
-@router.get("/find", response_model=list[schemas.Recipe])
+@router.get("/find", response_model=list[schemas.RecipeWithInventory])
 def find_recipes(
     q: str | None = None,
     available_only: bool = False,

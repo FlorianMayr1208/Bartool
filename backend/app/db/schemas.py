@@ -73,6 +73,15 @@ class Recipe(RecipeBase):
     class Config:
         orm_mode = True
 
+
+class RecipeWithInventory(Recipe):
+    """Recipe details along with inventory availability info."""
+    available_count: int
+    missing_count: int
+
+    class Config:
+        orm_mode = True
+
 class InventoryItemBase(BaseModel):
     ingredient_id: int
     quantity: int

@@ -179,12 +179,20 @@ def search_local_recipes(
         q = q.filter(models.Recipe.name.ilike(f"%{query}%"))
     q = q.offset(skip).limit(limit)
     recipes = q.all()
-    results: list[tuple[models.Recipe, int]] = []
+    results: list[tuple[models.Recipe, int, int]] = []
     for recipe in recipes:
         missing = recipe_missing_count(db, recipe)
         if available_only and missing > 0:
             continue
-        results.append((recipe, missing))
+        available = len(recipe.ingredients) - missing
+        results.append((recipe, available, missing))
     if order_missing:
-        results.sort(key=lambda t: t[1])
-    return [r for r, _ in results]
+        results.sort(key=lambda t: t[2])
+    return [
+        schemas.RecipeWithInventory(
+            **schemas.Recipe.model_validate(r, from_attributes=True).model_dump(),
+            available_count=a,
+            missing_count=m,
+        )
+        for r, a, m in results
+    ]
