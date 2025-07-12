@@ -9,6 +9,8 @@ interface Recipe {
   alcoholic?: string | null;
   instructions?: string | null;
   thumb?: string | null;
+  available_count?: number;
+  missing_count?: number;
 }
 
 export default function FindRecipes() {
@@ -73,6 +75,11 @@ export default function FindRecipes() {
                     <span className="flex-1 truncate font-semibold">
                       {r.name}
                     </span>
+                    {typeof r.available_count === "number" && typeof r.missing_count === "number" && (
+                      <span className="text-sm text-[var(--text-secondary)]">
+                        {r.available_count} available / {r.missing_count} missing
+                      </span>
+                    )}
                     <Link
                       to={`/recipes/${r.id}`}
                       onClick={(e) => e.stopPropagation()}
