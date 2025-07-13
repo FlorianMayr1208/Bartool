@@ -23,6 +23,7 @@ async def fetch_barcode(ean: str) -> Optional[Dict]:
             "name": product.get("product_name"),
             "brand": product.get("brands"),
             "image_url": product.get("image_front_url"),
+            "keywords": product.get("_keywords", []),
         }
         _cache[ean] = result
         return result
