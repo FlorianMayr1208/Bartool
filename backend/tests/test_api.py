@@ -197,6 +197,25 @@ async def test_inventory_create_delete(async_client):
 
 
 @pytest.mark.asyncio
+async def test_inventory_create_increment(async_client):
+    resp = await async_client.post("/ingredients/", json={"name": "Rum"})
+    ing_id = resp.json()["id"]
+    resp = await async_client.post(
+        "/inventory/", json={"ingredient_id": ing_id, "quantity": 1}
+    )
+    assert resp.status_code == 201
+    resp = await async_client.post(
+        "/inventory/", json={"ingredient_id": ing_id, "quantity": 1}
+    )
+    assert resp.status_code == 201
+    assert resp.json()["quantity"] == 2
+    resp = await async_client.get("/inventory/")
+    items = [i for i in resp.json() if i["ingredient"]["id"] == ing_id]
+    assert len(items) == 1
+    assert items[0]["quantity"] == 2
+
+
+@pytest.mark.asyncio
 async def test_recipe_import_adds_inventory(monkeypatch, async_client):
     async def fake_fetch(name: str):
         return {
