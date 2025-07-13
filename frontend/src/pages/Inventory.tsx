@@ -184,17 +184,13 @@ export default function Inventory() {
         )}
       </section>
 
-      <div className="space-x-2">
+      <div className="space-x-4">
         <input
           placeholder="Name"
           value={name}
           onChange={(e) => setName(e.target.value)}
           className="border p-1"
         />
-        {brand && <span className="text-sm text-gray-500">{brand}</span>}
-        {image && (
-          <img src={image} alt="product" className="inline-block h-8" />
-        )}
         <input
           type="number"
           value={quantity}
