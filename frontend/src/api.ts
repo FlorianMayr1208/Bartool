@@ -1,5 +1,41 @@
 const API_BASE = import.meta.env.VITE_API_BASE || "";
 
+export interface FetchDebug {
+  url: string;
+  status: number;
+  body: unknown;
+}
+
+async function fetchJson<T>(
+  url: string,
+  options?: RequestInit,
+): Promise<{ data: T | null; debug: FetchDebug }> {
+  const res = await fetch(url, options);
+  const body = await res.json().catch(() => null);
+  return {
+    data: res.ok ? (body as T) : null,
+    debug: { url, status: res.status, body },
+  };
+}
+
+export interface Ingredient {
+  id: number;
+  name: string;
+}
+
+export interface Synonym {
+  alias: string;
+  canonical: string;
+}
+
+export interface InventoryItem {
+  id: number;
+  ingredient_id: number;
+  quantity: number;
+  status?: string;
+  ingredient?: Ingredient;
+}
+
 export async function healthCheck() {
   const res = await fetch(`${API_BASE}/healthz`);
   if (!res.ok) {
@@ -9,50 +45,45 @@ export async function healthCheck() {
 }
 
 export async function listInventory() {
-  const res = await fetch(`${API_BASE}/inventory/`);
-  return res.json();
+  return fetchJson<InventoryItem[]>(`${API_BASE}/inventory/`);
 }
 
 export async function createIngredient(data: { name: string }) {
-  const res = await fetch(`${API_BASE}/ingredients/`, {
+  return fetchJson<Ingredient>(`${API_BASE}/ingredients/`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(data),
   });
-  return res.json();
 }
 
 export async function listIngredients() {
-  const res = await fetch(`${API_BASE}/ingredients/`)
-  return res.json()
+  return fetchJson<Ingredient[]>(`${API_BASE}/ingredients/`);
 }
 
 export async function createInventory(data: {
   ingredient_id: number;
   quantity: number;
 }) {
-  const res = await fetch(`${API_BASE}/inventory/`, {
+  return fetchJson<InventoryItem>(`${API_BASE}/inventory/`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(data),
   });
-  return res.json();
 }
 
 export async function updateInventory(
   id: number,
   data: { quantity?: number; status?: string },
 ) {
-  const res = await fetch(`${API_BASE}/inventory/${id}`, {
+  return fetchJson<InventoryItem>(`${API_BASE}/inventory/${id}`, {
     method: "PATCH",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(data),
   });
-  return res.json();
 }
 
 export async function deleteInventory(id: number) {
-  await fetch(`${API_BASE}/inventory/${id}`, { method: "DELETE" });
+  return fetchJson<void>(`${API_BASE}/inventory/${id}`, { method: "DELETE" });
 }
 
 export interface BarcodeResult {
@@ -140,21 +171,19 @@ export async function createRecipe(data: { name: string }) {
 }
 
 export async function listSynonyms() {
-  const res = await fetch(`${API_BASE}/synonyms/`);
-  return res.json();
+  return fetchJson<Synonym[]>(`${API_BASE}/synonyms/`);
 }
 
 export async function addSynonym(alias: string, canonical: string) {
-  const res = await fetch(`${API_BASE}/synonyms/`, {
+  return fetchJson<Synonym>(`${API_BASE}/synonyms/`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ alias, canonical }),
   });
-  return res.json();
 }
 
 export async function deleteSynonym(alias: string) {
-  await fetch(`${API_BASE}/synonyms/${encodeURIComponent(alias)}`, {
+  return fetchJson<void>(`${API_BASE}/synonyms/${encodeURIComponent(alias)}`, {
     method: "DELETE",
   });
 }

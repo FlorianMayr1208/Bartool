@@ -1,18 +1,31 @@
 import { useEffect, useState } from 'react';
-import { listSynonyms, addSynonym, deleteSynonym } from '../api';
+import {
+  listSynonyms,
+  addSynonym,
+  deleteSynonym,
+  type FetchDebug,
+  type Synonym,
+} from '../api';
 
-interface Synonym {
-  alias: string;
-  canonical: string;
-}
 
 export default function Synonyms() {
   const [synonyms, setSynonyms] = useState<Synonym[]>([]);
   const [alias, setAlias] = useState('');
   const [canonical, setCanonical] = useState('');
+  const [debugLog, setDebugLog] = useState<string[]>([]);
+
+  const formatDebug = (dbg: FetchDebug) =>
+    `GET ${dbg.url}\nStatus: ${dbg.status}\n` +
+    `Response: ${JSON.stringify(dbg.body, null, 2)}`;
+
+  const addDebug = (dbg: FetchDebug) =>
+    setDebugLog((d) => [...d, formatDebug(dbg)]);
 
   const refresh = () => {
-    listSynonyms().then(setSynonyms);
+    listSynonyms().then(({ data, debug }) => {
+      if (debug) addDebug(debug);
+      if (data) setSynonyms(data);
+    });
   };
 
   useEffect(() => {
@@ -21,14 +34,16 @@ export default function Synonyms() {
 
   const submit = async () => {
     if (!alias || !canonical) return;
-    await addSynonym(alias, canonical);
+    const { debug } = await addSynonym(alias, canonical);
+    if (debug) addDebug(debug);
     setAlias('');
     setCanonical('');
     refresh();
   };
 
   const remove = async (a: string) => {
-    await deleteSynonym(a);
+    const { debug } = await deleteSynonym(a);
+    if (debug) addDebug(debug);
     setSynonyms(synonyms.filter((s) => s.alias !== a));
   };
 
@@ -74,6 +89,11 @@ export default function Synonyms() {
           ))}
         </tbody>
       </table>
+      {debugLog.length > 0 && (
+        <pre className="whitespace-pre-wrap bg-gray-100 p-2 text-xs">
+          {debugLog.join('\n\n')}
+        </pre>
+      )}
     </div>
   );
 }

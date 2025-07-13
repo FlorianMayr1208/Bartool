@@ -10,25 +10,12 @@ import {
   listIngredients,
   listSynonyms,
   type BarcodeResult,
+  type FetchDebug,
+  type Ingredient,
+  type InventoryItem,
+  type Synonym,
 } from '../api'
 
-interface Ingredient {
-  id: number
-  name: string
-}
-
-interface Synonym {
-  alias: string
-  canonical: string
-}
-
-interface InventoryItem {
-  id: number
-  ingredient_id: number
-  quantity: number
-  status?: string
-  ingredient?: Ingredient
-}
 
 export default function Inventory() {
   const [items, setItems] = useState<InventoryItem[]>([])
@@ -36,10 +23,8 @@ export default function Inventory() {
   const [ean, setEan] = useState('')
   const [result, setResult] = useState<BarcodeResult | null>(null)
   const [name, setName] = useState('')
-  const [brand, setBrand] = useState('')
-  const [image, setImage] = useState('')
   const [quantity, setQuantity] = useState(1)
-  const [debug, setDebug] = useState('')
+  const [debugLog, setDebugLog] = useState<string[]>([])
   const [ingredients, setIngredients] = useState<Ingredient[]>([])
   const [synonyms, setSynonyms] = useState<Synonym[]>([])
   const [suggested, setSuggested] = useState<Ingredient | null>(null)
@@ -66,27 +51,38 @@ export default function Inventory() {
     return null
   }
 
+  const formatDebug = (dbg: FetchDebug) =>
+    `GET ${dbg.url}\nStatus: ${dbg.status}\n` +
+    `Response: ${JSON.stringify(dbg.body, null, 2)}`
+
+  const addDebug = (dbg: FetchDebug) =>
+    setDebugLog((d) => [...d, formatDebug(dbg)])
+
   const refresh = () => {
-    listInventory().then(setItems)
+    listInventory().then(({ data, debug }) => {
+      if (debug) addDebug(debug)
+      if (data) setItems(data)
+    })
   }
 
   useEffect(() => {
     refresh()
-    listIngredients().then(setIngredients)
-    listSynonyms().then(setSynonyms)
+    listIngredients().then(({ data, debug }) => {
+      if (debug) addDebug(debug)
+      if (data) setIngredients(data)
+    })
+    listSynonyms().then(({ data, debug }) => {
+      if (debug) addDebug(debug)
+      if (data) setSynonyms(data)
+    })
   }, [])
 
   const runLookup = async (code: string) => {
     if (!code) return
     const { data, debug: dbg } = await lookupBarcode(code)
-    setDebug(
-      `GET ${dbg.url}\nStatus: ${dbg.status}\n` +
-        `Response: ${JSON.stringify(dbg.body, null, 2)}`,
-    )
+    addDebug(dbg)
     setResult(data)
     setName(data?.name || '')
-    setBrand(data?.brand || '')
-    setImage(data?.image_url || '')
     if (data?.keywords) {
       setSuggested(matchIngredient(data.keywords))
     } else {
@@ -102,29 +98,33 @@ export default function Inventory() {
 
   const submit = async () => {
     if (!name) return
-    const ing = await createIngredient({ name })
-    await createInventory({ ingredient_id: ing.id, quantity })
+    const { data: ing, debug: dbg1 } = await createIngredient({ name })
+    if (dbg1) addDebug(dbg1)
+    if (!ing) return
+    const { debug: dbg2 } = await createInventory({ ingredient_id: ing.id, quantity })
+    if (dbg2) addDebug(dbg2)
     setName('')
-    setBrand('')
-    setImage('')
     setQuantity(1)
     refresh()
   }
 
   const updateQty = async (id: number, qty: number) => {
-    const item = await updateInventory(id, { quantity: qty })
-    setItems(items.map((i) => (i.id === id ? item : i)))
+    const { data: item, debug } = await updateInventory(id, { quantity: qty })
+    if (debug) addDebug(debug)
+    if (item) setItems(items.map((i) => (i.id === id ? item : i)))
   }
 
   const addSuggested = async () => {
     if (!suggested) return
-    await createInventory({ ingredient_id: suggested.id, quantity: 1 })
+    const { debug } = await createInventory({ ingredient_id: suggested.id, quantity: 1 })
+    if (debug) addDebug(debug)
     setSuggested(null)
     refresh()
   }
 
   const remove = async (id: number) => {
-    await deleteInventory(id)
+    const { debug } = await deleteInventory(id)
+    if (debug) addDebug(debug)
     setItems(items.filter((i) => i.id !== id))
   }
 
@@ -230,9 +230,9 @@ export default function Inventory() {
           ))}
         </tbody>
       </table>
-      {debug && (
+      {debugLog.length > 0 && (
         <pre className="whitespace-pre-wrap bg-gray-100 p-2 text-xs">
-          {debug}
+          {debugLog.join('\n\n')}
         </pre>
       )}
     </div>
