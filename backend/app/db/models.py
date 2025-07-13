@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from sqlalchemy import Column, Integer, String, ForeignKey, Float, Table
+from sqlalchemy import Column, Integer, String, ForeignKey, Float, Table, Text
 from sqlalchemy.orm import declarative_base, relationship
 
 Base = declarative_base()
@@ -172,3 +172,11 @@ class InventoryItem(Base):
     status = Column(String, default="available")
 
     ingredient = relationship("Ingredient")
+
+
+class BarcodeCache(Base):
+    __tablename__ = "barcode_cache"
+
+    ean = Column(String, primary_key=True, index=True)
+    timestamp = Column(Integer, nullable=False)
+    json = Column(Text, nullable=False)

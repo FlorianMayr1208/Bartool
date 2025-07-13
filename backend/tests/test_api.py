@@ -162,18 +162,23 @@ async def test_inventory_patch(async_client):
 
 @pytest.mark.asyncio
 async def test_barcode_lookup(monkeypatch, async_client):
-    async def fake_lookup(ean: str):
-        return {
-            "name": "Test",
-            "brand": "Foo",
-            "image_url": "http://img",
-            "keywords": ["gin", "liquor"],
-        }
+    async def fake_lookup(ean: str, db):
+        return (
+            {
+                "name": "Test",
+                "brand": "Foo",
+                "image_url": "http://img",
+                "keywords": ["gin", "liquor"],
+            },
+            False,
+        )
 
     monkeypatch.setattr("backend.app.services.barcode.fetch_barcode", fake_lookup)
     resp = await async_client.get("/barcode/123456")
     assert resp.status_code == 200
-    data = resp.json()
+    body = resp.json()
+    data = body["data"]
+    assert body["from_cache"] is False
     assert data["name"] == "Test"
     assert data["brand"] == "Foo"
     assert data["image_url"] == "http://img"
