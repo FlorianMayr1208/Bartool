@@ -29,6 +29,7 @@ export default function Inventory() {
   const [brand, setBrand] = useState('')
   const [image, setImage] = useState('')
   const [quantity, setQuantity] = useState(1)
+  const [debug, setDebug] = useState('')
 
   const refresh = () => {
     listInventory().then(setItems)
@@ -40,11 +41,15 @@ export default function Inventory() {
 
   const onDetected = async (code: string) => {
     setScanning(false)
-    const res = await lookupBarcode(code)
-    if (res?.name) {
-      setName(res.name)
-      setBrand(res.brand || '')
-      setImage(res.image_url || '')
+    const { data, debug: dbg } = await lookupBarcode(code)
+    setDebug(
+      `GET ${dbg.url}\nStatus: ${dbg.status}\n` +
+        `Response: ${JSON.stringify(dbg.body, null, 2)}`,
+    )
+    if (data?.name) {
+      setName(data.name)
+      setBrand(data.brand || '')
+      setImage(data.image_url || '')
     }
   }
 
@@ -134,6 +139,11 @@ export default function Inventory() {
           ))}
         </tbody>
       </table>
+      {debug && (
+        <pre className="whitespace-pre-wrap bg-gray-100 p-2 text-xs">
+          {debug}
+        </pre>
+      )}
     </div>
   )
 }

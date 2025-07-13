@@ -56,10 +56,29 @@ export interface BarcodeResult {
   image_url?: string | null
 }
 
-export async function lookupBarcode(ean: string): Promise<BarcodeResult | null> {
-  const res = await fetch(`${API_BASE}/barcode/${ean}`);
-  if (!res.ok) return null;
-  return res.json();
+export interface BarcodeDebug {
+  url: string
+  status: number
+  body: unknown
+}
+
+export interface BarcodeLookup {
+  data: BarcodeResult | null
+  debug: BarcodeDebug
+}
+
+export async function lookupBarcode(ean: string): Promise<BarcodeLookup> {
+  const url = `${API_BASE}/barcode/${ean}`
+  const res = await fetch(url)
+  const body = await res.json().catch(() => null)
+  return {
+    data: res.ok ? (body as BarcodeResult) : null,
+    debug: {
+      url,
+      status: res.status,
+      body
+    }
+  }
 }
 
 export async function listRecipes() {
