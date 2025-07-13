@@ -10,6 +10,7 @@ async def fetch_barcode(ean: str) -> Optional[Dict]:
     if ean in _cache:
         return _cache[ean]
     url = f"{API_URL}/{ean}.json"
+    print(url)
     async with httpx.AsyncClient() as client:
         resp = await client.get(url, timeout=10)
         if resp.status_code != 200:
