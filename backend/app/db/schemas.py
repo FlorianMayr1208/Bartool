@@ -123,3 +123,12 @@ class InventoryItemWithIngredient(InventoryItem):
 class Synonym(BaseModel):
     alias: str
     canonical: str
+
+
+class BarcodeCache(BaseModel):
+    ean: str
+    timestamp: int
+    json: str
+
+    class Config:
+        orm_mode = True

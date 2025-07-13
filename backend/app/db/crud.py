@@ -245,3 +245,25 @@ def search_local_recipes(
         )
         for r, a, m in results
     ]
+
+
+# Barcode cache CRUD
+def get_barcode_cache(db: Session, ean: str):
+    return db.query(models.BarcodeCache).filter(models.BarcodeCache.ean == ean).first()
+
+
+def store_barcode_cache(db: Session, ean: str, data: dict):
+    import json
+    from datetime import datetime
+
+    entry = get_barcode_cache(db, ean)
+    serialized = json.dumps(data)
+    ts = int(datetime.utcnow().timestamp())
+    if entry:
+        entry.json = serialized
+        entry.timestamp = ts
+    else:
+        entry = models.BarcodeCache(ean=ean, json=serialized, timestamp=ts)
+        db.add(entry)
+    db.commit()
+    return entry
