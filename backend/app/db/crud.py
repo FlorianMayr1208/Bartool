@@ -144,6 +144,12 @@ def get_inventory_by_ingredient(db: Session, ingredient_id: int):
 
 
 def create_inventory_item(db: Session, item: schemas.InventoryItemCreate):
+    existing = get_inventory_by_ingredient(db, item.ingredient_id)
+    if existing:
+        existing.quantity += item.quantity
+        db.commit()
+        db.refresh(existing)
+        return existing
     db_obj = models.InventoryItem(**item.model_dump())
     db.add(db_obj)
     db.commit()

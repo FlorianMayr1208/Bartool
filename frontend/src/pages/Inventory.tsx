@@ -28,6 +28,7 @@ export default function Inventory() {
   const [ingredients, setIngredients] = useState<Ingredient[]>([])
   const [synonyms, setSynonyms] = useState<Synonym[]>([])
   const [suggested, setSuggested] = useState<Ingredient | null>(null)
+  const [showDebug, setShowDebug] = useState(false)
 
   const synonymsMap = Object.fromEntries(
     synonyms.map((s) => [s.alias.toLowerCase(), s.canonical]),
@@ -116,10 +117,23 @@ export default function Inventory() {
 
   const addSuggested = async () => {
     if (!suggested) return
-    const { debug } = await createInventory({ ingredient_id: suggested.id, quantity: 1 })
-    if (debug) addDebug(debug)
+    const existing = items.find((i) => i.ingredient_id === suggested.id)
+    if (existing) {
+      const { debug, data } = await updateInventory(existing.id, {
+        quantity: existing.quantity + 1,
+      })
+      if (debug) addDebug(debug)
+      if (data)
+        setItems(items.map((it) => (it.id === existing.id ? data : it)))
+    } else {
+      const { debug } = await createInventory({
+        ingredient_id: suggested.id,
+        quantity: 1,
+      })
+      if (debug) addDebug(debug)
+      refresh()
+    }
     setSuggested(null)
-    refresh()
   }
 
   const remove = async (id: number) => {
@@ -231,9 +245,19 @@ export default function Inventory() {
         </tbody>
       </table>
       {debugLog.length > 0 && (
-        <pre className="whitespace-pre-wrap bg-gray-100 p-2 text-xs">
-          {debugLog.join('\n\n')}
-        </pre>
+        <div className="mt-4 space-y-2">
+          <button
+            onClick={() => setShowDebug(!showDebug)}
+            className="button-search"
+          >
+            {showDebug ? 'Hide Debug' : 'Show Debug'}
+          </button>
+          {showDebug && (
+            <pre className="whitespace-pre-wrap bg-gray-100 p-2 text-xs">
+              {debugLog.join('\n\n')}
+            </pre>
+          )}
+        </div>
       )}
     </div>
   )
