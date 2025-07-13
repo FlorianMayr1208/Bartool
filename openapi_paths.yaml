@@ -106,3 +106,22 @@ paths:
           required: true
           schema:
             type: string
+  /shopping-list:
+    get:
+      summary: List shopping list items
+    post:
+      summary: Add missing ingredients from recipe
+      parameters:
+        - in: query
+          name: recipe_id
+          schema:
+            type: integer
+  /shopping-list/from-recipe/{recipe_id}:
+    post:
+      summary: Add missing ingredients of recipe to shopping list
+      parameters:
+        - in: path
+          name: recipe_id
+          required: true
+          schema:
+            type: integer

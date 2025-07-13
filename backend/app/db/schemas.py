@@ -132,3 +132,23 @@ class BarcodeCache(BaseModel):
 
     class Config:
         orm_mode = True
+
+
+class ShoppingListItemBase(BaseModel):
+    ingredient_id: int
+    quantity: int = 1
+
+
+class ShoppingListItemCreate(ShoppingListItemBase):
+    pass
+
+
+class ShoppingListItem(ShoppingListItemBase):
+    id: int
+
+    class Config:
+        orm_mode = True
+
+
+class ShoppingListItemWithIngredient(ShoppingListItem):
+    ingredient: Ingredient

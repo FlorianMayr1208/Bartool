@@ -180,3 +180,13 @@ class BarcodeCache(Base):
     ean = Column(String, primary_key=True, index=True)
     timestamp = Column(Integer, nullable=False)
     json = Column(Text, nullable=False)
+
+
+class ShoppingListItem(Base):
+    __tablename__ = "shopping_list_items"
+
+    id = Column(Integer, primary_key=True, index=True)
+    ingredient_id = Column(Integer, ForeignKey("ingredients.id"), nullable=False)
+    quantity = Column(Integer, default=1)
+
+    ingredient = relationship("Ingredient")

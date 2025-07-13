@@ -220,6 +220,18 @@ def recipe_missing_count(db: Session, recipe: models.Recipe) -> int:
     return missing
 
 
+def recipe_missing_ingredients(db: Session, recipe: models.Recipe) -> list[models.Ingredient]:
+    """Return Ingredient objects that are missing from inventory."""
+    missing: list[models.Ingredient] = []
+    for r_ing in recipe.ingredients:
+        canonical = synonyms.canonical_name(r_ing.name)
+        ing = get_or_create_ingredient(db, schemas.IngredientCreate(name=canonical))
+        item = get_inventory_by_ingredient(db, ing.id)
+        if not item or item.quantity <= 0:
+            missing.append(ing)
+    return missing
+
+
 def search_local_recipes(
     db: Session,
     query: str | None = None,
@@ -273,3 +285,45 @@ def store_barcode_cache(db: Session, ean: str, data: dict):
         db.add(entry)
     db.commit()
     return entry
+
+
+# Shopping list CRUD
+def get_shopping_list_item_by_ingredient(db: Session, ingredient_id: int):
+    return (
+        db.query(models.ShoppingListItem)
+        .filter(models.ShoppingListItem.ingredient_id == ingredient_id)
+        .first()
+    )
+
+
+def add_to_shopping_list(db: Session, ingredient: models.Ingredient, quantity: int = 1):
+    item = get_shopping_list_item_by_ingredient(db, ingredient.id)
+    if item:
+        item.quantity += quantity
+    else:
+        item = models.ShoppingListItem(ingredient_id=ingredient.id, quantity=quantity)
+        db.add(item)
+    db.commit()
+    db.refresh(item)
+    return item
+
+
+def list_shopping_list_items(db: Session, skip: int = 0, limit: int = 100):
+    from sqlalchemy.orm import selectinload
+
+    return (
+        db.query(models.ShoppingListItem)
+        .options(selectinload(models.ShoppingListItem.ingredient))
+        .offset(skip)
+        .limit(limit)
+        .all()
+    )
+
+
+def add_missing_ingredients_to_shopping_list(db: Session, recipe_id: int):
+    recipe = get_recipe(db, recipe_id)
+    if not recipe:
+        return None
+    missing = recipe_missing_ingredients(db, recipe)
+    items = [add_to_shopping_list(db, ing, 1) for ing in missing]
+    return items

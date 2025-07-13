@@ -187,3 +187,21 @@ export async function deleteSynonym(alias: string) {
     method: "DELETE",
   });
 }
+
+export interface ShoppingListItem {
+  id: number;
+  ingredient_id: number;
+  quantity: number;
+  ingredient?: Ingredient;
+}
+
+export async function listShoppingList() {
+  return fetchJson<ShoppingListItem[]>(`${API_BASE}/shopping-list/`);
+}
+
+export async function addMissingFromRecipe(recipe_id: number) {
+  return fetchJson<ShoppingListItem[]>(
+    `${API_BASE}/shopping-list/from-recipe/${recipe_id}`,
+    { method: "POST" },
+  );
+}

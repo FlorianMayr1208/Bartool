@@ -418,3 +418,44 @@ async def test_recipe_find_inventory(monkeypatch, async_client):
     vg = next(r for r in data if r["name"] == "Vodka Gin")
     assert vg["available_count"] == 1
     assert vg["missing_count"] == 1
+
+
+@pytest.mark.asyncio
+async def test_shopping_list_from_recipe(monkeypatch, async_client):
+    async def fake_fetch(name: str):
+        return {
+            "name": "Gin Drink",
+            "alcoholic": "Alcoholic",
+            "instructions": "Mix",
+            "thumb": None,
+            "tags": [],
+            "categories": [],
+            "ibas": [],
+            "ingredients": [
+                {"name": "Vodka", "measure": "2 oz"},
+                {"name": "Gin", "measure": "1 oz"},
+            ],
+        }
+
+    monkeypatch.setattr("backend.app.services.cocktaildb.fetch_recipe_details", fake_fetch)
+    monkeypatch.setattr("backend.app.api.recipes.fetch_recipe_details", fake_fetch)
+
+    resp = await async_client.post("/recipes/", json={"name": "gin drink"})
+    assert resp.status_code == 201
+    recipe_id = resp.json()["id"]
+
+    # add vodka to inventory so only gin is missing
+    vodka = resp.json()["ingredients"][0]["name"]
+    resp2 = await async_client.post("/ingredients/", json={"name": vodka})
+    vodka_id = resp2.json()["id"]
+    await async_client.post("/inventory/", json={"ingredient_id": vodka_id, "quantity": 1})
+
+    resp = await async_client.post(f"/shopping-list/from-recipe/{recipe_id}")
+    assert resp.status_code == 201
+
+    resp = await async_client.get("/shopping-list/")
+    assert resp.status_code == 200
+    items = resp.json()
+    assert len(items) == 1
+    assert items[0]["ingredient"]["name"] == "Gin"
+
