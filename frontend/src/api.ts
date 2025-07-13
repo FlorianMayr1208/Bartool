@@ -22,6 +22,11 @@ export async function createIngredient(data: { name: string }) {
   return res.json();
 }
 
+export async function listIngredients() {
+  const res = await fetch(`${API_BASE}/ingredients/`)
+  return res.json()
+}
+
 export async function createInventory(data: {
   ingredient_id: number;
   quantity: number;
@@ -54,6 +59,7 @@ export interface BarcodeResult {
   name: string | null
   brand?: string | null
   image_url?: string | null
+  keywords?: string[]
 }
 
 export interface BarcodeDebug {
