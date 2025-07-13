@@ -42,8 +42,11 @@ python backend/app/db/seed_db.py
 This will generate `data/seed.sqlite` and insert a few example records so the
 API has initial data to work with.
 
-Afterwards open `http://localhost:5173` in your browser.  If the backend runs on a different port, set the environment variable `VITE_API_BASE` when starting the
-frontend, e.g. `VITE_API_BASE=http://localhost:8000 npm run dev`.
+Afterwards open `http://localhost:5173` in your browser. The frontend reads the
+API base URL from `frontend/.env`, which by default contains
+`VITE_API_BASE=http://localhost:8000`. If your backend runs on a different
+host or port, adjust this value before starting the frontend with `npm run
+dev`.
 
 ### Barcode lookup
 
