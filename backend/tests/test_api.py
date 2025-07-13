@@ -186,6 +186,47 @@ async def test_barcode_lookup(monkeypatch, async_client):
 
 
 @pytest.mark.asyncio
+async def test_barcode_lookup_cache(monkeypatch, async_client):
+    """Fetching the same barcode twice should use the cache."""
+
+    class MockResp:
+        def __init__(self, data):
+            self.status_code = 200
+            self._data = data
+
+        def json(self):
+            return self._data
+
+    class FakeClient:
+        async def __aenter__(self):
+            return self
+
+        async def __aexit__(self, exc_type, exc, tb):
+            pass
+
+        async def get(self, url, timeout=10):
+            return MockResp({"status": 1, "product": {"product_name": "Gin", "brands": "Bar", "image_front_url": "http://img", "_keywords": ["gin"]}})
+
+    monkeypatch.setattr("backend.app.services.barcode.httpx.AsyncClient", FakeClient)
+
+    resp = await async_client.get("/barcode/111111")
+    assert resp.status_code == 200
+    assert resp.json()["from_cache"] is False
+
+    class FailClient(FakeClient):
+        async def get(self, url, timeout=10):
+            raise RuntimeError("network call")
+
+    monkeypatch.setattr("backend.app.services.barcode.httpx.AsyncClient", FailClient)
+
+    resp = await async_client.get("/barcode/111111")
+    assert resp.status_code == 200
+    body = resp.json()
+    assert body["from_cache"] is True
+    assert body["data"]["name"] == "Gin"
+
+
+@pytest.mark.asyncio
 async def test_inventory_create_delete(async_client):
     resp = await async_client.post("/ingredients/", json={"name": "Tequila"})
     ing_id = resp.json()["id"]
