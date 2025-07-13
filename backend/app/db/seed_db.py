@@ -1,6 +1,19 @@
 from sqlalchemy.orm import Session
 
-from models import Base, Ingredient, Recipe, InventoryItem
+# Import all models so ``Base.metadata`` contains every table
+from models import (
+    Base,
+    Category,
+    Unit,
+    Ingredient,
+    IngredientSynonym,
+    UnitSynonym,
+    Tag,
+    Recipe,
+    Iba,
+    RecipeIngredient,
+    InventoryItem,
+)
 from session import engine
 
 
