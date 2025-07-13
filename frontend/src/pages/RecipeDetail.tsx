@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import { getRecipe } from '../api';
+import { getRecipe, addMissingFromRecipe } from '../api';
 
 interface Ingredient {
   id: number;
@@ -19,6 +19,7 @@ interface Recipe {
 export default function RecipeDetail() {
   const { id } = useParams<{ id: string }>();
   const [recipe, setRecipe] = useState<Recipe | null>(null);
+  const [added, setAdded] = useState(false);
 
   useEffect(() => {
     if (!id) return;
@@ -38,6 +39,18 @@ export default function RecipeDetail() {
         <img src={recipe.thumb} alt={recipe.name} className="w-48" />
       )}
       {recipe.instructions && <p>{recipe.instructions}</p>}
+      <button
+        onClick={async () => {
+          if (recipe) {
+            await addMissingFromRecipe(recipe.id);
+            setAdded(true);
+          }
+        }}
+        className="button-search"
+      >
+        Add missing to shopping list
+      </button>
+      {added && <p className="text-sm text-green-700">Added!</p>}
       {recipe.ingredients && recipe.ingredients.length > 0 && (
         <div>
           <h2 className="font-semibold">Ingredients</h2>
