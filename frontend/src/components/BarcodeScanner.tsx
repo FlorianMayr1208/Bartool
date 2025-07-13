@@ -19,7 +19,7 @@ export default function BarcodeScanner({ onDetected }: { onDetected: (code: stri
         Quagga.start()
       }
     )
-    Quagga.onDetected((res: QuaggaJSResultObject) => {
+    Quagga.onDetected((res: any) => {
       onDetected(res.codeResult.code)
       Quagga.stop()
     })
