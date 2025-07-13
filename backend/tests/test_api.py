@@ -157,7 +157,7 @@ async def test_inventory_patch(async_client):
 
 @pytest.mark.asyncio
 async def test_barcode_lookup(monkeypatch, async_client):
-    async def fake_lookup(ean: str):
+    async def fake_lookup(ean: str, db):
         return {"name": "Test"}
 
     monkeypatch.setattr("backend.app.services.barcode.fetch_barcode", fake_lookup)

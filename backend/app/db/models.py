@@ -1,5 +1,6 @@
-from sqlalchemy import Column, Integer, String, ForeignKey
+from sqlalchemy import Column, Integer, String, ForeignKey, DateTime, Text
 from sqlalchemy.orm import declarative_base, relationship
+from datetime import datetime
 
 Base = declarative_base()
 
@@ -78,3 +79,11 @@ class InventoryItem(Base):
     status = Column(String, default="available")
 
     ingredient = relationship("Ingredient")
+
+
+class BarcodeCache(Base):
+    __tablename__ = "barcode_cache"
+
+    ean = Column(String, primary_key=True, index=True)
+    data = Column(Text, nullable=False)
+    fetched_at = Column(DateTime, default=datetime.utcnow, nullable=False)
