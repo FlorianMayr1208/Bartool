@@ -146,7 +146,7 @@ export default function Inventory() {
     <div className="space-y-4">
       <h1 className="text-2xl font-bold">Inventory</h1>
 
-      <section className="space-y-2">
+      <section className="space-y-4 p-4 mb-6 rounded-lg bg-gray-50 shadow">
         <h2 className="text-xl font-semibold">Barcode Lookup</h2>
         {scanning ? (
           <div>
@@ -163,12 +163,12 @@ export default function Inventory() {
             Scan Barcode
           </button>
         )}
-        <div className="flex gap-2">
+        <div className="flex gap-4 items-center">
           <input
             placeholder="Enter barcode"
             value={ean}
             onChange={(e) => setEan(e.target.value)}
-            className="border p-1 flex-1"
+            className="border p-2 rounded w-48 max-w-full"
           />
           <button onClick={() => runLookup(ean)} className="button-search">
             Lookup
