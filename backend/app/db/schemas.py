@@ -1,5 +1,6 @@
 from pydantic import BaseModel
 from typing import Optional, List
+from datetime import datetime
 
 class IngredientBase(BaseModel):
     name: str
@@ -99,3 +100,12 @@ class InventoryItemWithIngredient(InventoryItem):
 class Synonym(BaseModel):
     alias: str
     canonical: str
+
+
+class BarcodeCache(BaseModel):
+    ean: str
+    data: str
+    fetched_at: datetime
+
+    class Config:
+        orm_mode = True

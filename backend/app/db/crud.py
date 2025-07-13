@@ -1,5 +1,7 @@
 from sqlalchemy.orm import Session
 from sqlalchemy import func
+import json
+from datetime import datetime
 
 from ..services import synonyms
 
@@ -136,3 +138,22 @@ def delete_inventory_item(db: Session, item_id: int) -> bool:
     db.delete(item)
     db.commit()
     return True
+
+
+# Barcode cache CRUD
+def get_barcode_cache(db: Session, ean: str):
+    return db.query(models.BarcodeCache).filter(models.BarcodeCache.ean == ean).first()
+
+
+def upsert_barcode_cache(db: Session, ean: str, data: dict) -> models.BarcodeCache:
+    json_data = json.dumps(data)
+    entry = get_barcode_cache(db, ean)
+    if entry:
+        entry.data = json_data
+        entry.fetched_at = datetime.utcnow()
+    else:
+        entry = models.BarcodeCache(ean=ean, data=json_data, fetched_at=datetime.utcnow())
+        db.add(entry)
+    db.commit()
+    db.refresh(entry)
+    return entry
