@@ -6,12 +6,19 @@ import {
   createInventory,
   updateInventory,
   deleteInventory,
-  lookupBarcode
+  lookupBarcode,
+  listIngredients,
+  listSynonyms
 } from '../api'
 
 interface Ingredient {
   id: number
   name: string
+}
+
+interface Synonym {
+  alias: string
+  canonical: string
 }
 
 interface InventoryItem {
@@ -30,6 +37,35 @@ export default function Inventory() {
   const [image, setImage] = useState('')
   const [quantity, setQuantity] = useState(1)
   const [debug, setDebug] = useState('')
+  const [ingredients, setIngredients] = useState<Ingredient[]>([])
+  const [synonyms, setSynonyms] = useState<Synonym[]>([])
+
+  const synonymsMap = Object.fromEntries(
+    synonyms.map((s) => [s.alias.toLowerCase(), s.canonical]),
+  )
+
+  const canonical = (n: string) => {
+    const key = n.trim().toLowerCase()
+    const cand = synonymsMap[key] || n.trim()
+    return cand.charAt(0).toUpperCase() + cand.slice(1)
+  }
+
+  const findIngredient = (n: string) => {
+    return ingredients.find((i) => i.name.toLowerCase() === n.toLowerCase())
+  }
+
+  const checkKeywords = async (kws: string[]) => {
+    for (const k of kws) {
+      const ing = findIngredient(canonical(k))
+      if (ing) {
+        if (window.confirm(`Add 1 of ${ing.name} to inventory?`)) {
+          await createInventory({ ingredient_id: ing.id, quantity: 1 })
+          refresh()
+        }
+        break
+      }
+    }
+  }
 
   const refresh = () => {
     listInventory().then(setItems)
@@ -37,6 +73,8 @@ export default function Inventory() {
 
   useEffect(() => {
     refresh()
+    listIngredients().then(setIngredients)
+    listSynonyms().then(setSynonyms)
   }, [])
 
   const onDetected = async (code: string) => {
@@ -50,6 +88,9 @@ export default function Inventory() {
       setName(data.name)
       setBrand(data.brand || '')
       setImage(data.image_url || '')
+    }
+    if (data?.keywords) {
+      await checkKeywords(data.keywords)
     }
   }
 
