@@ -40,7 +40,10 @@ export default function ShoppingList() {
 
   const download = () => {
     const lines = items.map(
-      (it) => `${it.quantity} x ${it.ingredient?.name || it.ingredient_id}`,
+      (it) =>
+        `${it.quantity}${it.unit ? ` ${it.unit}` : ""} x ${
+          it.ingredient?.name || it.ingredient_id
+        }`,
     );
     const blob = new Blob([lines.join('\n')], { type: 'text/plain' });
     const url = URL.createObjectURL(blob);
@@ -61,12 +64,17 @@ export default function ShoppingList() {
     {},
   );
 
-  const aggregated = items.reduce<Record<string, number>>((acc, it) => {
-    const name = it.ingredient?.name || String(it.ingredient_id);
-    const key = (synonymsMap[name.toLowerCase()] || name).toLowerCase();
-    acc[key] = (acc[key] || 0) + it.quantity;
-    return acc;
-  }, {});
+  const aggregated = items.reduce<Record<string, { qty: number; units: Set<string> }>>(
+    (acc, it) => {
+      const name = it.ingredient?.name || String(it.ingredient_id);
+      const key = (synonymsMap[name.toLowerCase()] || name).toLowerCase();
+      if (!acc[key]) acc[key] = { qty: 0, units: new Set() };
+      acc[key].qty += it.quantity;
+      if (it.unit) acc[key].units.add(it.unit);
+      return acc;
+    },
+    {},
+  );
 
   return (
     <div className="space-y-6">
@@ -92,7 +100,8 @@ export default function ShoppingList() {
                   className="flex items-center justify-between p-4"
                 >
                   <span>
-                    {it.quantity} x {it.ingredient?.name || it.ingredient_id}
+                    {it.quantity}
+                    {it.unit ? ` ${it.unit}` : ""} x {it.ingredient?.name || it.ingredient_id}
                     {canonical(it.ingredient?.name) && (
                       <span className="text-sm text-[var(--text-secondary)] ml-1">
                         ({canonical(it.ingredient?.name)})
@@ -110,10 +119,13 @@ export default function ShoppingList() {
         <div className="card p-0">
           <h2 className="px-4 py-2 font-semibold">All Ingredients</h2>
           <ul className="divide-y divide-[var(--border)]">
-            {Object.entries(aggregated).map(([name, qty]) => (
+            {Object.entries(aggregated).map(([name, info]) => (
               <li key={name} className="flex items-center justify-between p-4">
                 <span>
-                  {qty} x {name.charAt(0).toUpperCase() + name.slice(1)}
+                  {info.qty} x {name.charAt(0).toUpperCase() + name.slice(1)}
+                  {info.units.size > 0 && (
+                    <> ({Array.from(info.units).join(', ')})</>
+                  )}
                 </span>
               </li>
             ))}
