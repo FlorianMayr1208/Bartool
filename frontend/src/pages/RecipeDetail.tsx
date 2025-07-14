@@ -24,13 +24,13 @@ export default function RecipeDetail() {
   }
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-4 text-white">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-start">
         {recipe.thumb && (
           <img
             src={recipe.thumb}
             alt={recipe.name}
-            className="w-24 rounded-md object-cover"
+            className="w-24 h-24 aspect-square rounded-md object-cover"
           />
         )}
         <div>

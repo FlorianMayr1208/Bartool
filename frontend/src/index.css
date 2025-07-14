@@ -1,3 +1,5 @@
+@import "tailwindcss";
+
 :root {
   --bg-primary:   #242527;
   --bg-elevated:  #242526;
@@ -15,10 +17,6 @@
   --font-display: "Playfair Display", serif;
   --font-sans: "Inter", "Helvetica Neue", sans-serif;
 }
-
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
 
 body {
   background-color: var(--bg-primary);
