@@ -459,3 +459,37 @@ async def test_shopping_list_from_recipe(monkeypatch, async_client):
     assert len(items) == 1
     assert items[0]["ingredient"]["name"] == "Gin"
 
+
+@pytest.mark.asyncio
+async def test_clear_shopping_list(monkeypatch, async_client):
+    async def fake_fetch(name: str):
+        return {
+            "name": "Gin Drink",
+            "alcoholic": "Alcoholic",
+            "instructions": "Mix",
+            "thumb": None,
+            "tags": [],
+            "categories": [],
+            "ibas": [],
+            "ingredients": [
+                {"name": "Gin", "measure": "1 oz"},
+            ],
+        }
+
+    monkeypatch.setattr(
+        "backend.app.services.cocktaildb.fetch_recipe_details", fake_fetch
+    )
+    monkeypatch.setattr("backend.app.api.recipes.fetch_recipe_details", fake_fetch)
+
+    resp = await async_client.post("/recipes/", json={"name": "gin drink"})
+    recipe_id = resp.json()["id"]
+
+    await async_client.post(f"/shopping-list/from-recipe/{recipe_id}")
+
+    resp = await async_client.delete("/shopping-list/")
+    assert resp.status_code == 204
+
+    resp = await async_client.get("/shopping-list/")
+    assert resp.status_code == 200
+    assert resp.json() == []
+

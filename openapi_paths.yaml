@@ -109,6 +109,8 @@ paths:
   /shopping-list:
     get:
       summary: List shopping list items
+    delete:
+      summary: Clear shopping list
     post:
       summary: Add missing ingredients from recipe
       parameters:
