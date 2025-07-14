@@ -81,19 +81,19 @@ export default function Synonyms() {
           placeholder="Alias"
           value={alias}
           onChange={(e) => setAlias(e.target.value)}
-          className="border p-1"
+          className="border border-[var(--border)] p-1"
         />
         <input
           placeholder="Canonical"
           value={canonical}
           onChange={(e) => setCanonical(e.target.value)}
-          className="border p-1"
+          className="border border-[var(--border)] p-1"
         />
-        <button onClick={submit} className="rounded bg-blue-500 px-2 py-1 text-white">
+        <button onClick={submit} className="button-send">
           Add
         </button>
       </div>
-      <table className="min-w-full border text-left">
+      <table className="min-w-full border border-[var(--border)] text-left">
         <thead>
           <tr>
             <th className="px-2">Alias</th>
@@ -103,11 +103,11 @@ export default function Synonyms() {
         </thead>
         <tbody>
           {synonyms.map((s) => (
-            <tr key={s.alias} className="border-t">
+            <tr key={s.alias} className="border-t border-[var(--border)]">
               <td className="px-2 py-1">{s.alias}</td>
               <td className="px-2 py-1">{s.canonical}</td>
               <td className="px-2 py-1">
-                <button onClick={() => remove(s.alias)} className="text-red-600">
+                <button onClick={() => remove(s.alias)} className="button-search">
                   Delete
                 </button>
               </td>
@@ -122,19 +122,19 @@ export default function Synonyms() {
           placeholder="Alias"
           value={unitAlias}
           onChange={(e) => setUnitAlias(e.target.value)}
-          className="border p-1"
+          className="border border-[var(--border)] p-1"
         />
         <input
           placeholder="Canonical"
           value={unitCanonical}
           onChange={(e) => setUnitCanonical(e.target.value)}
-          className="border p-1"
+          className="border border-[var(--border)] p-1"
         />
-        <button onClick={submitUnit} className="rounded bg-blue-500 px-2 py-1 text-white">
+        <button onClick={submitUnit} className="button-send">
           Add
         </button>
       </div>
-      <table className="min-w-full border text-left">
+      <table className="min-w-full border border-[var(--border)] text-left">
         <thead>
           <tr>
             <th className="px-2">Alias</th>
@@ -144,11 +144,11 @@ export default function Synonyms() {
         </thead>
         <tbody>
           {unitSynonyms.map((s) => (
-            <tr key={s.alias} className="border-t">
+            <tr key={s.alias} className="border-t border-[var(--border)]">
               <td className="px-2 py-1">{s.alias}</td>
               <td className="px-2 py-1">{s.canonical}</td>
               <td className="px-2 py-1">
-                <button onClick={() => removeUnit(s.alias)} className="text-red-600">
+                <button onClick={() => removeUnit(s.alias)} className="button-search">
                   Delete
                 </button>
               </td>

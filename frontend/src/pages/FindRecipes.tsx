@@ -32,7 +32,7 @@ export default function FindRecipes() {
   return (
     <div className="space-y-4">
       <h1 className="text-2xl font-bold">Recipe Finder</h1>
-      <div className="flex max-w-md items-center overflow-hidden rounded border border-[var(--highlight)]">
+      <div className="flex max-w-md items-center overflow-hidden rounded border border-[var(--border)]">
         <input
           value={query}
           onChange={(e) => setQuery(e.target.value)}

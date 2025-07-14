@@ -20,7 +20,7 @@ export default function Dashboard() {
 
   return (
     <div className="space-y-6">
-      <h1 className="font-display text-3xl font-semibold">Dashboard</h1>
+      <h1 className="text-2xl font-bold">Dashboard</h1>
       <p className="text-[var(--text-muted)]">Welcome to BarTool. Select an action below.</p>
       <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
         {features.map((f) => (

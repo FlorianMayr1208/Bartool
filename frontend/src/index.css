@@ -13,7 +13,7 @@
   --brand-radius: 6px;
   --brand-shadow: 0 4px 12px rgba(0,0,0,.40);
   --space-4: 16px;
-  --space-2: 8px;
+  --space-2: 6px;
   --font-display: "Playfair Display", serif;
   --font-sans: "Inter", "Helvetica Neue", sans-serif;
 }
@@ -46,7 +46,7 @@ body {
 
 .button-send {
   background-color: var(--accent);
-  color: var(--high);
+  color: black;
   border-radius: var(--brand-radius);
   padding: var(--space-2) var(--space-4);
   border: none;
