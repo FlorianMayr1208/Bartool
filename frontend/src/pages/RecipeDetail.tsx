@@ -25,38 +25,50 @@ export default function RecipeDetail() {
 
   return (
     <div className="space-y-4">
-      <h1 className="text-2xl font-bold">{recipe.name}</h1>
-      {recipe.thumb && (
-        <img src={recipe.thumb} alt={recipe.name} className="w-48" />
-      )}
-      {recipe.instructions && <p>{recipe.instructions}</p>}
-      <button
-        onClick={async () => {
-          if (recipe) {
-            await addMissingFromRecipe(recipe.id);
-            setAdded(true);
-          }
-        }}
-        className="button-search"
-      >
-        Add missing to shopping list
-      </button>
-      {added && <p className="text-sm text-green-700">Added!</p>}
-      {recipe.ingredients && recipe.ingredients.length > 0 && (
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-start">
+        {recipe.thumb && (
+          <img
+            src={recipe.thumb}
+            alt={recipe.name}
+            className="w-24 rounded-md object-cover"
+          />
+        )}
         <div>
-          <h2 className="font-semibold">Ingredients</h2>
-          <ul className="list-disc pl-5">
+          <h1 className="text-2xl font-bold mb-2">{recipe.name}</h1>
+          {recipe.instructions && <p className="mb-4">{recipe.instructions}</p>}
+          <button
+            onClick={async () => {
+              if (recipe) {
+                await addMissingFromRecipe(recipe.id);
+                setAdded(true);
+              }
+            }}
+            className="button-search"
+          >
+            Add missing to shopping list
+          </button>
+          {added && <p className="text-sm text-green-700">Added!</p>}
+        </div>
+      </div>
+      {recipe.ingredients && recipe.ingredients.length > 0 && (
+        <section className="mt-6 p-4 bg-[var(--bg-elevated)] rounded-lg shadow border border-[var(--border)]">
+          <h2 className="text-xl font-semibold mb-2">Ingredients</h2>
+          <ul className="space-y-2">
             {recipe.ingredients.map((ing) => (
               <li key={ing.id}>
-                {ing.measure ? `${ing.measure} ` : ''}
-                {ing.name}
-                <span className="text-sm text-[var(--text-secondary)]">
-                  {` – ${ing.inventory_quantity} in stock`}
-                </span>
+                <div className="flex justify-between">
+                  <span className="font-medium">{ing.name}</span>
+                  <span className="text-sm text-[var(--text-secondary)]">
+                    {`${ing.inventory_quantity} in stock`}
+                  </span>
+                </div>
+                {ing.measure && (
+                  <div className="text-sm text-[var(--text-muted)]">{ing.measure}</div>
+                )}
               </li>
             ))}
           </ul>
-        </div>
+        </section>
       )}
     </div>
   );
