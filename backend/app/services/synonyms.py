@@ -44,6 +44,12 @@ def delete_synonym(alias: str) -> None:
     _save()
 
 
+def import_synonyms(mapping: dict[str, str]) -> None:
+    """Import multiple synonym mappings."""
+    for alias, canonical in mapping.items():
+        ALIASES[alias.strip().lower()] = canonical.strip().title()
+    _save()
+
 def canonical_name(name: str) -> str:
     """Return a normalized ingredient name using known aliases."""
     key = name.strip().lower()

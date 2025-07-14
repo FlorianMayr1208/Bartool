@@ -3,9 +3,11 @@ import {
   listSynonyms,
   addSynonym,
   deleteSynonym,
+  importSynonyms,
   listUnitSynonyms,
   addUnitSynonym,
   deleteUnitSynonym,
+  importUnitSynonyms,
   type FetchDebug,
   type Synonym,
 } from '../api';
@@ -20,6 +22,10 @@ export default function Synonyms() {
   const [unitCanonical, setUnitCanonical] = useState('');
   const [debugLog, setDebugLog] = useState<string[]>([]);
   const [showDebug, setShowDebug] = useState(false);
+  const [showImport, setShowImport] = useState(false);
+  const [importText, setImportText] = useState('');
+  const [showUnitImport, setShowUnitImport] = useState(false);
+  const [importUnitText, setImportUnitText] = useState('');
 
   const formatDebug = (dbg: FetchDebug) =>
     `GET ${dbg.url}\nStatus: ${dbg.status}\n` +
@@ -73,6 +79,37 @@ export default function Synonyms() {
     setUnitSynonyms(unitSynonyms.filter((s) => s.alias !== a));
   };
 
+  const submitImport = async () => {
+    try {
+      const data = JSON.parse(importText);
+      const { debug } = await importSynonyms(data);
+      if (debug) addDebug(debug);
+      setImportText('');
+      setShowImport(false);
+      refresh();
+    } catch {
+      alert('Invalid JSON');
+    }
+  };
+
+  const submitUnitImport = async () => {
+    try {
+      const data = JSON.parse(importUnitText);
+      const { debug } = await importUnitSynonyms(data);
+      if (debug) addDebug(debug);
+      setImportUnitText('');
+      setShowUnitImport(false);
+      refresh();
+    } catch {
+      alert('Invalid JSON');
+    }
+  };
+
+  const readFile = (e: React.ChangeEvent<HTMLInputElement>, setter: (v: string) => void) => {
+    const file = e.target.files?.[0];
+    if (file) file.text().then(setter);
+  };
+
   return (
     <div className="space-y-4">
       <h1 className="text-3xl font-bold font-display">Synonyms</h1>
@@ -89,10 +126,32 @@ export default function Synonyms() {
           onChange={(e) => setCanonical(e.target.value)}
           className="border border-[var(--border)] p-1"
         />
-        <button onClick={submit} className="button-send">
-          Add
+        <button onClick={submit} className="button-send">Add</button>
+        <button
+          onClick={() => setShowImport(!showImport)}
+          className="button-search"
+        >
+          Import
         </button>
       </div>
+      {showImport && (
+        <div className="space-y-2 mt-2">
+          <textarea
+            placeholder="{\"alias\": \"Canonical\"}"
+            value={importText}
+            onChange={(e) => setImportText(e.target.value)}
+            className="border border-[var(--border)] p-1 w-full h-24"
+          />
+          <input
+            type="file"
+            accept="application/json"
+            onChange={(e) => readFile(e, setImportText)}
+          />
+          <button onClick={submitImport} className="button-send">
+            Import JSON
+          </button>
+        </div>
+      )}
       <table className="min-w-full border border-[var(--border)] text-left">
         <thead>
           <tr>
@@ -130,10 +189,32 @@ export default function Synonyms() {
           onChange={(e) => setUnitCanonical(e.target.value)}
           className="border border-[var(--border)] p-1"
         />
-        <button onClick={submitUnit} className="button-send">
-          Add
+        <button onClick={submitUnit} className="button-send">Add</button>
+        <button
+          onClick={() => setShowUnitImport(!showUnitImport)}
+          className="button-search"
+        >
+          Import
         </button>
       </div>
+      {showUnitImport && (
+        <div className="space-y-2 mt-2">
+          <textarea
+            placeholder="{\"alias\": \"canonical\"}"
+            value={importUnitText}
+            onChange={(e) => setImportUnitText(e.target.value)}
+            className="border border-[var(--border)] p-1 w-full h-24"
+          />
+          <input
+            type="file"
+            accept="application/json"
+            onChange={(e) => readFile(e, setImportUnitText)}
+          />
+          <button onClick={submitUnitImport} className="button-send">
+            Import JSON
+          </button>
+        </div>
+      )}
       <table className="min-w-full border border-[var(--border)] text-left">
         <thead>
           <tr>

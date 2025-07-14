@@ -47,3 +47,10 @@ def delete_synonym(alias: str) -> None:
 
 def list_synonyms() -> list[dict[str, str]]:
     return [{"alias": a, "canonical": c} for a, c in ALIASES.items()]
+
+
+def import_synonyms(mapping: dict[str, str]) -> None:
+    """Import multiple unit synonyms."""
+    for alias, canonical in mapping.items():
+        ALIASES[alias.strip().lower()] = canonical.strip().lower()
+    _save()
