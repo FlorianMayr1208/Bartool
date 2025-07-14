@@ -12,8 +12,6 @@ export default function BarcodeScanner({ onDetected }: { onDetected: (code: stri
           type: 'LiveStream',
           target: ref.current,
           constraints: {
-            width: 640,
-            height: 192,
             facingMode: 'environment'
           }
         },
