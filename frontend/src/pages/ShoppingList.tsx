@@ -10,6 +10,7 @@ import {
 export default function ShoppingList() {
   const [items, setItems] = useState<ShoppingListItem[]>([]);
   const [synonyms, setSynonyms] = useState<Synonym[]>([]);
+  const [recipeCounts, setRecipeCounts] = useState<Record<string, number>>({});
 
   const synonymsMap = Object.fromEntries(
     synonyms.map((s) => [s.alias.toLowerCase(), s.canonical]),
@@ -25,7 +26,17 @@ export default function ShoppingList() {
 
   useEffect(() => {
     listShoppingList().then(({ data }) => {
-      if (data) setItems(data);
+      if (data) {
+        setItems(data);
+        const counts: Record<string, number> = {};
+        data.forEach((it) => {
+          if (it.recipe) {
+            const key = String(it.recipe.id);
+            if (!counts[key]) counts[key] = 1;
+          }
+        });
+        setRecipeCounts(counts);
+      }
     });
     listSynonyms().then(({ data }) => {
       if (data) setSynonyms(data);
@@ -39,11 +50,10 @@ export default function ShoppingList() {
   };
 
   const download = () => {
-    const lines = items.map(
-      (it) =>
-        `${it.quantity}${it.unit ? ` ${it.unit}` : ""} x ${
-          it.ingredient?.name || it.ingredient_id
-        }`,
+    const lines = Object.entries(aggregated).map(([name, info]) =>
+      `${info.qty} x ${name.charAt(0).toUpperCase() + name.slice(1)}${
+        info.units.size > 0 ? ` (${Array.from(info.units).join(', ')})` : ''
+      }`,
     );
     const blob = new Blob([lines.join('\n')], { type: 'text/plain' });
     const url = URL.createObjectURL(blob);
@@ -68,8 +78,9 @@ export default function ShoppingList() {
     (acc, it) => {
       const name = it.ingredient?.name || String(it.ingredient_id);
       const key = (synonymsMap[name.toLowerCase()] || name).toLowerCase();
+      const count = recipeCounts[it.recipe ? String(it.recipe.id) : 'other'] ?? 1;
       if (!acc[key]) acc[key] = { qty: 0, units: new Set() };
-      acc[key].qty += it.quantity;
+      acc[key].qty += it.quantity * count;
       if (it.unit) acc[key].units.add(it.unit);
       return acc;
     },
@@ -90,9 +101,25 @@ export default function ShoppingList() {
       <div className="space-y-4">
         {Object.entries(itemsByRecipe).map(([key, list]) => (
           <div key={key} className="card p-0">
-            <h2 className="px-4 py-2 font-semibold">
-              {list[0].recipe ? list[0].recipe.name : "Other"}
-            </h2>
+            <div className="flex items-center justify-between px-4 py-2">
+              <h2 className="font-semibold">
+                {list[0].recipe ? list[0].recipe.name : "Other"}
+              </h2>
+              {list[0].recipe && (
+                <input
+                  type="number"
+                  min={1}
+                  className="w-16 border border-[var(--border)]"
+                  value={recipeCounts[String(list[0].recipe.id)] ?? 1}
+                  onChange={(e) =>
+                    setRecipeCounts({
+                      ...recipeCounts,
+                      [list[0].recipe!.id]: Math.max(1, parseInt(e.target.value) || 1),
+                    })
+                  }
+                />
+              )}
+            </div>
             <ul className="divide-y divide-[var(--border)]">
               {list.map((it) => (
                 <li
@@ -100,7 +127,7 @@ export default function ShoppingList() {
                   className="flex items-center justify-between p-4"
                 >
                   <span>
-                    {it.quantity}
+                    {(it.quantity * (recipeCounts[it.recipe ? String(it.recipe.id) : 'other'] ?? 1))}
                     {it.unit ? ` ${it.unit}` : ""} x {it.ingredient?.name || it.ingredient_id}
                     {canonical(it.ingredient?.name) && (
                       <span className="text-sm text-[var(--text-secondary)] ml-1">
