@@ -101,6 +101,7 @@ export interface BarcodeDebug {
 
 export interface BarcodeLookup {
   data: BarcodeResult | null
+  from_cache: boolean
   debug: BarcodeDebug
 }
 
@@ -109,12 +110,13 @@ export async function lookupBarcode(ean: string): Promise<BarcodeLookup> {
   const res = await fetch(url)
   const body = await res.json().catch(() => null)
   return {
-    data: res.ok ? (body as BarcodeResult) : null,
+    data: res.ok ? (body?.data as BarcodeResult) : null,
+    from_cache: Boolean(body?.from_cache),
     debug: {
       url,
       status: res.status,
-      body
-    }
+      body,
+    },
   }
 }
 

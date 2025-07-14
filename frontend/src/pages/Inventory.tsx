@@ -82,7 +82,7 @@ export default function Inventory() {
     if (!code) return
     const { data, debug: dbg } = await lookupBarcode(code)
     addDebug(dbg)
-    setResult(data?.data || null)
+    setResult(data || null)
     setName(data?.name || '')
     if (data?.keywords) {
       setSuggested(matchIngredient(data.keywords))
