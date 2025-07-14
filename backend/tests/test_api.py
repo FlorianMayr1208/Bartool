@@ -103,12 +103,17 @@ async def test_get_recipe(monkeypatch, async_client):
     monkeypatch.setattr(
         "backend.app.services.cocktaildb.fetch_recipe_details", fake_fetch
     )
+    monkeypatch.setattr("backend.app.api.recipes.fetch_recipe_details", fake_fetch)
     resp = await async_client.post("/recipes/", json={"name": "mojito"})
     recipe_id = resp.json()["id"]
 
     resp = await async_client.get(f"/recipes/{recipe_id}")
     assert resp.status_code == 200
-    assert resp.json()["name"] == "Mojito"
+    data = resp.json()
+    assert data["name"] == "Mojito"
+    ing = next(i for i in data["ingredients"] if i["name"] == "Rum")
+    assert ing["inventory_quantity"] == 0
+    assert ing["inventory_item_id"] is not None
 
 
 @pytest.mark.asyncio

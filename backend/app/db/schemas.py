@@ -97,6 +97,18 @@ class RecipeWithInventory(Recipe):
     class Config:
         orm_mode = True
 
+
+class RecipeIngredientWithInventory(RecipeIngredient):
+    """Recipe ingredient including current inventory quantity."""
+    inventory_item_id: int | None = None
+    inventory_quantity: int = 0
+
+
+class RecipeDetail(Recipe):
+    """Full recipe data with inventory info for each ingredient."""
+    ingredients: List[RecipeIngredientWithInventory] = []
+
+
 class InventoryItemBase(BaseModel):
     ingredient_id: int
     quantity: int

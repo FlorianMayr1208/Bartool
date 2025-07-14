@@ -95,6 +95,31 @@ def get_recipe(db: Session, recipe_id: int):
     return db.query(models.Recipe).filter(models.Recipe.id == recipe_id).first()
 
 
+def get_recipe_with_inventory(db: Session, recipe_id: int):
+    """Return recipe details including inventory quantities."""
+    recipe = get_recipe(db, recipe_id)
+    if not recipe:
+        return None
+    ingredients: list[schemas.RecipeIngredientWithInventory] = []
+    for r_ing in recipe.ingredients:
+        canonical = synonyms.canonical_name(r_ing.name)
+        ing = get_or_create_ingredient(db, schemas.IngredientCreate(name=canonical))
+        item = get_inventory_by_ingredient(db, ing.id)
+        ingredients.append(
+            schemas.RecipeIngredientWithInventory(
+                id=r_ing.id,
+                name=r_ing.name,
+                measure=r_ing.measure,
+                inventory_item_id=item.id if item else None,
+                inventory_quantity=item.quantity if item else 0,
+            )
+        )
+    base = schemas.Recipe.model_validate(
+        recipe, from_attributes=True
+    ).model_dump(exclude={"ingredients"})
+    return schemas.RecipeDetail(**base, ingredients=ingredients)
+
+
 def _get_or_create_by_name(db: Session, model, name: str):
     obj = db.query(model).filter(func.lower(model.name) == name.lower()).first()
     if obj:
