@@ -327,3 +327,8 @@ def add_missing_ingredients_to_shopping_list(db: Session, recipe_id: int):
     missing = recipe_missing_ingredients(db, recipe)
     items = [add_to_shopping_list(db, ing, 1) for ing in missing]
     return items
+
+
+def clear_shopping_list(db: Session):
+    db.query(models.ShoppingListItem).delete()
+    db.commit()

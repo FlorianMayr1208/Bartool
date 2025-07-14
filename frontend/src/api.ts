@@ -199,6 +199,10 @@ export async function listShoppingList() {
   return fetchJson<ShoppingListItem[]>(`${API_BASE}/shopping-list/`);
 }
 
+export async function clearShoppingList() {
+  return fetchJson<void>(`${API_BASE}/shopping-list/`, { method: "DELETE" });
+}
+
 export async function addMissingFromRecipe(recipe_id: number) {
   return fetchJson<ShoppingListItem[]>(
     `${API_BASE}/shopping-list/from-recipe/${recipe_id}`,

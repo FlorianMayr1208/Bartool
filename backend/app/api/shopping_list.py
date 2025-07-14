@@ -17,3 +17,9 @@ def add_from_recipe(recipe_id: int, db: Session = Depends(session.get_db)):
     if items is None:
         raise HTTPException(status_code=404, detail="Recipe not found")
     return items
+
+
+@router.delete("/", status_code=204)
+def clear_list(db: Session = Depends(session.get_db)):
+    crud.clear_shopping_list(db)
+    return None
