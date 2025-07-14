@@ -44,6 +44,11 @@ export interface RecipeIngredient {
   inventory_quantity: number;
 }
 
+export interface Recipe {
+  id: number;
+  name: string;
+}
+
 export interface RecipeDetail {
   id: number;
   name: string;
@@ -252,6 +257,8 @@ export interface ShoppingListItem {
   ingredient_id: number;
   quantity: number;
   ingredient?: Ingredient;
+  recipe_id?: number | null;
+  recipe?: Recipe | null;
 }
 
 export async function listShoppingList() {

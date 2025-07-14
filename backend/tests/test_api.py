@@ -31,6 +31,7 @@ def override_get_db():
     finally:
         db.close()
 
+
 app.dependency_overrides[db_session.get_db] = override_get_db
 
 
@@ -75,7 +76,9 @@ async def test_create_recipe(monkeypatch, async_client):
             "ingredients": [{"name": "Rum", "measure": "2 oz"}],
         }
 
-    monkeypatch.setattr("backend.app.services.cocktaildb.fetch_recipe_details", fake_fetch)
+    monkeypatch.setattr(
+        "backend.app.services.cocktaildb.fetch_recipe_details", fake_fetch
+    )
     monkeypatch.setattr("backend.app.api.recipes.fetch_recipe_details", fake_fetch)
     monkeypatch.setattr("backend.app.api.recipes.fetch_recipe_details", fake_fetch)
     monkeypatch.setattr("backend.app.api.recipes.fetch_recipe_details", fake_fetch)
@@ -137,9 +140,7 @@ async def test_recipe_search(monkeypatch, async_client):
     monkeypatch.setattr(
         "backend.app.services.cocktaildb.search_recipes_details", fake_search
     )
-    monkeypatch.setattr(
-        "backend.app.api.recipes.search_recipes_details", fake_search
-    )
+    monkeypatch.setattr("backend.app.api.recipes.search_recipes_details", fake_search)
     resp = await async_client.get("/recipes/search", params={"q": "margarita"})
     assert resp.status_code == 200
     assert resp.json() == await fake_search("")
@@ -153,8 +154,11 @@ async def test_inventory_patch(async_client):
     resp = await async_client.post("/ingredients/", json={"name": "Gin"})
     # create inventory
     from backend.app.db import crud, schemas
+
     db = next(override_get_db())
-    item = crud.create_inventory_item(db, schemas.InventoryItemCreate(ingredient_id=ing_id, quantity=1))
+    item = crud.create_inventory_item(
+        db, schemas.InventoryItemCreate(ingredient_id=ing_id, quantity=1)
+    )
     db.close()
     resp = await async_client.get(f"/inventory/{item.id}")
     assert resp.status_code == 200
@@ -210,7 +214,17 @@ async def test_barcode_lookup_cache(monkeypatch, async_client):
             pass
 
         async def get(self, url, timeout=10):
-            return MockResp({"status": 1, "product": {"product_name": "Gin", "brands": "Bar", "image_front_url": "http://img", "_keywords": ["gin"]}})
+            return MockResp(
+                {
+                    "status": 1,
+                    "product": {
+                        "product_name": "Gin",
+                        "brands": "Bar",
+                        "image_front_url": "http://img",
+                        "_keywords": ["gin"],
+                    },
+                }
+            )
 
     monkeypatch.setattr("backend.app.services.barcode.httpx.AsyncClient", FakeClient)
 
@@ -235,7 +249,9 @@ async def test_barcode_lookup_cache(monkeypatch, async_client):
 async def test_inventory_create_delete(async_client):
     resp = await async_client.post("/ingredients/", json={"name": "Tequila"})
     ing_id = resp.json()["id"]
-    resp = await async_client.post("/inventory/", json={"ingredient_id": ing_id, "quantity": 2})
+    resp = await async_client.post(
+        "/inventory/", json={"ingredient_id": ing_id, "quantity": 2}
+    )
     assert resp.status_code == 201
     item_id = resp.json()["id"]
     resp = await async_client.delete(f"/inventory/{item_id}")
@@ -275,7 +291,9 @@ async def test_recipe_import_adds_inventory(monkeypatch, async_client):
             "ingredients": [{"name": "Vodka", "measure": "2 oz"}],
         }
 
-    monkeypatch.setattr("backend.app.services.cocktaildb.fetch_recipe_details", fake_fetch)
+    monkeypatch.setattr(
+        "backend.app.services.cocktaildb.fetch_recipe_details", fake_fetch
+    )
     resp = await async_client.post("/recipes/", json={"name": "mule"})
     assert resp.status_code == 201
     resp = await async_client.get("/inventory/")
@@ -306,7 +324,9 @@ async def test_ingredient_deduplication(monkeypatch, async_client):
             "ingredients": [{"name": "Dark Rum", "measure": "1 oz"}],
         }
 
-    monkeypatch.setattr("backend.app.services.cocktaildb.fetch_recipe_details", fake_fetch)
+    monkeypatch.setattr(
+        "backend.app.services.cocktaildb.fetch_recipe_details", fake_fetch
+    )
     resp = await async_client.post("/recipes/", json={"name": "dark drink"})
     assert resp.status_code == 201
     resp = await async_client.get("/ingredients/")
@@ -348,7 +368,6 @@ async def test_synonym_import(async_client):
     aliases = [s["alias"] for s in resp.json()]
     assert "tester" in aliases
     await async_client.delete("/synonyms/tester")
-
 
 
 @pytest.mark.asyncio
@@ -402,7 +421,9 @@ async def test_unit_synonym_handled(monkeypatch, async_client):
             "ingredients": [{"name": "Vodka", "measure": "2 ounces"}],
         }
 
-    monkeypatch.setattr("backend.app.services.cocktaildb.fetch_recipe_details", fake_fetch)
+    monkeypatch.setattr(
+        "backend.app.services.cocktaildb.fetch_recipe_details", fake_fetch
+    )
     await async_client.post("/recipes/", json={"name": "test drink"})
     db = next(override_get_db())
     units = [u.name for u in db.query(models.Unit).all()]
@@ -437,6 +458,7 @@ async def test_inventory_aggregate_synonyms(async_client):
 @pytest.mark.asyncio
 async def test_recipe_find_inventory(monkeypatch, async_client):
     from backend.app.db import crud, schemas
+
     async def fake_fetch(name: str):
         if name == "vodka only":
             return {
@@ -464,21 +486,31 @@ async def test_recipe_find_inventory(monkeypatch, async_client):
         }
 
     monkeypatch.setattr("backend.app.api.recipes.fetch_recipe_details", fake_fetch)
-    monkeypatch.setattr("backend.app.services.cocktaildb.fetch_recipe_details", fake_fetch)
+    monkeypatch.setattr(
+        "backend.app.services.cocktaildb.fetch_recipe_details", fake_fetch
+    )
 
     # ensure vodka inventory with quantity > 0
     db = next(override_get_db())
     ing = crud.get_or_create_ingredient(db, schemas.IngredientCreate(name="Vodka"))
     if not crud.get_inventory_by_ingredient(db, ing.id):
-        crud.create_inventory_item(db, schemas.InventoryItemCreate(ingredient_id=ing.id, quantity=1))
+        crud.create_inventory_item(
+            db, schemas.InventoryItemCreate(ingredient_id=ing.id, quantity=1)
+        )
     else:
-        crud.update_inventory_item(db, crud.get_inventory_by_ingredient(db, ing.id).id, schemas.InventoryItemUpdate(quantity=1))
+        crud.update_inventory_item(
+            db,
+            crud.get_inventory_by_ingredient(db, ing.id).id,
+            schemas.InventoryItemUpdate(quantity=1),
+        )
     db.close()
 
     await async_client.post("/recipes/", json={"name": "vodka only"})
     await async_client.post("/recipes/", json={"name": "vodka gin"})
 
-    resp = await async_client.get("/recipes/find", params={"available_only": True, "q": "vodka"})
+    resp = await async_client.get(
+        "/recipes/find", params={"available_only": True, "q": "vodka"}
+    )
     assert resp.status_code == 200
     data = resp.json()
     names = [r["name"] for r in data]
@@ -488,7 +520,9 @@ async def test_recipe_find_inventory(monkeypatch, async_client):
     assert vo["available_count"] == 1
     assert vo["missing_count"] == 0
 
-    resp = await async_client.get("/recipes/find", params={"order_missing": True, "q": "vodka"})
+    resp = await async_client.get(
+        "/recipes/find", params={"order_missing": True, "q": "vodka"}
+    )
     assert resp.status_code == 200
     data = resp.json()
     names = [r["name"] for r in data]
@@ -515,7 +549,9 @@ async def test_shopping_list_from_recipe(monkeypatch, async_client):
             ],
         }
 
-    monkeypatch.setattr("backend.app.services.cocktaildb.fetch_recipe_details", fake_fetch)
+    monkeypatch.setattr(
+        "backend.app.services.cocktaildb.fetch_recipe_details", fake_fetch
+    )
     monkeypatch.setattr("backend.app.api.recipes.fetch_recipe_details", fake_fetch)
 
     resp = await async_client.post("/recipes/", json={"name": "gin drink"})
@@ -526,7 +562,9 @@ async def test_shopping_list_from_recipe(monkeypatch, async_client):
     vodka = resp.json()["ingredients"][0]["name"]
     resp2 = await async_client.post("/ingredients/", json={"name": vodka})
     vodka_id = resp2.json()["id"]
-    await async_client.post("/inventory/", json={"ingredient_id": vodka_id, "quantity": 1})
+    await async_client.post(
+        "/inventory/", json={"ingredient_id": vodka_id, "quantity": 1}
+    )
 
     resp = await async_client.post(f"/shopping-list/from-recipe/{recipe_id}")
     assert resp.status_code == 201
@@ -536,6 +574,7 @@ async def test_shopping_list_from_recipe(monkeypatch, async_client):
     items = resp.json()
     assert len(items) == 1
     assert items[0]["ingredient"]["name"] == "Gin"
+    assert items[0]["recipe"]["id"] == recipe_id
 
 
 @pytest.mark.asyncio
@@ -570,4 +609,3 @@ async def test_clear_shopping_list(monkeypatch, async_client):
     resp = await async_client.get("/shopping-list/")
     assert resp.status_code == 200
     assert resp.json() == []
-

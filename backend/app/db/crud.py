@@ -13,19 +13,27 @@ def _extract_unit(measure: str | None) -> str | None:
         return None
     return " ".join(parts[1:]).strip()
 
+
 from . import models, schemas
 
 # Ingredient CRUD
 
+
 def get_ingredient(db: Session, ingredient_id: int):
-    return db.query(models.Ingredient).filter(models.Ingredient.id == ingredient_id).first()
+    return (
+        db.query(models.Ingredient)
+        .filter(models.Ingredient.id == ingredient_id)
+        .first()
+    )
 
 
 def create_ingredient(db: Session, ingredient: schemas.IngredientCreate):
     canonical = synonyms.canonical_name(ingredient.name)
-    existing = db.query(models.Ingredient).filter(
-        func.lower(models.Ingredient.name) == canonical.lower()
-    ).first()
+    existing = (
+        db.query(models.Ingredient)
+        .filter(func.lower(models.Ingredient.name) == canonical.lower())
+        .first()
+    )
     if existing:
         return existing
     data = ingredient.model_dump()
@@ -43,9 +51,11 @@ def list_ingredients(db: Session, skip: int = 0, limit: int = 100):
 
 def get_ingredient_by_name(db: Session, name: str):
     canonical = synonyms.canonical_name(name)
-    return db.query(models.Ingredient).filter(
-        func.lower(models.Ingredient.name) == canonical.lower()
-    ).first()
+    return (
+        db.query(models.Ingredient)
+        .filter(func.lower(models.Ingredient.name) == canonical.lower())
+        .first()
+    )
 
 
 def get_or_create_ingredient(db: Session, ingredient: schemas.IngredientCreate):
@@ -57,18 +67,23 @@ def get_or_create_ingredient(db: Session, ingredient: schemas.IngredientCreate):
 
 # Unit CRUD
 
+
 def get_unit_by_name(db: Session, name: str):
     canonical = unit_synonyms.canonical_name(name)
-    return db.query(models.Unit).filter(
-        func.lower(models.Unit.name) == canonical.lower()
-    ).first()
+    return (
+        db.query(models.Unit)
+        .filter(func.lower(models.Unit.name) == canonical.lower())
+        .first()
+    )
 
 
 def create_unit(db: Session, unit: schemas.UnitCreate):
     canonical = unit_synonyms.canonical_name(unit.name)
-    existing = db.query(models.Unit).filter(
-        func.lower(models.Unit.name) == canonical.lower()
-    ).first()
+    existing = (
+        db.query(models.Unit)
+        .filter(func.lower(models.Unit.name) == canonical.lower())
+        .first()
+    )
     if existing:
         return existing
     data = unit.model_dump()
@@ -90,6 +105,7 @@ def get_or_create_unit(db: Session, unit: schemas.UnitCreate):
 
 
 # Recipe CRUD
+
 
 def get_recipe(db: Session, recipe_id: int):
     return db.query(models.Recipe).filter(models.Recipe.id == recipe_id).first()
@@ -114,9 +130,9 @@ def get_recipe_with_inventory(db: Session, recipe_id: int):
                 inventory_quantity=item.quantity if item else 0,
             )
         )
-    base = schemas.Recipe.model_validate(
-        recipe, from_attributes=True
-    ).model_dump(exclude={"ingredients"})
+    base = schemas.Recipe.model_validate(recipe, from_attributes=True).model_dump(
+        exclude={"ingredients"}
+    )
     return schemas.RecipeDetail(**base, ingredients=ingredients)
 
 
@@ -135,9 +151,14 @@ def create_recipe(db: Session, recipe: schemas.RecipeCreate):
     db_obj = models.Recipe(**data)
 
     db_obj.tags = [_get_or_create_by_name(db, models.Tag, t) for t in recipe.tags]
-    db_obj.categories = [_get_or_create_by_name(db, models.Category, c) for c in recipe.categories]
+    db_obj.categories = [
+        _get_or_create_by_name(db, models.Category, c) for c in recipe.categories
+    ]
     db_obj.ibas = [_get_or_create_by_name(db, models.Iba, i) for i in recipe.ibas]
-    db_obj.ingredients = [models.RecipeIngredient(name=i.name, measure=i.measure) for i in recipe.ingredients]
+    db_obj.ingredients = [
+        models.RecipeIngredient(name=i.name, measure=i.measure)
+        for i in recipe.ingredients
+    ]
 
     for ing in recipe.ingredients:
         unit_name = _extract_unit(ing.measure)
@@ -156,8 +177,13 @@ def list_recipes(db: Session, skip: int = 0, limit: int = 100):
 
 # InventoryItem CRUD
 
+
 def get_inventory_item(db: Session, item_id: int):
-    return db.query(models.InventoryItem).filter(models.InventoryItem.id == item_id).first()
+    return (
+        db.query(models.InventoryItem)
+        .filter(models.InventoryItem.id == item_id)
+        .first()
+    )
 
 
 def get_inventory_by_ingredient(db: Session, ingredient_id: int):
@@ -199,7 +225,9 @@ def ensure_inventory_for_ingredients(
     db.commit()
 
 
-def update_inventory_item(db: Session, item_id: int, item_update: schemas.InventoryItemUpdate):
+def update_inventory_item(
+    db: Session, item_id: int, item_update: schemas.InventoryItemUpdate
+):
     db_obj = get_inventory_item(db, item_id)
     if not db_obj:
         return None
@@ -212,6 +240,7 @@ def update_inventory_item(db: Session, item_id: int, item_update: schemas.Invent
 
 def list_inventory_items(db: Session, skip: int = 0, limit: int = 100):
     from sqlalchemy.orm import selectinload
+
     return (
         db.query(models.InventoryItem)
         .options(selectinload(models.InventoryItem.ingredient))
@@ -234,7 +263,9 @@ def aggregate_inventory_by_synonyms(db: Session) -> None:
         canonical = synonyms.canonical_name(item.ingredient.name)
         if canonical == item.ingredient.name:
             continue
-        canon_ing = get_or_create_ingredient(db, schemas.IngredientCreate(name=canonical))
+        canon_ing = get_or_create_ingredient(
+            db, schemas.IngredientCreate(name=canonical)
+        )
         if item.ingredient_id == canon_ing.id:
             continue
         existing = get_inventory_by_ingredient(db, canon_ing.id)
@@ -281,7 +312,9 @@ def recipe_missing_count(db: Session, recipe: models.Recipe) -> int:
     return missing
 
 
-def recipe_missing_ingredients(db: Session, recipe: models.Recipe) -> list[models.Ingredient]:
+def recipe_missing_ingredients(
+    db: Session, recipe: models.Recipe
+) -> list[models.Ingredient]:
     """Return Ingredient objects that are missing from inventory."""
     missing: list[models.Ingredient] = []
     for r_ing in recipe.ingredients:
@@ -349,20 +382,34 @@ def store_barcode_cache(db: Session, ean: str, data: dict):
 
 
 # Shopping list CRUD
-def get_shopping_list_item_by_ingredient(db: Session, ingredient_id: int):
-    return (
-        db.query(models.ShoppingListItem)
-        .filter(models.ShoppingListItem.ingredient_id == ingredient_id)
-        .first()
+def get_shopping_list_item_by_ingredient(
+    db: Session, ingredient_id: int, recipe_id: int | None = None
+):
+    query = db.query(models.ShoppingListItem).filter(
+        models.ShoppingListItem.ingredient_id == ingredient_id
     )
+    if recipe_id is None:
+        query = query.filter(models.ShoppingListItem.recipe_id.is_(None))
+    else:
+        query = query.filter(models.ShoppingListItem.recipe_id == recipe_id)
+    return query.first()
 
 
-def add_to_shopping_list(db: Session, ingredient: models.Ingredient, quantity: int = 1):
-    item = get_shopping_list_item_by_ingredient(db, ingredient.id)
+def add_to_shopping_list(
+    db: Session,
+    ingredient: models.Ingredient,
+    quantity: int = 1,
+    recipe_id: int | None = None,
+):
+    item = get_shopping_list_item_by_ingredient(db, ingredient.id, recipe_id)
     if item:
         item.quantity += quantity
     else:
-        item = models.ShoppingListItem(ingredient_id=ingredient.id, quantity=quantity)
+        item = models.ShoppingListItem(
+            ingredient_id=ingredient.id,
+            quantity=quantity,
+            recipe_id=recipe_id,
+        )
         db.add(item)
     db.commit()
     db.refresh(item)
@@ -374,7 +421,10 @@ def list_shopping_list_items(db: Session, skip: int = 0, limit: int = 100):
 
     return (
         db.query(models.ShoppingListItem)
-        .options(selectinload(models.ShoppingListItem.ingredient))
+        .options(
+            selectinload(models.ShoppingListItem.ingredient),
+            selectinload(models.ShoppingListItem.recipe),
+        )
         .offset(skip)
         .limit(limit)
         .all()
@@ -386,7 +436,7 @@ def add_missing_ingredients_to_shopping_list(db: Session, recipe_id: int):
     if not recipe:
         return None
     missing = recipe_missing_ingredients(db, recipe)
-    items = [add_to_shopping_list(db, ing, 1) for ing in missing]
+    items = [add_to_shopping_list(db, ing, 1, recipe_id) for ing in missing]
     return items
 
 
