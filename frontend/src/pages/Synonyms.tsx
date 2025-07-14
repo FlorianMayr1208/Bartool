@@ -118,13 +118,13 @@ export default function Synonyms() {
           placeholder="Alias"
           value={alias}
           onChange={(e) => setAlias(e.target.value)}
-          className="border border-[var(--border)] p-1"
+          className="border p-1" style={{ borderColor: 'var(--border)' }}
         />
         <input
           placeholder="Canonical"
           value={canonical}
           onChange={(e) => setCanonical(e.target.value)}
-          className="border border-[var(--border)] p-1"
+          className="border p-1" style={{ borderColor: 'var(--border)' }}
         />
         <button onClick={submit} className="button-send">Add</button>
         <button
@@ -137,10 +137,10 @@ export default function Synonyms() {
       {showImport && (
         <div className="space-y-2 mt-2">
           <textarea
-            placeholder="{\"alias\": \"Canonical\"}"
+            placeholder='{"alias": "Canonical"}'
             value={importText}
             onChange={(e) => setImportText(e.target.value)}
-            className="border border-[var(--border)] p-1 w-full h-24"
+            className="border p-1 w-full h-24" style={{ border: '1px solid var(--border)' }}
           />
           <input
             type="file"
@@ -152,7 +152,7 @@ export default function Synonyms() {
           </button>
         </div>
       )}
-      <table className="min-w-full border border-[var(--border)] text-left">
+      <table className="min-w-full border text-left" style={{ border: '1px solid var(--border)' }}>
         <thead>
           <tr>
             <th className="px-2">Alias</th>
@@ -162,7 +162,7 @@ export default function Synonyms() {
         </thead>
         <tbody>
           {synonyms.map((s) => (
-            <tr key={s.alias} className="border-t border-[var(--border)]">
+            <tr key={s.alias} className="border-t" style={{ borderTop: '1px solid var(--border)' }}>
               <td className="px-2 py-1">{s.alias}</td>
               <td className="px-2 py-1">{s.canonical}</td>
               <td className="px-2 py-1">
@@ -175,19 +175,19 @@ export default function Synonyms() {
         </tbody>
       </table>
 
-      <h2 className="text-xl font-bold">Unit Synonyms</h2>
+      <h1 className="text-xl font-bold">Unit Synonyms</h1>
       <div className="space-x-2">
         <input
           placeholder="Alias"
           value={unitAlias}
           onChange={(e) => setUnitAlias(e.target.value)}
-          className="border border-[var(--border)] p-1"
+          className="border p-1" style={{ border: '1px solid var(--border)' }}
         />
         <input
           placeholder="Canonical"
           value={unitCanonical}
           onChange={(e) => setUnitCanonical(e.target.value)}
-          className="border border-[var(--border)] p-1"
+          className="border p-1" style={{ border: '1px solid var(--border)' }}
         />
         <button onClick={submitUnit} className="button-send">Add</button>
         <button
@@ -200,10 +200,10 @@ export default function Synonyms() {
       {showUnitImport && (
         <div className="space-y-2 mt-2">
           <textarea
-            placeholder="{\"alias\": \"canonical\"}"
+            placeholder='{"alias": "canonical"}'
             value={importUnitText}
             onChange={(e) => setImportUnitText(e.target.value)}
-            className="border border-[var(--border)] p-1 w-full h-24"
+            className="border p-1 w-full h-24" style={{ border: '1px solid var(--border)' }}
           />
           <input
             type="file"
@@ -215,7 +215,7 @@ export default function Synonyms() {
           </button>
         </div>
       )}
-      <table className="min-w-full border border-[var(--border)] text-left">
+      <table className="min-w-full border text-left" style={{ border: '1px solid var(--border)' }}>
         <thead>
           <tr>
             <th className="px-2">Alias</th>
@@ -225,7 +225,7 @@ export default function Synonyms() {
         </thead>
         <tbody>
           {unitSynonyms.map((s) => (
-            <tr key={s.alias} className="border-t border-[var(--border)]">
+            <tr key={s.alias} className="border-t" style={{ borderTop: '1px solid var(--border)' }}>
               <td className="px-2 py-1">{s.alias}</td>
               <td className="px-2 py-1">{s.canonical}</td>
               <td className="px-2 py-1">
