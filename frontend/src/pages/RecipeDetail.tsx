@@ -14,7 +14,7 @@ import {
 export default function RecipeDetail() {
   const { id } = useParams<{ id: string }>();
   const [recipe, setRecipe] = useState<RecipeDetail | null>(null);
-  const [added, setAdded] = useState(false);
+  const [added, setAdded] = useState<number | null>(null);
   const [synonyms, setSynonyms] = useState<Synonym[]>([]);
 
   const synonymsMap = Object.fromEntries(
@@ -71,15 +71,23 @@ export default function RecipeDetail() {
           <button
             onClick={async () => {
               if (recipe) {
-                await addMissingFromRecipe(recipe.id);
-                setAdded(true);
+                const { data } = await addMissingFromRecipe(recipe.id);
+                if (data) {
+                  setAdded(data.length);
+                }
               }
             }}
             className="button-search"
           >
             Add missing to shopping list
           </button>
-          {added && <p className="text-sm text-green-700">Added!</p>}
+          {added !== null && (
+            <p className="text-sm text-green-700">
+              {added > 0
+                ? `Added ${added} item${added === 1 ? "" : "s"}!`
+                : "All ingredients already in inventory"}
+            </p>
+          )}
         </div>
       </div>
       {recipe.ingredients && recipe.ingredients.length > 0 && (
