@@ -1,12 +1,21 @@
 import Card from '../components/Card';
-import { Box, BookOpen, ClipboardList, BarChart2 } from 'lucide-react';
+import {
+  Box,
+  BookOpen,
+  ClipboardList,
+  BarChart2,
+  Search,
+  Replace,
+} from 'lucide-react';
 
 export default function Dashboard() {
   const features = [
     { to: '/inventory', title: 'Inventory', icon: <Box size={20} /> },
     { to: '/recipes', title: 'Recipes', icon: <BookOpen size={20} /> },
+    { to: '/recipes/find', title: 'Recipe Finder', icon: <Search size={20} /> },
     { to: '/shopping-list', title: 'Shopping List', icon: <ClipboardList size={20} /> },
     { to: '/stats', title: 'Stats', icon: <BarChart2 size={20} /> },
+    { to: '/synonyms', title: 'Synonyms', icon: <Replace size={20} /> },
   ];
 
   return (
