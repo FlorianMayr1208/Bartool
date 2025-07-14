@@ -36,6 +36,22 @@ export interface InventoryItem {
   ingredient?: Ingredient;
 }
 
+export interface RecipeIngredient {
+  id: number;
+  name: string;
+  measure?: string | null;
+  inventory_item_id?: number | null;
+  inventory_quantity: number;
+}
+
+export interface RecipeDetail {
+  id: number;
+  name: string;
+  instructions?: string | null;
+  thumb?: string | null;
+  ingredients: RecipeIngredient[];
+}
+
 export async function healthCheck() {
   const res = await fetch(`${API_BASE}/healthz`);
   if (!res.ok) {
@@ -155,7 +171,7 @@ export async function findRecipes(options: FindRecipesOptions = {}) {
   return res.json();
 }
 
-export async function getRecipe(id: number) {
+export async function getRecipe(id: number): Promise<RecipeDetail> {
   const res = await fetch(`${API_BASE}/recipes/${id}`);
   if (!res.ok) {
     throw new Error("Recipe not found");
