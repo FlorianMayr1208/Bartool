@@ -86,11 +86,17 @@ paths:
       summary: List synonyms
     post:
       summary: Create synonym
+  /synonyms/import:
+    post:
+      summary: Import synonyms from JSON
   /unit-synonyms:
     get:
       summary: List unit synonyms
     post:
       summary: Create unit synonym
+  /unit-synonyms/import:
+    post:
+      summary: Import unit synonyms from JSON
   /synonyms/{alias}:
     delete:
       summary: Delete synonym

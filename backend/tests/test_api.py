@@ -340,6 +340,18 @@ async def test_synonym_crud(async_client):
 
 
 @pytest.mark.asyncio
+async def test_synonym_import(async_client):
+    data = {"tester": "Test"}
+    resp = await async_client.post("/synonyms/import", json=data)
+    assert resp.status_code == 201
+    resp = await async_client.get("/synonyms/")
+    aliases = [s["alias"] for s in resp.json()]
+    assert "tester" in aliases
+    await async_client.delete("/synonyms/tester")
+
+
+
+@pytest.mark.asyncio
 async def test_unit_synonym_crud(async_client):
     resp = await async_client.get("/unit-synonyms/")
     assert resp.status_code == 200
@@ -363,6 +375,17 @@ async def test_unit_synonym_crud(async_client):
     resp = await async_client.get("/unit-synonyms/")
     aliases = [s["alias"] for s in resp.json()]
     assert "testunit" not in aliases
+
+
+@pytest.mark.asyncio
+async def test_unit_synonym_import(async_client):
+    data = {"unittest": "ut"}
+    resp = await async_client.post("/unit-synonyms/import", json=data)
+    assert resp.status_code == 201
+    resp = await async_client.get("/unit-synonyms/")
+    aliases = [s["alias"] for s in resp.json()]
+    assert "unittest" in aliases
+    await async_client.delete("/unit-synonyms/unittest")
 
 
 @pytest.mark.asyncio

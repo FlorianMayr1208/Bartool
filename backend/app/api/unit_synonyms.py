@@ -1,4 +1,5 @@
 from fastapi import APIRouter, HTTPException
+from fastapi import Body
 
 from ..services import unit_synonyms
 from ..db import schemas
@@ -19,3 +20,11 @@ def create_synonym(s: schemas.Synonym):
 def delete_synonym(alias: str):
     unit_synonyms.delete_synonym(alias)
     return None
+
+
+@router.post('/import', status_code=201)
+def import_unit_synonym_data(data: dict[str, str] = Body(...)):
+    if not data:
+        raise HTTPException(status_code=400, detail='No data provided')
+    unit_synonyms.import_synonyms(data)
+    return {"imported": len(data)}

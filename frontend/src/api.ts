@@ -206,6 +206,14 @@ export async function deleteSynonym(alias: string) {
   });
 }
 
+export async function importSynonyms(data: Record<string, string>) {
+  return fetchJson<void>(`${API_BASE}/synonyms/import`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(data),
+  });
+}
+
 export async function listUnitSynonyms() {
   return fetchJson<Synonym[]>(`${API_BASE}/unit-synonyms/`);
 }
@@ -223,6 +231,14 @@ export async function deleteUnitSynonym(alias: string) {
     `${API_BASE}/unit-synonyms/${encodeURIComponent(alias)}`,
     { method: "DELETE" },
   );
+}
+
+export async function importUnitSynonyms(data: Record<string, string>) {
+  return fetchJson<void>(`${API_BASE}/unit-synonyms/import`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(data),
+  });
 }
 
 export async function aggregateInventorySynonyms() {
