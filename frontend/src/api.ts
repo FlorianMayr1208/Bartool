@@ -256,6 +256,7 @@ export interface ShoppingListItem {
   id: number;
   ingredient_id: number;
   quantity: number;
+  unit?: string | null;
   ingredient?: Ingredient;
   recipe_id?: number | null;
   recipe?: Recipe | null;

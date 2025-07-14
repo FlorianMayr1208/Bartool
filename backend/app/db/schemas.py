@@ -168,6 +168,7 @@ class ShoppingListItemBase(BaseModel):
     ingredient_id: int
     quantity: int = 1
     recipe_id: int | None = None
+    unit: str | None = None
 
 
 class ShoppingListItemCreate(ShoppingListItemBase):

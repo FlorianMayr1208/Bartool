@@ -575,6 +575,7 @@ async def test_shopping_list_from_recipe(monkeypatch, async_client):
     assert len(items) == 1
     assert items[0]["ingredient"]["name"] == "Gin"
     assert items[0]["recipe"]["id"] == recipe_id
+    assert items[0]["unit"] == "oz"
 
 
 @pytest.mark.asyncio

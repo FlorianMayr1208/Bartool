@@ -314,15 +314,18 @@ def recipe_missing_count(db: Session, recipe: models.Recipe) -> int:
 
 def recipe_missing_ingredients(
     db: Session, recipe: models.Recipe
-) -> list[models.Ingredient]:
-    """Return Ingredient objects that are missing from inventory."""
-    missing: list[models.Ingredient] = []
+) -> list[tuple[models.Ingredient, str | None]]:
+    """Return missing ingredients along with their units."""
+    missing: list[tuple[models.Ingredient, str | None]] = []
     for r_ing in recipe.ingredients:
         canonical = synonyms.canonical_name(r_ing.name)
         ing = get_or_create_ingredient(db, schemas.IngredientCreate(name=canonical))
         item = get_inventory_by_ingredient(db, ing.id)
         if not item or item.quantity <= 0:
-            missing.append(ing)
+            unit = _extract_unit(r_ing.measure)
+            if unit:
+                unit = unit_synonyms.canonical_name(unit)
+            missing.append((ing, unit))
     return missing
 
 
@@ -400,15 +403,19 @@ def add_to_shopping_list(
     ingredient: models.Ingredient,
     quantity: int = 1,
     recipe_id: int | None = None,
+    unit: str | None = None,
 ):
     item = get_shopping_list_item_by_ingredient(db, ingredient.id, recipe_id)
     if item:
         item.quantity += quantity
+        if unit and not item.unit:
+            item.unit = unit
     else:
         item = models.ShoppingListItem(
             ingredient_id=ingredient.id,
             quantity=quantity,
             recipe_id=recipe_id,
+            unit=unit,
         )
         db.add(item)
     db.commit()
@@ -436,7 +443,10 @@ def add_missing_ingredients_to_shopping_list(db: Session, recipe_id: int):
     if not recipe:
         return None
     missing = recipe_missing_ingredients(db, recipe)
-    items = [add_to_shopping_list(db, ing, 1, recipe_id) for ing in missing]
+    items = [
+        add_to_shopping_list(db, ing, 1, recipe_id, unit)
+        for ing, unit in missing
+    ]
     return items
 
 
