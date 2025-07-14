@@ -76,12 +76,6 @@ export default function Synonyms() {
   return (
     <div className="space-y-4">
       <h1 className="text-2xl font-bold">Synonyms</h1>
-      <button
-        onClick={() => setShowDebug((v) => !v)}
-        className="rounded bg-gray-200 px-2 py-1"
-      >
-        {showDebug ? 'Hide Debug' : 'Show Debug'}
-      </button>
       <div className="space-x-2">
         <input
           placeholder="Alias"
@@ -162,10 +156,20 @@ export default function Synonyms() {
           ))}
         </tbody>
       </table>
-      {showDebug && debugLog.length > 0 && (
-        <pre className="whitespace-pre-wrap bg-gray-100 p-2 text-xs">
-          {debugLog.join('\n\n')}
-        </pre>
+        {debugLog.length > 0 && (
+        <div className="mt-4 space-y-2">
+          <button
+            onClick={() => setShowDebug(!showDebug)}
+            className="button-search"
+          >
+            {showDebug ? 'Hide Debug' : 'Show Debug'}
+          </button>
+          {showDebug && (
+            <pre className="whitespace-pre-wrap bg-gray-100 p-2 text-xs">
+              {debugLog.join('\n\n')}
+            </pre>
+          )}
+        </div>
       )}
     </div>
   );
