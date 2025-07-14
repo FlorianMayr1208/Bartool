@@ -11,6 +11,13 @@ def list_items(skip: int = 0, limit: int = 100, db: Session = Depends(session.ge
     return crud.list_inventory_items(db, skip=skip, limit=limit)
 
 
+@router.post("/aggregate-synonyms", status_code=200)
+def aggregate_synonyms(db: Session = Depends(session.get_db)):
+    """Aggregate inventory items using current synonyms."""
+    crud.aggregate_inventory_by_synonyms(db)
+    return {"status": "ok"}
+
+
 @router.post("/", response_model=schemas.InventoryItem, status_code=201)
 def create_item(item: schemas.InventoryItemCreate, db: Session = Depends(session.get_db)):
     return crud.create_inventory_item(db, item)

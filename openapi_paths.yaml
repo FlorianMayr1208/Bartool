@@ -114,6 +114,9 @@ paths:
           required: true
           schema:
             type: string
+  /inventory/aggregate-synonyms:
+    post:
+      summary: Aggregate inventory items using current synonyms
   /shopping-list:
     get:
       summary: List shopping list items

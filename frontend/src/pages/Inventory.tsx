@@ -6,6 +6,7 @@ import {
   createInventory,
   updateInventory,
   deleteInventory,
+  aggregateInventorySynonyms,
   lookupBarcode,
   listIngredients,
   listSynonyms,
@@ -213,6 +214,16 @@ export default function Inventory() {
         />
         <button onClick={submit} className="button-search">
           Add
+        </button>
+        <button
+          onClick={async () => {
+            const { debug } = await aggregateInventorySynonyms();
+            if (debug) addDebug(debug);
+            refresh();
+          }}
+          className="button-send"
+        >
+          Aggregate Synonyms
         </button>
       </div>
       <table className="min-w-full border border-[var(--border)] text-left">
