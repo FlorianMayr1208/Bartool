@@ -49,7 +49,7 @@ export default function Recipes() {
   return (
     <div className="space-y-4">
       {/* Page title */}
-      <h1 className="text-2xl font-bold">Recipes</h1>
+      <h1 className="text-3xl font-bold font-display">Recipes</h1>
       {/* Search bar */}
       <div className="flex max-w-md items-center overflow-hidden rounded border border-[var(--border)]">
         <input

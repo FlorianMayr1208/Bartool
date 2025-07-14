@@ -145,7 +145,7 @@ export default function Inventory() {
 
   return (
     <div className="space-y-4">
-      <h1 className="text-2xl font-bold">Inventory</h1>
+      <h1 className="text-3xl font-bold font-display">Inventory</h1>
 
       <section className="space-y-4 p-4 mb-6 rounded-lg shadow">
         <h2 className="text-xl font-semibold">Barcode Lookup</h2>
@@ -181,7 +181,7 @@ export default function Inventory() {
               <img
                 src={result.image_url}
                 alt={result.name || 'product'}
-                className="h-16 w-16 rounded object-cover"
+                className="h-48 w-48 rounded object-cover"
               />
             )}
             <div className="flex-1">

@@ -8,8 +8,7 @@ export default function Navbar() {
     [
       "relative px-4 py-2 rounded-full font-semibold transition-all duration-300 no-underline",
       isActive
-        ? "bg-[var(--accent)] text-black shadow-md p-3" +
-          "" +
+        ? "bg-[var(--accent)] text-black shadow-md p-3 flex items-center justify-center" +
           " pl-[10px] pr-[10px] pt-[5px] pb-[5px]"
         : "text-[var(--text-muted)] hover:text-[var(--accent)] hover:bg-[var(--bg-primary)]",
       "hover:scale-105",
@@ -17,9 +16,9 @@ export default function Navbar() {
 
   return (
     <header className="bg-[var(--bg-elevated)] border-b border-[var(--border)] text-[var(--text-primary)] shadow-lg sticky top-0 z-50">
-      <nav className="container mx-auto flex items-center justify-between py-3 px-4 mb-4">
+      <nav className="container mx-auto flex items-center justify-between py-3 px-4">
         <div className="flex items-center gap-3">
-          <span className="text-xl font-bold tracking-tight text-[var(--accent)]">Bartool</span>
+          <span className="text-3xl font-bold tracking-tight text-[var(--accent)]">Bartool</span>
         </div>
         <div className="flex gap-4 md:gap-8 mr:gap-8">
           <NavLink to="/" className={linkClass} end>

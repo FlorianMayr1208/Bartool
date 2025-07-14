@@ -66,7 +66,7 @@ export default function RecipeDetail() {
           />
         )}
         <div>
-          <h1 className="text-2xl font-bold mb-2">{recipe.name}</h1>
+          <h1 className="text-3xl font-bold mb-2 font-display">{recipe.name}</h1>
           {recipe.instructions && <p className="mb-4">{recipe.instructions}</p>}
           <button
             onClick={async () => {
