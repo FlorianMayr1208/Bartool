@@ -221,6 +221,42 @@ def list_inventory_items(db: Session, skip: int = 0, limit: int = 100):
     )
 
 
+def aggregate_inventory_by_synonyms(db: Session) -> None:
+    """Merge items whose ingredient name is now a synonym."""
+    from sqlalchemy.orm import selectinload
+
+    items = (
+        db.query(models.InventoryItem)
+        .options(selectinload(models.InventoryItem.ingredient))
+        .all()
+    )
+    for item in list(items):
+        canonical = synonyms.canonical_name(item.ingredient.name)
+        if canonical == item.ingredient.name:
+            continue
+        canon_ing = get_or_create_ingredient(db, schemas.IngredientCreate(name=canonical))
+        if item.ingredient_id == canon_ing.id:
+            continue
+        existing = get_inventory_by_ingredient(db, canon_ing.id)
+        if existing:
+            existing.quantity += item.quantity
+            db.delete(item)
+        else:
+            item.ingredient_id = canon_ing.id
+    db.commit()
+
+    # remove ingredients without inventory
+    for ing in db.query(models.Ingredient).all():
+        used = (
+            db.query(models.InventoryItem)
+            .filter(models.InventoryItem.ingredient_id == ing.id)
+            .first()
+        )
+        if not used:
+            db.delete(ing)
+    db.commit()
+
+
 def delete_inventory_item(db: Session, item_id: int) -> bool:
     item = get_inventory_item(db, item_id)
     if not item:

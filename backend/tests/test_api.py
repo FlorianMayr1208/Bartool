@@ -388,6 +388,30 @@ async def test_unit_synonym_handled(monkeypatch, async_client):
 
 
 @pytest.mark.asyncio
+async def test_inventory_aggregate_synonyms(async_client):
+    r1 = await async_client.post("/ingredients/", json={"name": "Rum"})
+    r1_id = r1.json()["id"]
+    r2 = await async_client.post("/ingredients/", json={"name": "151 Proof Rum"})
+    r2_id = r2.json()["id"]
+
+    await async_client.post("/inventory/", json={"ingredient_id": r1_id, "quantity": 1})
+    await async_client.post("/inventory/", json={"ingredient_id": r2_id, "quantity": 2})
+
+    await async_client.post(
+        "/synonyms/", json={"alias": "151 proof rum", "canonical": "Rum"}
+    )
+
+    resp = await async_client.post("/inventory/aggregate-synonyms")
+    assert resp.status_code == 200
+
+    resp = await async_client.get("/inventory/")
+    items = resp.json()
+    rum_items = [i for i in items if i["ingredient"]["name"] == "Rum"]
+    assert rum_items
+    assert rum_items[0]["quantity"] >= 3
+
+
+@pytest.mark.asyncio
 async def test_recipe_find_inventory(monkeypatch, async_client):
     from backend.app.db import crud, schemas
     async def fake_fetch(name: str):

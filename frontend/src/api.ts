@@ -225,6 +225,12 @@ export async function deleteUnitSynonym(alias: string) {
   );
 }
 
+export async function aggregateInventorySynonyms() {
+  return fetchJson<void>(`${API_BASE}/inventory/aggregate-synonyms`, {
+    method: "POST",
+  });
+}
+
 export interface ShoppingListItem {
   id: number;
   ingredient_id: number;
