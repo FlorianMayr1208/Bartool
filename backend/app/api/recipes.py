@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 
 from ..db import crud, schemas, session
@@ -40,12 +40,10 @@ def list_recipes(skip: int = 0, limit: int = 100, db: Session = Depends(session.
     return crud.list_recipes(db, skip=skip, limit=limit)
 
 
-@router.get("/{recipe_id}", response_model=schemas.Recipe)
+@router.get("/{recipe_id}", response_model=schemas.RecipeDetail)
 def get_recipe(recipe_id: int, db: Session = Depends(session.get_db)):
-    recipe = crud.get_recipe(db, recipe_id)
+    recipe = crud.get_recipe_with_inventory(db, recipe_id)
     if not recipe:
-        from fastapi import HTTPException
-
         raise HTTPException(status_code=404, detail="Recipe not found")
     return recipe
 

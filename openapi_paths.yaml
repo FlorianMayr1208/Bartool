@@ -65,7 +65,7 @@ paths:
       summary: Add recipe from CocktailDB
   /recipes/{recipe_id}:
     get:
-      summary: Get recipe
+      summary: Get recipe with inventory
       parameters:
         - in: path
           name: recipe_id
