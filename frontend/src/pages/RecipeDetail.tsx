@@ -3,7 +3,9 @@ import { useParams } from 'react-router-dom';
 import {
   getRecipe,
   addMissingFromRecipe,
+  updateInventory,
   type RecipeDetail,
+  type RecipeIngredient,
 } from '../api';
 
 
@@ -11,6 +13,19 @@ export default function RecipeDetail() {
   const { id } = useParams<{ id: string }>();
   const [recipe, setRecipe] = useState<RecipeDetail | null>(null);
   const [added, setAdded] = useState(false);
+
+  const updateQty = async (ing: RecipeIngredient, qty: number) => {
+    if (!recipe || !ing.inventory_item_id) return;
+    const { data } = await updateInventory(ing.inventory_item_id, { quantity: qty });
+    if (data) {
+      setRecipe({
+        ...recipe,
+        ingredients: recipe.ingredients.map((i) =>
+          i.id === ing.id ? { ...i, inventory_quantity: data.quantity } : i,
+        ),
+      });
+    }
+  };
 
   useEffect(() => {
     if (!id) return;
@@ -56,11 +71,17 @@ export default function RecipeDetail() {
           <ul className="space-y-2">
             {recipe.ingredients.map((ing) => (
               <li key={ing.id}>
-                <div className="flex justify-between">
+                <div className="flex justify-between items-center gap-2">
                   <span className="font-medium">{ing.name}</span>
-                  <span className="text-sm text-[var(--text-secondary)]">
-                    {`${ing.inventory_quantity} in stock`}
-                  </span>
+                  <div className="flex items-center gap-2">
+                    <input
+                      type="number"
+                      value={ing.inventory_quantity}
+                      onChange={(e) => updateQty(ing, parseInt(e.target.value))}
+                      className="w-16 border border-[var(--border)]"
+                    />
+                    <span className="text-sm text-[var(--text-secondary)]">in stock</span>
+                  </div>
                 </div>
                 {ing.measure && (
                   <div className="text-sm text-[var(--text-muted)]">{ing.measure}</div>
