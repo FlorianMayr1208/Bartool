@@ -188,5 +188,7 @@ class ShoppingListItem(Base):
     id = Column(Integer, primary_key=True, index=True)
     ingredient_id = Column(Integer, ForeignKey("ingredients.id"), nullable=False)
     quantity = Column(Integer, default=1)
+    recipe_id = Column(Integer, ForeignKey("recipes.id"), nullable=True)
 
     ingredient = relationship("Ingredient")
+    recipe = relationship("Recipe")

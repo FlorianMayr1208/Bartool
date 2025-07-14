@@ -1,6 +1,7 @@
 from pydantic import BaseModel
 from typing import Optional, List
 
+
 class UnitBase(BaseModel):
     name: str
     symbol: Optional[str] = None
@@ -16,14 +17,17 @@ class Unit(UnitBase):
     class Config:
         orm_mode = True
 
+
 class IngredientBase(BaseModel):
     name: str
     type: Optional[str] = None
     barcode: Optional[str] = None
     notes: Optional[str] = None
 
+
 class IngredientCreate(IngredientBase):
     pass
+
 
 class Ingredient(IngredientBase):
     id: int
@@ -31,24 +35,29 @@ class Ingredient(IngredientBase):
     class Config:
         orm_mode = True
 
+
 class RecipeBase(BaseModel):
     name: str
     alcoholic: Optional[str] = None
     instructions: Optional[str] = None
     thumb: Optional[str] = None
 
+
 class RecipeIngredientBase(BaseModel):
     name: str
     measure: Optional[str] = None
 
+
 class RecipeIngredientCreate(RecipeIngredientBase):
     pass
+
 
 class RecipeIngredient(RecipeIngredientBase):
     id: int
 
     class Config:
         orm_mode = True
+
 
 class Tag(BaseModel):
     id: int
@@ -57,12 +66,14 @@ class Tag(BaseModel):
     class Config:
         orm_mode = True
 
+
 class Category(BaseModel):
     id: int
     name: str
 
     class Config:
         orm_mode = True
+
 
 class Iba(BaseModel):
     id: int
@@ -78,6 +89,7 @@ class RecipeCreate(RecipeBase):
     ibas: List[str] = []
     ingredients: List[RecipeIngredientCreate] = []
 
+
 class Recipe(RecipeBase):
     id: int
     tags: List[Tag] = []
@@ -91,6 +103,7 @@ class Recipe(RecipeBase):
 
 class RecipeWithInventory(Recipe):
     """Recipe details along with inventory availability info."""
+
     available_count: int
     missing_count: int
 
@@ -100,12 +113,14 @@ class RecipeWithInventory(Recipe):
 
 class RecipeIngredientWithInventory(RecipeIngredient):
     """Recipe ingredient including current inventory quantity."""
+
     inventory_item_id: int | None = None
     inventory_quantity: int = 0
 
 
 class RecipeDetail(Recipe):
     """Full recipe data with inventory info for each ingredient."""
+
     ingredients: List[RecipeIngredientWithInventory] = []
 
 
@@ -114,12 +129,15 @@ class InventoryItemBase(BaseModel):
     quantity: int
     status: Optional[str] = None
 
+
 class InventoryItemCreate(InventoryItemBase):
     pass
+
 
 class InventoryItemUpdate(BaseModel):
     quantity: Optional[int] = None
     status: Optional[str] = None
+
 
 class InventoryItem(InventoryItemBase):
     id: int
@@ -149,6 +167,7 @@ class BarcodeCache(BaseModel):
 class ShoppingListItemBase(BaseModel):
     ingredient_id: int
     quantity: int = 1
+    recipe_id: int | None = None
 
 
 class ShoppingListItemCreate(ShoppingListItemBase):
@@ -164,3 +183,4 @@ class ShoppingListItem(ShoppingListItemBase):
 
 class ShoppingListItemWithIngredient(ShoppingListItem):
     ingredient: Ingredient
+    recipe: Recipe | None = None
