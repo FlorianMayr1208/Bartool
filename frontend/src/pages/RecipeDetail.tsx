@@ -4,8 +4,10 @@ import {
   getRecipe,
   addMissingFromRecipe,
   updateInventory,
+  listSynonyms,
   type RecipeDetail,
   type RecipeIngredient,
+  type Synonym,
 } from '../api';
 
 
@@ -13,6 +15,18 @@ export default function RecipeDetail() {
   const { id } = useParams<{ id: string }>();
   const [recipe, setRecipe] = useState<RecipeDetail | null>(null);
   const [added, setAdded] = useState(false);
+  const [synonyms, setSynonyms] = useState<Synonym[]>([]);
+
+  const synonymsMap = Object.fromEntries(
+    synonyms.map((s) => [s.alias.toLowerCase(), s.canonical]),
+  );
+
+  const canonical = (n: string): string | null => {
+    const key = n.trim().toLowerCase();
+    const cand = synonymsMap[key];
+    if (!cand || cand.toLowerCase() === key) return null;
+    return cand.charAt(0).toUpperCase() + cand.slice(1);
+  };
 
   const updateQty = async (ing: RecipeIngredient, qty: number) => {
     if (!recipe || !ing.inventory_item_id) return;
@@ -32,6 +46,9 @@ export default function RecipeDetail() {
     getRecipe(parseInt(id))
       .then(setRecipe)
       .catch(() => setRecipe(null));
+    listSynonyms().then(({ data }) => {
+      if (data) setSynonyms(data);
+    });
   }, [id]);
 
   if (!recipe) {
@@ -72,7 +89,14 @@ export default function RecipeDetail() {
             {recipe.ingredients.map((ing) => (
               <li key={ing.id}>
                 <div className="flex justify-between items-center gap-2">
-                  <span className="font-medium">{ing.name}</span>
+                  <span className="font-medium">
+                    {ing.name}
+                    {canonical(ing.name) && (
+                      <span className="ml-1 text-sm text-[var(--text-secondary)]">
+                        ({canonical(ing.name)})
+                      </span>
+                    )}
+                  </span>
                   <div className="flex items-center gap-2">
                     <input
                       type="number"
