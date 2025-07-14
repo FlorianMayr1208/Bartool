@@ -1,24 +1,15 @@
 import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import { getRecipe, addMissingFromRecipe } from '../api';
+import {
+  getRecipe,
+  addMissingFromRecipe,
+  type RecipeDetail,
+} from '../api';
 
-interface Ingredient {
-  id: number;
-  name: string;
-  measure?: string | null;
-}
-
-interface Recipe {
-  id: number;
-  name: string;
-  instructions?: string | null;
-  thumb?: string | null;
-  ingredients?: Ingredient[];
-}
 
 export default function RecipeDetail() {
   const { id } = useParams<{ id: string }>();
-  const [recipe, setRecipe] = useState<Recipe | null>(null);
+  const [recipe, setRecipe] = useState<RecipeDetail | null>(null);
   const [added, setAdded] = useState(false);
 
   useEffect(() => {
@@ -59,6 +50,9 @@ export default function RecipeDetail() {
               <li key={ing.id}>
                 {ing.measure ? `${ing.measure} ` : ''}
                 {ing.name}
+                <span className="text-sm text-[var(--text-secondary)]">
+                  {` – ${ing.inventory_quantity} in stock`}
+                </span>
               </li>
             ))}
           </ul>
