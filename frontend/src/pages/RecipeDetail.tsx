@@ -30,7 +30,7 @@ export default function RecipeDetail() {
           <img
             src={recipe.thumb}
             alt={recipe.name}
-            className="w-24 h-24 aspect-square rounded-md object-cover"
+            className="w-48 rounded-md object-cover"
           />
         )}
         <div>

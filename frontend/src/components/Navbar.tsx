@@ -21,7 +21,7 @@ export default function Navbar() {
         <div className="flex items-center gap-3">
           <span className="text-xl font-bold tracking-tight text-[var(--accent)]">Bartool</span>
         </div>
-        <div className="flex gap-4 md:gap-8 mr:gap-8" style={{ gap: "32px" }}>
+        <div className="flex gap-4 md:gap-8 mr:gap-8">
           <NavLink to="/" className={linkClass} end>
             Dashboard
           </NavLink>

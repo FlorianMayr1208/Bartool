@@ -146,7 +146,7 @@ export default function Inventory() {
     <div className="space-y-4">
       <h1 className="text-2xl font-bold">Inventory</h1>
 
-      <section className="space-y-4 p-4 mb-6 rounded-lg bg-gray-50 shadow">
+      <section className="space-y-4 p-4 mb-6 rounded-lg shadow">
         <h2 className="text-xl font-semibold">Barcode Lookup</h2>
         {scanning ? (
           <div>
@@ -168,7 +168,7 @@ export default function Inventory() {
             placeholder="Enter barcode"
             value={ean}
             onChange={(e) => setEan(e.target.value)}
-            className="border p-2 rounded w-48 max-w-full"
+            className="border border-[var(--border)] p-2 rounded w-48 max-w-full"
           />
           <button onClick={() => runLookup(ean)} className="button-search">
             Lookup
@@ -203,19 +203,19 @@ export default function Inventory() {
           placeholder="Name"
           value={name}
           onChange={(e) => setName(e.target.value)}
-          className="border p-1"
+          className="border border-[var(--border)] p-1"
         />
         <input
           type="number"
           value={quantity}
           onChange={(e) => setQuantity(parseInt(e.target.value))}
-          className="w-20 border p-1"
+          className="w-20 border border-[var(--border)] p-1"
         />
         <button onClick={submit} className="button-search">
           Add
         </button>
       </div>
-      <table className="min-w-full border text-left">
+      <table className="min-w-full border border-[var(--border)] text-left">
         <thead>
           <tr>
             <th className="px-2">Name</th>
@@ -225,14 +225,14 @@ export default function Inventory() {
         </thead>
         <tbody>
           {items.map((it) => (
-            <tr key={it.id} className="border-t">
+            <tr key={it.id} className="border-t border-[var(--border)]">
               <td className="px-2 py-1">{it.ingredient?.name || it.ingredient_id}</td>
               <td className="px-2 py-1">
                 <input
                   type="number"
                   value={it.quantity}
                   onChange={(e) => updateQty(it.id, parseInt(e.target.value))}
-                  className="w-16 border"
+                  className="w-16 border border-[var(--border)]"
                 />
               </td>
               <td className="px-2 py-1">
