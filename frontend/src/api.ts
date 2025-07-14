@@ -190,6 +190,25 @@ export async function deleteSynonym(alias: string) {
   });
 }
 
+export async function listUnitSynonyms() {
+  return fetchJson<Synonym[]>(`${API_BASE}/unit-synonyms/`);
+}
+
+export async function addUnitSynonym(alias: string, canonical: string) {
+  return fetchJson<Synonym>(`${API_BASE}/unit-synonyms/`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ alias, canonical }),
+  });
+}
+
+export async function deleteUnitSynonym(alias: string) {
+  return fetchJson<void>(
+    `${API_BASE}/unit-synonyms/${encodeURIComponent(alias)}`,
+    { method: "DELETE" },
+  );
+}
+
 export interface ShoppingListItem {
   id: number;
   ingredient_id: number;

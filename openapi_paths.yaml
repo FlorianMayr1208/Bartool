@@ -86,9 +86,17 @@ paths:
       summary: List synonyms
     post:
       summary: Create synonym
+  /unit-synonyms:
+    get:
+      summary: List unit synonyms
+    post:
+      summary: Create unit synonym
   /synonyms/{alias}:
     delete:
       summary: Delete synonym
+  /unit-synonyms/{alias}:
+    delete:
+      summary: Delete unit synonym
     patch:
       summary: Update inventory item
       parameters:
