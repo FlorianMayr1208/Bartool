@@ -13,6 +13,7 @@ from models import (
     Iba,
     RecipeIngredient,
     InventoryItem,
+    Alcoholic,
 )
 from session import engine
 
@@ -48,6 +49,14 @@ def run():
     db.add_all([iba_unforget, iba_new])
     db.commit()
 
+    # ensure Alcoholic entry exists
+    alcoholic_entry = db.query(Alcoholic).filter_by(name="Alcoholic").first()
+    if not alcoholic_entry:
+        alcoholic_entry = Alcoholic(name="Alcoholic")
+        db.add(alcoholic_entry)
+        db.commit()
+
+
     # ingredients
     vodka = Ingredient(name="Vodka", type="spirit")
     rum = Ingredient(name="Rum", type="spirit")
@@ -61,11 +70,14 @@ def run():
     db.commit()
 
     # recipes
+    alcoholic_type = db.query(Alcoholic).filter_by(name="Alcoholic").first()
     mojito = Recipe(
         name="Mojito",
-        alcoholic="Alcoholic",
+        alcoholic_id=alcoholic_type.id,
         instructions="Muddle mint with sugar syrup, add lime and rum, top with soda.",
     )
+    db.add(mojito)
+    db.flush()
     mojito.tags.append(tag_classic)
     mojito.categories.append(cat_cocktail)
     mojito.ibas.append(iba_unforget)
@@ -78,9 +90,11 @@ def run():
 
     margarita = Recipe(
         name="Margarita",
-        alcoholic="Alcoholic",
+        alcoholic_id=alcoholic_type.id,
         instructions="Shake tequila, triple sec and lime juice with ice.",
     )
+    db.add(margarita)
+    db.flush()
     margarita.tags.append(tag_classic)
     margarita.categories.append(cat_cocktail)
     margarita.ibas.append(iba_new)
@@ -92,9 +106,11 @@ def run():
 
     caipirinha = Recipe(
         name="Caipirinha",
-        alcoholic="Alcoholic",
+        alcoholic_id=alcoholic_type.id,
         instructions="Muddle lime with sugar syrup, add cachaça and ice.",
     )
+    db.add(caipirinha)
+    db.flush()
     caipirinha.tags.append(tag_summer)
     caipirinha.categories.append(cat_cocktail)
     caipirinha.ibas.append(iba_new)

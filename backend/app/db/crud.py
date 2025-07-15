@@ -151,6 +151,8 @@ def create_recipe(db: Session, recipe: schemas.RecipeCreate):
         exclude={"tags", "categories", "ibas", "ingredients", "glass", "alcoholic"}
     )
     db_obj = models.Recipe(**data)
+    db.add(db_obj)
+    db.flush()
 
     if recipe.glass:
         db_obj.glass = _get_or_create_by_name(db, models.Glass, recipe.glass)
@@ -172,7 +174,6 @@ def create_recipe(db: Session, recipe: schemas.RecipeCreate):
         if unit_name:
             get_or_create_unit(db, schemas.UnitCreate(name=unit_name))
 
-    db.add(db_obj)
     db.commit()
     db.refresh(db_obj)
     return db_obj

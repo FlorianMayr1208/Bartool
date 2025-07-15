@@ -31,7 +31,7 @@ export default function Navbar() {
             Recipes
           </NavLink>
           <NavLink to="/search" className={linkClass}>
-            Recipe Finder
+            Recipe Search
           </NavLink>
           <NavLink to="/shopping-list" className={linkClass}>
             Shopping List
