@@ -64,7 +64,7 @@ export default function Recipes() {
       {/* Search results section */}
       {results.length > 0 && (
         <div className="space-y-2">
-          <h2 className="font-semibold">Results ({results.length})</h2>
+          <h2 className="text-2xl font-semibold mb-4 mt-8">Results ({results.length})</h2>
           <RecipeList
             recipes={results}
             renderAction={(r) => (
@@ -78,7 +78,7 @@ export default function Recipes() {
       {/* Saved recipes section */}
       {saved.length > 0 && (
         <div className="space-y-2">
-          <h2 className="font-semibold">Saved Recipes</h2>
+          <h2 className="text-2xl font-semibold mb-4 mt-8">Saved Recipes</h2>
           <RecipeList
             recipes={saved}
             renderAction={(r) =>
