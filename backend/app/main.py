@@ -8,6 +8,7 @@ from .api import (
     recipes,
     inventory,
     barcode,
+    search,
     synonyms,
     unit_synonyms,
     shopping_list,
@@ -48,6 +49,7 @@ app.include_router(ingredients.router, prefix="/ingredients")
 app.include_router(recipes.router, prefix="/recipes")
 app.include_router(inventory.router, prefix="/inventory")
 app.include_router(barcode.router, prefix="/barcode")
+app.include_router(search.router, prefix="/search")
 app.include_router(synonyms.router, prefix="/synonyms")
 app.include_router(unit_synonyms.router, prefix="/unit-synonyms")
 app.include_router(shopping_list.router, prefix="/shopping-list")
