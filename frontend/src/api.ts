@@ -173,6 +173,9 @@ export async function searchRecipes(q: string): Promise<RecipeSearchResult[]> {
 
 export interface FindRecipesOptions {
   q?: string;
+  tag?: string;
+  category?: string;
+  iba?: string;
   available_only?: boolean;
   order_missing?: boolean;
   skip?: number;
@@ -182,6 +185,9 @@ export interface FindRecipesOptions {
 export async function findRecipes(options: FindRecipesOptions = {}) {
   const params = new URLSearchParams();
   if (options.q) params.append("q", options.q);
+  if (options.tag) params.append("tag", options.tag);
+  if (options.category) params.append("category", options.category);
+  if (options.iba) params.append("iba", options.iba);
   if (options.available_only) params.append("available_only", "true");
   if (options.order_missing) params.append("order_missing", "true");
   if (options.skip !== undefined) params.append("skip", String(options.skip));

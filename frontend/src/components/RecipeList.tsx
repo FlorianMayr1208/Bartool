@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { Link } from 'react-router-dom';
 import type { NamedItem } from '../api';
 import type { ReactNode } from 'react';
 
@@ -33,8 +34,25 @@ export default function RecipeList({
       ? value
       : value.name;
 
-  const joinNames = (items: (string | NamedItem)[] | undefined) =>
-    items?.map((i) => (typeof i === 'string' ? i : i.name)).join(', ');
+
+  const joinLinks = (
+    items: (string | NamedItem)[] | undefined,
+    param: 'tag' | 'category' | 'iba',
+  ) =>
+    items?.map((i, idx) => {
+      const name = typeof i === 'string' ? i : i.name;
+      return (
+        <span key={name}>
+          <Link
+            to={`/search?${param}=${encodeURIComponent(name)}`}
+            className="text-[var(--highlight)] hover:underline"
+          >
+            {name}
+          </Link>
+          {idx < items.length - 1 ? ', ' : ''}
+        </span>
+      );
+    });
 
   // Helper to truncate instructions
   const truncate = (text: string, maxLength: number) => {
@@ -117,19 +135,19 @@ export default function RecipeList({
                     {r.categories && r.categories.length > 0 && (
                       <div className="mb-2">
                         <h4 className="font-semibold text-[var(--text-primary)]">Category</h4>
-                        <p>{joinNames(r.categories)}</p>
+                        <p>{joinLinks(r.categories, 'category')}</p>
                       </div>
                     )}
                     {r.tags && r.tags.length > 0 && (
                       <div className="mb-2">
                         <h4 className="font-semibold text-[var(--text-primary)]">Tags</h4>
-                        <p>{joinNames(r.tags)}</p>
+                        <p>{joinLinks(r.tags, 'tag')}</p>
                       </div>
                     )}
                     {r.ibas && r.ibas.length > 0 && (
                       <div>
                         <h4 className="font-semibold text-[var(--text-primary)]">IBA</h4>
-                        <p>{joinNames(r.ibas)}</p>
+                        <p>{joinLinks(r.ibas, 'iba')}</p>
                       </div>
                     )}
                   </div>

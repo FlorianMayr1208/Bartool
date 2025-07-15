@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, Link } from 'react-router-dom';
 import {
   getRecipe,
   addMissingFromRecipe,
@@ -70,13 +70,52 @@ export default function RecipeDetail() {
           {(recipe.categories?.length || recipe.tags?.length || recipe.ibas?.length) && (
             <div className="space-y-1 mb-2 text-sm text-[var(--text-secondary)]">
               {recipe.categories && recipe.categories.length > 0 && (
-                <p>Category: {recipe.categories.map((c) => c.name).join(', ')}</p>
+                <p>
+                  Category:{" "}
+                  {recipe.categories.map((c, idx) => (
+                    <span key={c.id}>
+                      <Link
+                        to={`/search?category=${encodeURIComponent(c.name)}`}
+                        className="text-[var(--highlight)] hover:underline"
+                      >
+                        {c.name}
+                      </Link>
+                      {idx < recipe.categories!.length - 1 ? ", " : ""}
+                    </span>
+                  ))}
+                </p>
               )}
               {recipe.tags && recipe.tags.length > 0 && (
-                <p>Tags: {recipe.tags.map((t) => t.name).join(', ')}</p>
+                <p>
+                  Tags:{" "}
+                  {recipe.tags.map((t, idx) => (
+                    <span key={t.id}>
+                      <Link
+                        to={`/search?tag=${encodeURIComponent(t.name)}`}
+                        className="text-[var(--highlight)] hover:underline"
+                      >
+                        {t.name}
+                      </Link>
+                      {idx < recipe.tags!.length - 1 ? ", " : ""}
+                    </span>
+                  ))}
+                </p>
               )}
               {recipe.ibas && recipe.ibas.length > 0 && (
-                <p>IBA: {recipe.ibas.map((i) => i.name).join(', ')}</p>
+                <p>
+                  IBA:{" "}
+                  {recipe.ibas.map((i, idx) => (
+                    <span key={i.id}>
+                      <Link
+                        to={`/search?iba=${encodeURIComponent(i.name)}`}
+                        className="text-[var(--highlight)] hover:underline"
+                      >
+                        {i.name}
+                      </Link>
+                      {idx < recipe.ibas!.length - 1 ? ", " : ""}
+                    </span>
+                  ))}
+                </p>
               )}
             </div>
           )}
