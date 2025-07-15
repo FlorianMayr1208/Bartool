@@ -128,12 +128,18 @@ async def test_recipe_search(monkeypatch, async_client):
                 "alcoholic": "Alcoholic",
                 "instructions": "Mix",
                 "thumb": "http://example.com/margarita.jpg",
+                "tags": [],
+                "categories": [],
+                "ibas": [],
             },
             {
                 "name": "Blue Margarita",
                 "alcoholic": "Alcoholic",
                 "instructions": "Mix blue",
                 "thumb": "http://example.com/blue.jpg",
+                "tags": [],
+                "categories": [],
+                "ibas": [],
             },
         ]
 

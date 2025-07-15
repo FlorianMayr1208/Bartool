@@ -67,6 +67,19 @@ export default function RecipeDetail() {
         )}
         <div>
           <h1 className="text-3xl font-bold mb-2 font-display">{recipe.name}</h1>
+          {(recipe.categories?.length || recipe.tags?.length || recipe.ibas?.length) && (
+            <div className="space-y-1 mb-2 text-sm text-[var(--text-secondary)]">
+              {recipe.categories && recipe.categories.length > 0 && (
+                <p>Category: {recipe.categories.map((c) => c.name).join(', ')}</p>
+              )}
+              {recipe.tags && recipe.tags.length > 0 && (
+                <p>Tags: {recipe.tags.map((t) => t.name).join(', ')}</p>
+              )}
+              {recipe.ibas && recipe.ibas.length > 0 && (
+                <p>IBA: {recipe.ibas.map((i) => i.name).join(', ')}</p>
+              )}
+            </div>
+          )}
           {recipe.instructions && <p className="mb-4">{recipe.instructions}</p>}
           <button
             onClick={async () => {

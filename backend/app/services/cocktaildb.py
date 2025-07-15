@@ -28,7 +28,7 @@ async def search_recipes(name: str) -> list[str]:
 
 
 async def search_recipes_details(name: str) -> list[dict]:
-    """Return basic recipe information for matches."""
+    """Return basic recipe information for matches including tags."""
     url = f"{API_BASE}/search.php"
     params = {"s": name}
     async with httpx.AsyncClient() as client:
@@ -38,12 +38,18 @@ async def search_recipes_details(name: str) -> list[dict]:
         drinks = data.get("drinks") or []
         results = []
         for d in drinks:
+            tags = [t.strip() for t in (d.get("strTags") or "").split(",") if t.strip()]
+            categories = [c.strip() for c in (d.get("strCategory") or "").split(",") if c.strip()]
+            ibas = [i.strip() for i in (d.get("strIBA") or "").split(",") if i.strip()]
             results.append(
                 {
                     "name": d.get("strDrink"),
                     "alcoholic": d.get("strAlcoholic"),
                     "instructions": d.get("strInstructions"),
                     "thumb": d.get("strDrinkThumb"),
+                    "tags": tags,
+                    "categories": categories,
+                    "ibas": ibas,
                 }
             )
         return results
