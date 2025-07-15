@@ -45,6 +45,7 @@ async def search_recipes_details(name: str) -> list[dict]:
                 {
                     "name": d.get("strDrink"),
                     "alcoholic": d.get("strAlcoholic"),
+                    "glass": d.get("strGlass"),
                     "instructions": d.get("strInstructions"),
                     "thumb": d.get("strDrinkThumb"),
                     "tags": tags,
@@ -79,6 +80,7 @@ async def fetch_recipe_details(name: str) -> dict | None:
         return {
             "name": d.get("strDrink"),
             "alcoholic": d.get("strAlcoholic"),
+            "glass": d.get("strGlass"),
             "instructions": d.get("strInstructions"),
             "thumb": d.get("strDrinkThumb"),
             "tags": tags,

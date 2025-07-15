@@ -108,14 +108,37 @@ class Tag(Base):
     )
 
 
+class Glass(Base):
+    __tablename__ = "glasses"
+
+    id = Column(Integer, primary_key=True, index=True)
+    name = Column(String, unique=True, nullable=False)
+
+    recipes = relationship("Recipe", back_populates="glass")
+
+
+class Alcoholic(Base):
+    __tablename__ = "alcoholics"
+
+    id = Column(Integer, primary_key=True, index=True)
+    name = Column(String, unique=True, nullable=False)
+
+    recipes = relationship("Recipe", back_populates="alcoholic")
+
+
 class Recipe(Base):
     __tablename__ = "recipes"
 
     id = Column(Integer, primary_key=True, index=True)
     name = Column(String, nullable=False)
     alcoholic = Column(String, nullable=True)
+    glass_id = Column(Integer, ForeignKey("glasses.id"), nullable=True)
+    alcoholic_id = Column(Integer, ForeignKey("alcoholics.id"), nullable=True)
     instructions = Column(String, nullable=True)
     thumb = Column(String, nullable=True)
+
+    glass = relationship("Glass", back_populates="recipes")
+    alcoholic = relationship("Alcoholic", back_populates="recipes")
 
     tags = relationship(
         "Tag",

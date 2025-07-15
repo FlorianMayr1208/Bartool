@@ -147,8 +147,15 @@ def _get_or_create_by_name(db: Session, model, name: str):
 
 
 def create_recipe(db: Session, recipe: schemas.RecipeCreate):
-    data = recipe.model_dump(exclude={"tags", "categories", "ibas", "ingredients"})
+    data = recipe.model_dump(
+        exclude={"tags", "categories", "ibas", "ingredients", "glass", "alcoholic"}
+    )
     db_obj = models.Recipe(**data)
+
+    if recipe.glass:
+        db_obj.glass = _get_or_create_by_name(db, models.Glass, recipe.glass)
+    if recipe.alcoholic:
+        db_obj.alcoholic = _get_or_create_by_name(db, models.Alcoholic, recipe.alcoholic)
 
     db_obj.tags = [_get_or_create_by_name(db, models.Tag, t) for t in recipe.tags]
     db_obj.categories = [

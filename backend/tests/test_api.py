@@ -68,6 +68,7 @@ async def test_create_recipe(monkeypatch, async_client):
         return {
             "name": "Mojito",
             "alcoholic": "Alcoholic",
+            "glass": "Highball glass",
             "instructions": "Mix it",
             "thumb": "http://example.com/mojito.jpg",
             "tags": ["Classic"],
@@ -86,7 +87,16 @@ async def test_create_recipe(monkeypatch, async_client):
     monkeypatch.setattr("backend.app.api.recipes.fetch_recipe_details", fake_fetch)
     resp = await async_client.post("/recipes/", json={"name": "mojito"})
     assert resp.status_code == 201
-    assert resp.json()["name"] == "Mojito"
+    body = resp.json()
+    assert body["name"] == "Mojito"
+    assert body["glass"]["name"] == "Highball glass"
+    assert body["alcoholic"]["name"] == "Alcoholic"
+
+    db = next(override_get_db())
+    recipe = db.query(models.Recipe).filter_by(id=body["id"]).first()
+    assert recipe.glass.name == "Highball glass"
+    assert recipe.alcoholic.name == "Alcoholic"
+    db.close()
 
 
 @pytest.mark.asyncio
@@ -95,6 +105,7 @@ async def test_get_recipe(monkeypatch, async_client):
         return {
             "name": "Mojito",
             "alcoholic": "Alcoholic",
+            "glass": "Highball glass",
             "instructions": "Mix it",
             "thumb": "http://example.com/mojito.jpg",
             "tags": ["Classic"],
@@ -114,6 +125,8 @@ async def test_get_recipe(monkeypatch, async_client):
     assert resp.status_code == 200
     data = resp.json()
     assert data["name"] == "Mojito"
+    assert data["glass"]["name"] == "Highball glass"
+    assert data["alcoholic"]["name"] == "Alcoholic"
     ing = next(i for i in data["ingredients"] if i["name"] == "Rum")
     assert ing["inventory_quantity"] == 0
     assert ing["inventory_item_id"] is not None
@@ -126,6 +139,7 @@ async def test_recipe_search(monkeypatch, async_client):
             {
                 "name": "Margarita",
                 "alcoholic": "Alcoholic",
+                "glass": None,
                 "instructions": "Mix",
                 "thumb": "http://example.com/margarita.jpg",
                 "tags": [],
@@ -135,6 +149,7 @@ async def test_recipe_search(monkeypatch, async_client):
             {
                 "name": "Blue Margarita",
                 "alcoholic": "Alcoholic",
+                "glass": None,
                 "instructions": "Mix blue",
                 "thumb": "http://example.com/blue.jpg",
                 "tags": [],
