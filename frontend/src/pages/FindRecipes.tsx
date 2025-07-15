@@ -4,6 +4,9 @@ import { Link, useSearchParams } from "react-router-dom";
 import { Search } from "lucide-react";
 import RecipeList, { type RecipeItem } from "../components/RecipeList";
 
+import { Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/react';
+import { ChevronDownIcon } from '@heroicons/react/20/solid';
+
 type Recipe = RecipeItem;
 
 export default function FindRecipes() {
@@ -90,39 +93,119 @@ export default function FindRecipes() {
           />
           Order by missing
         </label>
-        <select
-          value={tagFilter || ""}
-          onChange={(e) => setTagFilter(e.target.value || undefined)}
-          className="bg-transparent border border-[var(--border)] p-1 rounded"
-        >
-          <option value="">All Tags</option>
-          {tags.map((t) => (
-            <option key={t} value={t}>
-              {t}
-            </option>
-          ))}
-        </select>
-        <select
-          value={categoryFilter || ""}
-          onChange={(e) => setCategoryFilter(e.target.value || undefined)}
-          className="bg-transparent border border-[var(--border)] p-1 rounded"
-        >
-          <option value="">All Categories</option>
-          {categories.map((c) => (
-            <option key={c} value={c}>
-              {c}
-            </option>
-          ))}
-        </select>
-        <select
-          value={alcoholicFilter || ""}
-          onChange={(e) => setAlcoholicFilter(e.target.value || undefined)}
-          className="bg-transparent border border-[var(--border)] p-1 rounded"
-        >
-          <option value="">All</option>
-          <option value="Alcoholic">Alcoholic</option>
-          <option value="Non alcoholic">Non alcoholic</option>
-        </select>
+        {/* Tag Filter Dropdown */}
+        <Menu as="div" className="relative inline-block text-left">
+          <div>
+            <MenuButton className="inline-flex w-full justify-center gap-x-1.5 rounded border border-[var(--border)] bg-transparent px-3 py-2 text-sm font-semibold text-[var(--text-primary)] hover:bg-[var(--border)]/10">
+              {tagFilter ? tags.find((t) => t === tagFilter) : "All Tags"}
+              <ChevronDownIcon aria-hidden="true" className="-mr-1 size-5 text-[var(--border)]" />
+            </MenuButton>
+          </div>
+          <MenuItems className="absolute right-0 z-10 mt-2 w-56 origin-top-right rounded-md bg-[var(--background)] border border-[var(--border)] shadow-lg ring-1 ring-black/5 focus:outline-none">
+            <div className="py-1">
+              <MenuItem>
+                {({ active }) => (
+                  <button
+                    className={`block w-full px-4 py-2 text-left text-sm text-[var(--text-primary)] ${active ? "bg-[var(--border)]/20" : ""}`}
+                    onClick={() => setTagFilter(undefined)}
+                  >
+                    All Tags
+                  </button>
+                )}
+              </MenuItem>
+              {tags.map((t) => (
+                <MenuItem key={t}>
+                  {({ active }) => (
+                    <button
+                      className={`block w-full px-4 py-2 text-left text-sm text-[var(--text-primary)] ${active ? "bg-[var(--border)]/20" : ""}`}
+                      onClick={() => setTagFilter(t)}
+                    >
+                      {t}
+                    </button>
+                  )}
+                </MenuItem>
+              ))}
+            </div>
+          </MenuItems>
+        </Menu>
+        {/* Category Filter Dropdown */}
+        <Menu as="div" className="relative inline-block text-left">
+          <div>
+            <MenuButton className="inline-flex w-full justify-center gap-x-1.5 rounded border border-[var(--border)] bg-transparent px-3 py-2 text-sm font-semibold text-[var(--text-primary)] hover:bg-[var(--border)]/10">
+              {categoryFilter ? categories.find((c) => c === categoryFilter) : "All Categories"}
+              <ChevronDownIcon aria-hidden="true" className="-mr-1 size-5 text-[var(--border)]" />
+            </MenuButton>
+          </div>
+          <MenuItems className="absolute right-0 z-10 mt-2 w-56 origin-top-right rounded-md bg-[var(--background)] border border-[var(--border)] shadow-lg ring-1 ring-black/5 focus:outline-none">
+            <div className="py-1">
+              <MenuItem>
+                {({ active }) => (
+                  <button
+                    className={`block w-full px-4 py-2 text-left text-sm text-[var(--text-primary)] ${active ? "bg-[var(--border)]/20" : ""}`}
+                    onClick={() => setCategoryFilter(undefined)}
+                  >
+                    All Categories
+                  </button>
+                )}
+              </MenuItem>
+              {categories.map((c) => (
+                <MenuItem key={c}>
+                  {({ active }) => (
+                    <button
+                      className={`block w-full px-4 py-2 text-left text-sm text-[var(--text-primary)] ${active ? "bg-[var(--border)]/20" : ""}`}
+                      onClick={() => setCategoryFilter(c)}
+                    >
+                      {c}
+                    </button>
+                  )}
+                </MenuItem>
+              ))}
+            </div>
+          </MenuItems>
+        </Menu>
+        {/* Alcoholic Filter Dropdown */}
+        <Menu as="div" className="relative inline-block text-left">
+          <div>
+            <MenuButton className="inline-flex w-full justify-center gap-x-1.5 rounded border border-[var(--border)] bg-transparent px-3 py-2 text-sm font-semibold text-[var(--text-primary)] hover:bg-[var(--border)]/10">
+              {alcoholicFilter ? alcoholicFilter : "All"}
+              <ChevronDownIcon aria-hidden="true" className="-mr-1 size-5 text-[var(--border)]" />
+            </MenuButton>
+          </div>
+          <MenuItems className="absolute right-0 z-10 mt-2 w-56 origin-top-right rounded-md bg-[var(--background)] border border-[var(--border)] shadow-lg ring-1 ring-black/5 focus:outline-none">
+            <div className="py-1">
+              <MenuItem>
+                {({ active }) => (
+                  <button
+                    className={`block w-full px-4 py-2 text-left text-sm text-[var(--text-primary)] ${active ? "bg-[var(--border)]/20" : ""}`}
+                    onClick={() => setAlcoholicFilter(undefined)}
+                  >
+                    All
+                  </button>
+                )}
+              </MenuItem>
+              <MenuItem>
+                {({ active }) => (
+                  <button
+                    className={`block w-full px-4 py-2 text-left text-sm text-[var(--text-primary)] ${active ? "bg-[var(--border)]/20" : ""}`}
+                    onClick={() => setAlcoholicFilter("Alcoholic")}
+                  >
+                    Alcoholic
+                  </button>
+                )}
+              </MenuItem>
+              <MenuItem>
+                {({ active }) => (
+                  <button
+                    className={`block w-full px-4 py-2 text-left text-sm text-[var(--text-primary)] ${active ? "bg-[var(--border)]/20" : ""}`}
+                    onClick={() => setAlcoholicFilter("Non alcoholic")}
+                  >
+                    Non alcoholic
+                  </button>
+                )}
+              </MenuItem>
+            </div>
+          </MenuItems>
+        </Menu>
       </div>
       {results.length > 0 && (
         <RecipeList
