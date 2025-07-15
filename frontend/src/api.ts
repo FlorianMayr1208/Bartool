@@ -164,6 +164,16 @@ export async function listRecipes() {
   return res.json();
 }
 
+export async function listTags() {
+  const res = await fetch(`${API_BASE}/tags`);
+  return res.json();
+}
+
+export async function listCategories() {
+  const res = await fetch(`${API_BASE}/categories`);
+  return res.json();
+}
+
 export async function searchRecipes(q: string): Promise<RecipeSearchResult[]> {
   const res = await fetch(
     `${API_BASE}/recipes/search?q=${encodeURIComponent(q)}`,
@@ -175,6 +185,7 @@ export interface FindRecipesOptions {
   q?: string;
   tag?: string;
   category?: string;
+  alcoholic?: string;
   iba?: string;
   available_only?: boolean;
   order_missing?: boolean;
@@ -187,6 +198,7 @@ export async function findRecipes(options: FindRecipesOptions = {}) {
   if (options.q) params.append("q", options.q);
   if (options.tag) params.append("tag", options.tag);
   if (options.category) params.append("category", options.category);
+  if (options.alcoholic) params.append("alcoholic", options.alcoholic);
   if (options.iba) params.append("iba", options.iba);
   if (options.available_only) params.append("available_only", "true");
   if (options.order_missing) params.append("order_missing", "true");

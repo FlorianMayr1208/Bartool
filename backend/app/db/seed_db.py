@@ -6,8 +6,6 @@ from models import (
     Category,
     Unit,
     Ingredient,
-    IngredientSynonym,
-    UnitSynonym,
     Tag,
     Recipe,
     Iba,

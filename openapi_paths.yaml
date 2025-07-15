@@ -42,6 +42,10 @@ paths:
           schema:
             type: string
         - in: query
+          name: alcoholic
+          schema:
+            type: string
+        - in: query
           name: iba
           schema:
             type: string
@@ -162,3 +166,27 @@ paths:
   /db/import:
     post:
       summary: Upload SQLite database file
+  /tags:
+    get:
+      summary: List tags
+      parameters:
+        - in: query
+          name: skip
+          schema:
+            type: integer
+        - in: query
+          name: limit
+          schema:
+            type: integer
+  /categories:
+    get:
+      summary: List categories
+      parameters:
+        - in: query
+          name: skip
+          schema:
+            type: integer
+        - in: query
+          name: limit
+          schema:
+            type: integer
