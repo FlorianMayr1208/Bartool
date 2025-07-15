@@ -118,7 +118,7 @@ export default function Recipes() {
                     </div>
                     {/* Expanded recipe details */}
                     {expandedKey && (
-                      <div className="flex h-52 w-96 space-x-4 p-2 text-sm text-[var(--text-muted)] mb-4">
+                      <div className="flex h-52 w-full space-x-4 p-2 text-sm text-[var(--text-muted)] mb-4">
                         {/* Recipe thumbnail */}
                         {r.thumb && (
                           <img
@@ -127,40 +127,47 @@ export default function Recipes() {
                             className="h-48 w-48 rounded object-cover"
                           />
                         )}
-                        <div className="flex flex-row items-start space-x-16 w-full">
+                        <div className="flex flex-row items-start w-full">
                           {/* Alcoholic info with promille icon if alcoholic */}
-                          {r.alcoholic && (
-                            <div className="ml-16 flex items-center space-x-2">
-                              <p>{getName(r.alcoholic)}</p>
-                              {getName(r.alcoholic) === "Alcoholic" && (
-                                <span title="Alcoholic">
-                                  {/* Promille SVG icon */}
-                                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 20 20">
-                                    <circle cx="10" cy="10" r="8" stroke="currentColor" strokeWidth="2" fill="none" />
-                                    <text x="10" y="14" textAnchor="middle" fontSize="10" fill="currentColor">%</text>
-                                  </svg>
-                                </span>
-                              )}
-                            </div>
-                          )}
+                          <div className="flex flex-col justify-start items-start w-32 min-w-[100px]">
+                            {r.alcoholic && (
+                              <div className="flex items-center space-x-2 mb-2">
+                                <p>{getName(r.alcoholic)}</p>
+                                {getName(r.alcoholic) === "Alcoholic" && (
+                                  <span title="Alcoholic">
+                                    {/* Promille SVG icon */}
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 20 20">
+                                      <circle cx="10" cy="10" r="8" stroke="currentColor" strokeWidth="2" fill="none" />
+                                      <text x="10" y="14" textAnchor="middle" fontSize="10" fill="currentColor">%</text>
+                                    </svg>
+                                  </span>
+                                )}
+                              </div>
+                            )}
+                            {r.categories && r.categories.length > 0 && (
+                              <div className="mb-2">
+                                <h4 className="font-semibold text-[var(--text-primary)]">Category</h4>
+                                <p>{joinNames(r.categories)}</p>
+                              </div>
+                            )}
+                            {r.tags && r.tags.length > 0 && (
+                              <div className="mb-2">
+                                <h4 className="font-semibold text-[var(--text-primary)]">Tags</h4>
+                                <p>{joinNames(r.tags)}</p>
+                              </div>
+                            )}
+                            {r.ibas && r.ibas.length > 0 && (
+                              <div>
+                                <h4 className="font-semibold text-[var(--text-primary)]">IBA</h4>
+                                <p>{joinNames(r.ibas)}</p>
+                              </div>
+                            )}
+                          </div>
                           {/* Instructions section */}
                           {r.instructions && (
-                            <div className="ml-2 flex-1 min-w-[500px] max-w-[700px] space-y-2">
+                            <div className="ml-4 flex-1 min-w-[300px] max-w-[700px] space-y-2">
                               <h3 className="font-semibold text-[var(--text-primary)] mb-1">Instructions</h3>
                               <p>{r.instructions}</p>
-                              {(r.categories?.length || r.tags?.length || r.ibas?.length) && (
-                                <div className="space-y-1 text-[var(--text-secondary)]">
-                                  {r.categories && r.categories.length > 0 && (
-                                    <p>Category: {joinNames(r.categories)}</p>
-                                  )}
-                                  {r.tags && r.tags.length > 0 && (
-                                    <p>Tags: {joinNames(r.tags)}</p>
-                                  )}
-                                  {r.ibas && r.ibas.length > 0 && (
-                                    <p>IBA: {joinNames(r.ibas)}</p>
-                                  )}
-                                </div>
-                              )}
                             </div>
                           )}
                         </div>
@@ -207,7 +214,7 @@ export default function Recipes() {
                     </div>
                     {/* Expanded saved recipe details */}
                     {expandedKey && (
-                      <div className="flex h-52 w-96 space-x-4 p-2 text-sm text-[var(--text-muted)] mb-4">
+                      <div className="flex h-52 w-full space-x-4 p-2 text-sm text-[var(--text-muted)] mb-4">
                         {/* Recipe thumbnail */}
                         {s.thumb && (
                           <img
@@ -216,40 +223,47 @@ export default function Recipes() {
                             className="h-48 w-48 rounded object-cover"
                           />
                         )}
-                        <div className="flex flex-row items-start space-x-16 w-full">
+                        <div className="flex flex-row items-start w-full">
                           {/* Alcoholic info with promille icon if alcoholic */}
-                          {s.alcoholic && (
-                            <div className="ml-16 flex items-center space-x-2">
-                              <p>{getName(s.alcoholic)}</p>
-                              {getName(s.alcoholic) === "Alcoholic" && (
-                                <span title="Alcoholic">
-                                  {/* Promille SVG icon */}
-                                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 20 20">
-                                    <circle cx="10" cy="10" r="8" stroke="currentColor" strokeWidth="2" fill="none" />
-                                    <text x="10" y="14" textAnchor="middle" fontSize="10" fill="currentColor">%</text>
-                                  </svg>
-                                </span>
-                              )}
-                            </div>
-                          )}
+                          <div className="flex flex-col justify-start items-start w-32 min-w-[100px]">
+                            {s.alcoholic && (
+                              <div className="flex items-center space-x-2 mb-2">
+                                <p>{getName(s.alcoholic)}</p>
+                                {getName(s.alcoholic) === "Alcoholic" && (
+                                  <span title="Alcoholic">
+                                    {/* Promille SVG icon */}
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 20 20">
+                                      <circle cx="10" cy="10" r="8" stroke="currentColor" strokeWidth="2" fill="none" />
+                                      <text x="10" y="14" textAnchor="middle" fontSize="10" fill="currentColor">%</text>
+                                    </svg>
+                                  </span>
+                                )}
+                              </div>
+                            )}
+                            {s.categories && s.categories.length > 0 && (
+                              <div className="mb-2">
+                                <h4 className="font-semibold text-[var(--text-primary)]">Category</h4>
+                                <p>{joinNames(s.categories)}</p>
+                              </div>
+                            )}
+                            {s.tags && s.tags.length > 0 && (
+                              <div className="mb-2">
+                                <h4 className="font-semibold text-[var(--text-primary)]">Tags</h4>
+                                <p>{joinNames(s.tags)}</p>
+                              </div>
+                            )}
+                            {s.ibas && s.ibas.length > 0 && (
+                              <div>
+                                <h4 className="font-semibold text-[var(--text-primary)]">IBA</h4>
+                                <p>{joinNames(s.ibas)}</p>
+                              </div>
+                            )}
+                          </div>
                           {/* Instructions section */}
                           {s.instructions && (
-                            <div className="ml-2 flex-1 min-w-[300px] max-w-[500px] space-y-2">
+                            <div className="ml-4 flex-1 min-w-[300px] max-w-[500px] space-y-2">
                               <h3 className="font-semibold text-[var(--text-primary)] mb-1">Instructions</h3>
                               <p>{s.instructions}</p>
-                              {(s.categories?.length || s.tags?.length || s.ibas?.length) && (
-                                <div className="space-y-1 text-[var(--text-secondary)]">
-                                  {s.categories && s.categories.length > 0 && (
-                                    <p>Category: {joinNames(s.categories)}</p>
-                                  )}
-                                  {s.tags && s.tags.length > 0 && (
-                                    <p>Tags: {joinNames(s.tags)}</p>
-                                  )}
-                                  {s.ibas && s.ibas.length > 0 && (
-                                    <p>IBA: {joinNames(s.ibas)}</p>
-                                  )}
-                                </div>
-                              )}
                             </div>
                           )}
                         </div>
