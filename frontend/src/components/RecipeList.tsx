@@ -36,6 +36,12 @@ export default function RecipeList({
   const joinNames = (items: (string | NamedItem)[] | undefined) =>
     items?.map((i) => (typeof i === 'string' ? i : i.name)).join(', ');
 
+  // Helper to truncate instructions
+  const truncate = (text: string, maxLength: number) => {
+    if (!text) return '';
+    return text.length > maxLength ? text.slice(0, maxLength) + '...' : text;
+  };
+
   return (
     <div className="card p-0">
       <ul className="divide-y divide-[var(--border)]">
@@ -61,73 +67,86 @@ export default function RecipeList({
                 )}
               </div>
               {expandedKey && (
-                <div className="flex h-52 w-full space-x-4 p-2 text-sm text-[var(--text-muted)] mb-4">
-                  {r.thumb && (
-                    <img
-                      src={r.thumb}
-                      alt={r.name}
-                      className="h-48 w-48 rounded object-cover"
-                    />
-                  )}
-                  <div className="flex flex-row items-start w-full">
-                    <div className="flex flex-col justify-start items-start w-32 min-w-[100px]">
-                      {r.alcoholic && (
-                        <div className="flex items-center space-x-2 mb-2">
-                          <p>{getName(r.alcoholic)}</p>
-                          {getName(r.alcoholic) === 'Alcoholic' && (
-                            <span title="Alcoholic">
-                              <svg
-                                xmlns="http://www.w3.org/2000/svg"
-                                width="20"
-                                height="20"
-                                fill="currentColor"
-                                viewBox="0 0 20 20"
-                              >
-                                <circle
-                                  cx="10"
-                                  cy="10"
-                                  r="8"
-                                  stroke="currentColor"
-                                  strokeWidth="2"
-                                  fill="none"
-                                />
-                                <text
-                                  x="10"
-                                  y="14"
-                                  textAnchor="middle"
-                                  fontSize="10"
-                                  fill="currentColor"
-                                >
-                                  %
-                                </text>
-                              </svg>
-                            </span>
-                          )}
-                        </div>
-                      )}
-                      {r.categories && r.categories.length > 0 && (
-                        <div className="mb-2">
-                          <h4 className="font-semibold text-[var(--text-primary)]">Category</h4>
-                          <p>{joinNames(r.categories)}</p>
-                        </div>
-                      )}
-                      {r.tags && r.tags.length > 0 && (
-                        <div className="mb-2">
-                          <h4 className="font-semibold text-[var(--text-primary)]">Tags</h4>
-                          <p>{joinNames(r.tags)}</p>
-                        </div>
-                      )}
-                      {r.ibas && r.ibas.length > 0 && (
-                        <div>
-                          <h4 className="font-semibold text-[var(--text-primary)]">IBA</h4>
-                          <p>{joinNames(r.ibas)}</p>
-                        </div>
-                      )}
-                    </div>
+                <div
+                  className="grid grid-cols-4 gap-4 h-52 w-full p-2 text-sm text-[var(--text-muted)] mb-4"
+                  style={{ gridTemplateColumns: '1fr 1fr 2fr 1fr' }}
+                >
+                  {/* Image */}
+                  <div className="flex items-center justify-center">
+                    {r.thumb && (
+                      <img
+                        src={r.thumb}
+                        alt={r.name}
+                        className="h-40 w-40 rounded object-cover"
+                      />
+                    )}
+                  </div>
+                  {/* Categories, Tags, IBA */}
+                  <div className="flex flex-col justify-start items-start">
+                    {r.categories && r.categories.length > 0 && (
+                      <div className="mb-2">
+                        <h4 className="font-semibold text-[var(--text-primary)]">Category</h4>
+                        <p>{joinNames(r.categories)}</p>
+                      </div>
+                    )}
+                    {r.tags && r.tags.length > 0 && (
+                      <div className="mb-2">
+                        <h4 className="font-semibold text-[var(--text-primary)]">Tags</h4>
+                        <p>{joinNames(r.tags)}</p>
+                      </div>
+                    )}
+                    {r.ibas && r.ibas.length > 0 && (
+                      <div>
+                        <h4 className="font-semibold text-[var(--text-primary)]">IBA</h4>
+                        <p>{joinNames(r.ibas)}</p>
+                      </div>
+                    )}
+                  </div>
+                  {/* Instructions */}
+                  <div className="flex flex-col justify-start items-start">
                     {r.instructions && (
-                      <div className="ml-4 flex-1 min-w-[300px] max-w-[700px] space-y-2">
+                      <>
                         <h3 className="font-semibold text-[var(--text-primary)] mb-1">Instructions</h3>
-                        <p>{r.instructions}</p>
+                        <p>{truncate(r.instructions, 300)}</p>
+                      </>
+                    )}
+                  </div>
+                  {/* Alcoholic/Non-Alcoholic */}
+                  <div className="flex flex-col justify-center items-end">
+                    {r.alcoholic && (
+                      <div className="flex flex-col items-end space-y-2">
+                        <span className="font-semibold">
+                          {getName(r.alcoholic)}
+                        </span>
+                        {getName(r.alcoholic) === 'Alcoholic' && (
+                          <span title="Alcoholic">
+                            <svg
+                              xmlns="http://www.w3.org/2000/svg"
+                              width="20"
+                              height="20"
+                              fill="currentColor"
+                              viewBox="0 0 20 20"
+                            >
+                              <circle
+                                cx="10"
+                                cy="10"
+                                r="8"
+                                stroke="currentColor"
+                                strokeWidth="2"
+                                fill="none"
+                              />
+                              <text
+                                x="10"
+                                y="14"
+                                textAnchor="middle"
+                                fontSize="10"
+                                fill="currentColor"
+                              >
+                                %
+                              </text>
+                            </svg>
+                          </span>
+                        )}
                       </div>
                     )}
                   </div>
