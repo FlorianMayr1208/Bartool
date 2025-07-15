@@ -96,9 +96,9 @@ export default function FindRecipes() {
         {/* Tag Filter Dropdown */}
         <Menu as="div" className="relative inline-block text-left">
           <div>
-            <MenuButton className="inline-flex w-full justify-center gap-x-1.5 rounded border border-[var(--border)] bg-transparent px-3 py-2 text-sm font-semibold text-[var(--text-primary)] hover:bg-[var(--border)]/10">
+            <MenuButton className="inline-flex w-full justify-center gap-x-1.5 rounded border border-[var(--border)] bg-transparent px-3 py-2 text-sm font-semibold text-[var(--text-primary)] hover:bg-[var(--accent)]/10">
               {tagFilter ? tags.find((t) => t === tagFilter) : "All Tags"}
-              <ChevronDownIcon aria-hidden="true" className="-mr-1 size-5 text-[var(--border)]" />
+              <ChevronDownIcon aria-hidden="true" className="-mr-1 size-5 text-[var(--accent)]" />
             </MenuButton>
           </div>
           <MenuItems className="absolute right-0 z-10 mt-2 w-56 origin-top-right rounded-md bg-[var(--background)] border border-[var(--border)] shadow-lg ring-1 ring-black/5 focus:outline-none">
@@ -106,7 +106,7 @@ export default function FindRecipes() {
               <MenuItem>
                 {({ active }) => (
                   <button
-                    className={`block w-full px-4 py-2 text-left text-sm text-[var(--text-primary)] ${active ? "bg-[var(--border)]/20" : ""}`}
+                    className={`block w-full px-4 py-2 text-left text-sm text-[var(--text-primary)] ${active ? "bg-[var(--accent)]/20" : ""}`}
                     onClick={() => setTagFilter(undefined)}
                   >
                     All Tags
@@ -117,7 +117,7 @@ export default function FindRecipes() {
                 <MenuItem key={t}>
                   {({ active }) => (
                     <button
-                      className={`block w-full px-4 py-2 text-left text-sm text-[var(--text-primary)] ${active ? "bg-[var(--border)]/20" : ""}`}
+                      className={`block w-full px-4 py-2 text-left text-sm text-[var(--text-primary)] ${active ? "bg-[var(--accent)]/20" : ""}`}
                       onClick={() => setTagFilter(t)}
                     >
                       {t}
@@ -131,9 +131,9 @@ export default function FindRecipes() {
         {/* Category Filter Dropdown */}
         <Menu as="div" className="relative inline-block text-left">
           <div>
-            <MenuButton className="inline-flex w-full justify-center gap-x-1.5 rounded border border-[var(--border)] bg-transparent px-3 py-2 text-sm font-semibold text-[var(--text-primary)] hover:bg-[var(--border)]/10">
+            <MenuButton className="inline-flex w-full justify-center gap-x-1.5 rounded border border-[var(--border)] bg-transparent px-3 py-2 text-sm font-semibold text-[var(--text-primary)] hover:bg-[var(--accent)]/10">
               {categoryFilter ? categories.find((c) => c === categoryFilter) : "All Categories"}
-              <ChevronDownIcon aria-hidden="true" className="-mr-1 size-5 text-[var(--border)]" />
+              <ChevronDownIcon aria-hidden="true" className="-mr-1 size-5 text-[var(--accent)]" />
             </MenuButton>
           </div>
           <MenuItems className="absolute right-0 z-10 mt-2 w-56 origin-top-right rounded-md bg-[var(--background)] border border-[var(--border)] shadow-lg ring-1 ring-black/5 focus:outline-none">
@@ -141,7 +141,7 @@ export default function FindRecipes() {
               <MenuItem>
                 {({ active }) => (
                   <button
-                    className={`block w-full px-4 py-2 text-left text-sm text-[var(--text-primary)] ${active ? "bg-[var(--border)]/20" : ""}`}
+                    className={`block w-full px-4 py-2 text-left text-sm text-[var(--text-primary)] ${active ? "bg-[var(--accent)]/20" : ""}`}
                     onClick={() => setCategoryFilter(undefined)}
                   >
                     All Categories
@@ -152,7 +152,7 @@ export default function FindRecipes() {
                 <MenuItem key={c}>
                   {({ active }) => (
                     <button
-                      className={`block w-full px-4 py-2 text-left text-sm text-[var(--text-primary)] ${active ? "bg-[var(--border)]/20" : ""}`}
+                      className={`block w-full px-4 py-2 text-left text-sm text-[var(--text-primary)] ${active ? "bg-[var(--accent)]/20" : ""}`}
                       onClick={() => setCategoryFilter(c)}
                     >
                       {c}
@@ -166,9 +166,9 @@ export default function FindRecipes() {
         {/* Alcoholic Filter Dropdown */}
         <Menu as="div" className="relative inline-block text-left">
           <div>
-            <MenuButton className="inline-flex w-full justify-center gap-x-1.5 rounded border border-[var(--border)] bg-transparent px-3 py-2 text-sm font-semibold text-[var(--text-primary)] hover:bg-[var(--border)]/10">
+            <MenuButton className="inline-flex w-full justify-center gap-x-1.5 rounded border border-[var(--border)] bg-transparent px-3 py-2 text-sm font-semibold text-[var(--text-primary)] hover:bg-[var(--accent)]/10">
               {alcoholicFilter ? alcoholicFilter : "All"}
-              <ChevronDownIcon aria-hidden="true" className="-mr-1 size-5 text-[var(--border)]" />
+              <ChevronDownIcon aria-hidden="true" className="-mr-1 size-5 text-[var(--accent)]" />
             </MenuButton>
           </div>
           <MenuItems className="absolute right-0 z-10 mt-2 w-56 origin-top-right rounded-md bg-[var(--background)] border border-[var(--border)] shadow-lg ring-1 ring-black/5 focus:outline-none">
@@ -176,7 +176,7 @@ export default function FindRecipes() {
               <MenuItem>
                 {({ active }) => (
                   <button
-                    className={`block w-full px-4 py-2 text-left text-sm text-[var(--text-primary)] ${active ? "bg-[var(--border)]/20" : ""}`}
+                    className={`block w-full px-4 py-2 text-left text-sm text-[var(--text-primary)] ${active ? "bg-[var(--accent)]/20" : ""}`}
                     onClick={() => setAlcoholicFilter(undefined)}
                   >
                     All
@@ -186,7 +186,7 @@ export default function FindRecipes() {
               <MenuItem>
                 {({ active }) => (
                   <button
-                    className={`block w-full px-4 py-2 text-left text-sm text-[var(--text-primary)] ${active ? "bg-[var(--border)]/20" : ""}`}
+                    className={`block w-full px-4 py-2 text-left text-sm text-[var(--text-primary)] ${active ? "bg-[var(--accent)]/20" : ""}`}
                     onClick={() => setAlcoholicFilter("Alcoholic")}
                   >
                     Alcoholic
@@ -196,7 +196,7 @@ export default function FindRecipes() {
               <MenuItem>
                 {({ active }) => (
                   <button
-                    className={`block w-full px-4 py-2 text-left text-sm text-[var(--text-primary)] ${active ? "bg-[var(--border)]/20" : ""}`}
+                    className={`block w-full px-4 py-2 text-left text-sm text-[var(--text-primary)] ${active ? "bg-[var(--accent)]/20" : ""}`}
                     onClick={() => setAlcoholicFilter("Non alcoholic")}
                   >
                     Non alcoholic
