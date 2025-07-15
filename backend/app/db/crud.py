@@ -340,6 +340,9 @@ def recipe_missing_ingredients(
 def search_local_recipes(
     db: Session,
     query: str | None = None,
+    tag: str | None = None,
+    category: str | None = None,
+    iba: str | None = None,
     available_only: bool = False,
     order_missing: bool = False,
     skip: int = 0,
@@ -347,8 +350,22 @@ def search_local_recipes(
 ):
     """Search recipes stored in the DB with optional inventory filters."""
     q = db.query(models.Recipe)
+
+    if tag:
+        q = q.join(models.recipe_tag).join(models.Tag).filter(
+            func.lower(models.Tag.name) == tag.lower()
+        )
+    if category:
+        q = q.join(models.recipe_category).join(models.Category).filter(
+            func.lower(models.Category.name) == category.lower()
+        )
+    if iba:
+        q = q.join(models.recipe_iba).join(models.Iba).filter(
+            func.lower(models.Iba.name) == iba.lower()
+        )
     if query:
         q = q.filter(models.Recipe.name.ilike(f"%{query}%"))
+
     q = q.offset(skip).limit(limit)
     recipes = q.all()
     results: list[tuple[models.Recipe, int, int]] = []

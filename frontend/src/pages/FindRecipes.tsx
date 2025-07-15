@@ -1,12 +1,13 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { findRecipes } from "../api";
-import { Link } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
 import { Search } from "lucide-react";
 import RecipeList, { type RecipeItem } from "../components/RecipeList";
 
 type Recipe = RecipeItem;
 
 export default function FindRecipes() {
+  const [searchParams] = useSearchParams();
   const [query, setQuery] = useState("");
   const [availableOnly, setAvailableOnly] = useState(false);
   const [orderMissing, setOrderMissing] = useState(false);
@@ -15,11 +16,25 @@ export default function FindRecipes() {
   const runSearch = async () => {
     const data = await findRecipes({
       q: query || undefined,
+      tag: searchParams.get("tag") || undefined,
+      category: searchParams.get("category") || undefined,
+      iba: searchParams.get("iba") || undefined,
       available_only: availableOnly,
       order_missing: orderMissing,
     });
     setResults(data);
   };
+
+  useEffect(() => {
+    const q = searchParams.get("q") || "";
+    const tag = searchParams.get("tag") || undefined;
+    const category = searchParams.get("category") || undefined;
+    const iba = searchParams.get("iba") || undefined;
+    if (q || tag || category || iba) {
+      setQuery(q);
+      findRecipes({ q: q || undefined, tag, category, iba }).then(setResults);
+    }
+  }, [searchParams]);
 
   return (
     <div className="space-y-4">

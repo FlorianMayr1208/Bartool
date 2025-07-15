@@ -34,6 +34,18 @@ paths:
           schema:
             type: string
         - in: query
+          name: tag
+          schema:
+            type: string
+        - in: query
+          name: category
+          schema:
+            type: string
+        - in: query
+          name: iba
+          schema:
+            type: string
+        - in: query
           name: available_only
           schema:
             type: boolean

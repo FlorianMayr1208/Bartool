@@ -9,6 +9,9 @@ router = APIRouter()
 @router.get("", response_model=list[schemas.RecipeWithInventory])
 def find_recipes(
     q: str | None = None,
+    tag: str | None = None,
+    category: str | None = None,
+    iba: str | None = None,
     available_only: bool = False,
     order_missing: bool = False,
     skip: int = 0,
@@ -19,6 +22,9 @@ def find_recipes(
     return crud.search_local_recipes(
         db,
         query=q,
+        tag=tag,
+        category=category,
+        iba=iba,
         available_only=available_only,
         order_missing=order_missing,
         skip=skip,
