@@ -5,15 +5,20 @@ import { Link } from 'react-router-dom';
 import { Search } from 'lucide-react';
 
 // Recipe interface for type safety
+interface NamedItem {
+  id: number;
+  name: string;
+}
+
 interface Recipe {
   id?: number;
   name: string;
-  alcoholic?: string | null;
+  alcoholic?: string | NamedItem | null;
   instructions?: string | null;
   thumb?: string | null;
-  tags?: string[];
-  categories?: string[];
-  ibas?: string[];
+  tags?: (string | NamedItem)[];
+  categories?: (string | NamedItem)[];
+  ibas?: (string | NamedItem)[];
 }
 
 export default function Recipes() {
@@ -40,6 +45,14 @@ export default function Recipes() {
     // Filter out recipes that are already saved
     setResults(res.filter((r: Recipe) => !saved.some((s) => s.name === r.name)));
   };
+
+  const getName = (value: string | NamedItem | undefined | null) =>
+    typeof value === 'string' || value === null || value === undefined
+      ? value
+      : value.name;
+
+  const joinNames = (items: (string | NamedItem)[] | undefined) =>
+    items?.map((i) => (typeof i === 'string' ? i : i.name)).join(', ');
 
   // Save a recipe by name, refresh saved list, remove from search results
   const save = async (name: string) => {
@@ -118,8 +131,8 @@ export default function Recipes() {
                           {/* Alcoholic info with promille icon if alcoholic */}
                           {r.alcoholic && (
                             <div className="ml-16 flex items-center space-x-2">
-                              <p>{r.alcoholic}</p>
-                              {r.alcoholic === "Alcoholic" && (
+                              <p>{getName(r.alcoholic)}</p>
+                              {getName(r.alcoholic) === "Alcoholic" && (
                                 <span title="Alcoholic">
                                   {/* Promille SVG icon */}
                                   <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 20 20">
@@ -138,13 +151,13 @@ export default function Recipes() {
                               {(r.categories?.length || r.tags?.length || r.ibas?.length) && (
                                 <div className="space-y-1 text-[var(--text-secondary)]">
                                   {r.categories && r.categories.length > 0 && (
-                                    <p>Category: {r.categories.join(', ')}</p>
+                                    <p>Category: {joinNames(r.categories)}</p>
                                   )}
                                   {r.tags && r.tags.length > 0 && (
-                                    <p>Tags: {r.tags.join(', ')}</p>
+                                    <p>Tags: {joinNames(r.tags)}</p>
                                   )}
                                   {r.ibas && r.ibas.length > 0 && (
-                                    <p>IBA: {r.ibas.join(', ')}</p>
+                                    <p>IBA: {joinNames(r.ibas)}</p>
                                   )}
                                 </div>
                               )}
@@ -207,8 +220,8 @@ export default function Recipes() {
                           {/* Alcoholic info with promille icon if alcoholic */}
                           {s.alcoholic && (
                             <div className="ml-16 flex items-center space-x-2">
-                              <p>{s.alcoholic}</p>
-                              {s.alcoholic === "Alcoholic" && (
+                              <p>{getName(s.alcoholic)}</p>
+                              {getName(s.alcoholic) === "Alcoholic" && (
                                 <span title="Alcoholic">
                                   {/* Promille SVG icon */}
                                   <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 20 20">
@@ -227,13 +240,13 @@ export default function Recipes() {
                               {(s.categories?.length || s.tags?.length || s.ibas?.length) && (
                                 <div className="space-y-1 text-[var(--text-secondary)]">
                                   {s.categories && s.categories.length > 0 && (
-                                    <p>Category: {s.categories.join(', ')}</p>
+                                    <p>Category: {joinNames(s.categories)}</p>
                                   )}
                                   {s.tags && s.tags.length > 0 && (
-                                    <p>Tags: {s.tags.join(', ')}</p>
+                                    <p>Tags: {joinNames(s.tags)}</p>
                                   )}
                                   {s.ibas && s.ibas.length > 0 && (
-                                    <p>IBA: {s.ibas.join(', ')}</p>
+                                    <p>IBA: {joinNames(s.ibas)}</p>
                                   )}
                                 </div>
                               )}
