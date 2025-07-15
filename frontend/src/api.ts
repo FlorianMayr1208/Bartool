@@ -171,7 +171,7 @@ export async function findRecipes(options: FindRecipesOptions = {}) {
     params.append("limit", String(options.limit));
   const query = params.toString();
   const res = await fetch(
-    `${API_BASE}/recipes/find${query ? `?${query}` : ""}`,
+    `${API_BASE}/search${query ? `?${query}` : ""}`,
   );
   return res.json();
 }

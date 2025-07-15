@@ -509,7 +509,7 @@ async def test_recipe_find_inventory(monkeypatch, async_client):
     await async_client.post("/recipes/", json={"name": "vodka gin"})
 
     resp = await async_client.get(
-        "/recipes/find", params={"available_only": True, "q": "vodka"}
+        "/search", params={"available_only": True, "q": "vodka"}
     )
     assert resp.status_code == 200
     data = resp.json()
@@ -521,7 +521,7 @@ async def test_recipe_find_inventory(monkeypatch, async_client):
     assert vo["missing_count"] == 0
 
     resp = await async_client.get(
-        "/recipes/find", params={"order_missing": True, "q": "vodka"}
+        "/search", params={"order_missing": True, "q": "vodka"}
     )
     assert resp.status_code == 200
     data = resp.json()

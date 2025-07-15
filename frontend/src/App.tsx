@@ -31,7 +31,7 @@ export default function App() {
           <Route path="/" element={<Dashboard />} />
           <Route path="/inventory" element={<Inventory />} />
           <Route path="/recipes" element={<Recipes />} />
-          <Route path="/recipes/find" element={<FindRecipes />} />
+          <Route path="/search" element={<FindRecipes />} />
           <Route path="/recipes/:id" element={<RecipeDetail />} />
           <Route path="/shopping-list" element={<ShoppingList />} />
           <Route path="/stats" element={<Stats />} />
