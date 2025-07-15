@@ -12,6 +12,7 @@ from .api import (
     synonyms,
     unit_synonyms,
     shopping_list,
+    db_admin,
 )
 
 app = FastAPI(title="Bar Management")
@@ -53,4 +54,5 @@ app.include_router(search.router, prefix="/search")
 app.include_router(synonyms.router, prefix="/synonyms")
 app.include_router(unit_synonyms.router, prefix="/unit-synonyms")
 app.include_router(shopping_list.router, prefix="/shopping-list")
+app.include_router(db_admin.router, prefix="/db")
 

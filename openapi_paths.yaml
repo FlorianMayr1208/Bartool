@@ -144,3 +144,9 @@ paths:
           required: true
           schema:
             type: integer
+  /db/export:
+    get:
+      summary: Download SQLite database file
+  /db/import:
+    post:
+      summary: Upload SQLite database file
