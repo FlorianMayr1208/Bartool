@@ -2,7 +2,7 @@ from sqlalchemy.orm import Session
 from sqlalchemy import func
 
 from ..services import synonyms, unit_synonyms
-import re
+from . import models, schemas
 
 
 def _extract_unit(measure: str | None) -> str | None:
@@ -14,7 +14,6 @@ def _extract_unit(measure: str | None) -> str | None:
     return " ".join(parts[1:]).strip()
 
 
-from . import models, schemas
 
 # Ingredient CRUD
 
@@ -47,6 +46,28 @@ def create_ingredient(db: Session, ingredient: schemas.IngredientCreate):
 
 def list_ingredients(db: Session, skip: int = 0, limit: int = 100):
     return db.query(models.Ingredient).offset(skip).limit(limit).all()
+
+
+def list_tags(db: Session, skip: int = 0, limit: int = 100):
+    """Return all tags sorted by name."""
+    return (
+        db.query(models.Tag)
+        .order_by(models.Tag.name)
+        .offset(skip)
+        .limit(limit)
+        .all()
+    )
+
+
+def list_categories(db: Session, skip: int = 0, limit: int = 100):
+    """Return all categories sorted by name."""
+    return (
+        db.query(models.Category)
+        .order_by(models.Category.name)
+        .offset(skip)
+        .limit(limit)
+        .all()
+    )
 
 
 def get_ingredient_by_name(db: Session, name: str):
@@ -342,6 +363,7 @@ def search_local_recipes(
     query: str | None = None,
     tag: str | None = None,
     category: str | None = None,
+    alcoholic: str | None = None,
     iba: str | None = None,
     available_only: bool = False,
     order_missing: bool = False,
@@ -362,6 +384,10 @@ def search_local_recipes(
     if iba:
         q = q.join(models.recipe_iba).join(models.Iba).filter(
             func.lower(models.Iba.name) == iba.lower()
+        )
+    if alcoholic:
+        q = q.join(models.Alcoholic).filter(
+            func.lower(models.Alcoholic.name) == alcoholic.lower()
         )
     if query:
         q = q.filter(models.Recipe.name.ilike(f"%{query}%"))

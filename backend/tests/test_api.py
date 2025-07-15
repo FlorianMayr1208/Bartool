@@ -1,4 +1,3 @@
-import asyncio
 from typing import AsyncGenerator
 
 import pytest
@@ -597,6 +596,78 @@ async def test_search_by_tag_category(monkeypatch, async_client):
     data = resp.json()
     names = {r["name"] for r in data}
     assert {"Tagged", "Other"} == names
+
+
+@pytest.mark.asyncio
+async def test_list_tags_categories(monkeypatch, async_client):
+    async def fake_fetch(name: str):
+        return {
+            "name": "Cooler",
+            "alcoholic": "Alcoholic",
+            "instructions": "Mix",
+            "thumb": None,
+            "tags": ["Refreshing"],
+            "categories": ["Longdrink"],
+            "ibas": [],
+            "ingredients": [{"name": "Rum", "measure": "1 oz"}],
+        }
+
+    monkeypatch.setattr(
+        "backend.app.services.cocktaildb.fetch_recipe_details", fake_fetch
+    )
+    monkeypatch.setattr("backend.app.api.recipes.fetch_recipe_details", fake_fetch)
+
+    await async_client.post("/recipes/", json={"name": "cooler"})
+
+    resp = await async_client.get("/tags/")
+    assert resp.status_code == 200
+    tags = [t["name"] for t in resp.json()]
+    assert "Refreshing" in tags
+
+    resp = await async_client.get("/categories/")
+    assert resp.status_code == 200
+    cats = [c["name"] for c in resp.json()]
+    assert "Longdrink" in cats
+
+
+@pytest.mark.asyncio
+async def test_search_by_alcoholic(monkeypatch, async_client):
+    async def fake_fetch(name: str):
+        if name == "virgin":
+            return {
+                "name": "Virgin Drink",
+                "alcoholic": "Non alcoholic",
+                "instructions": "Mix",
+                "thumb": None,
+                "tags": [],
+                "categories": [],
+                "ibas": [],
+                "ingredients": [{"name": "Lime", "measure": "1 oz"}],
+            }
+        return {
+            "name": "Boozy",
+            "alcoholic": "Alcoholic",
+            "instructions": "Mix",
+            "thumb": None,
+            "tags": [],
+            "categories": [],
+            "ibas": [],
+            "ingredients": [{"name": "Rum", "measure": "1 oz"}],
+        }
+
+    monkeypatch.setattr(
+        "backend.app.services.cocktaildb.fetch_recipe_details", fake_fetch
+    )
+    monkeypatch.setattr("backend.app.api.recipes.fetch_recipe_details", fake_fetch)
+
+    await async_client.post("/recipes/", json={"name": "virgin"})
+    await async_client.post("/recipes/", json={"name": "boozy"})
+
+    resp = await async_client.get("/search", params={"alcoholic": "Non alcoholic"})
+    assert resp.status_code == 200
+    data = resp.json()
+    names = [r["name"] for r in data]
+    assert names == ["Virgin Drink"]
 
 
 @pytest.mark.asyncio
