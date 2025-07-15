@@ -39,6 +39,7 @@ class Ingredient(IngredientBase):
 class RecipeBase(BaseModel):
     name: str
     alcoholic: Optional[str] = None
+    glass: Optional[str] = None
     instructions: Optional[str] = None
     thumb: Optional[str] = None
 
@@ -83,6 +84,22 @@ class Iba(BaseModel):
         orm_mode = True
 
 
+class Glass(BaseModel):
+    id: int
+    name: str
+
+    class Config:
+        orm_mode = True
+
+
+class Alcoholic(BaseModel):
+    id: int
+    name: str
+
+    class Config:
+        orm_mode = True
+
+
 class RecipeCreate(RecipeBase):
     tags: List[str] = []
     categories: List[str] = []
@@ -100,6 +117,8 @@ class RecipePreview(RecipeBase):
 
 class Recipe(RecipeBase):
     id: int
+    glass: Glass | None = None
+    alcoholic: Alcoholic | None = None
     tags: List[Tag] = []
     categories: List[Category] = []
     ibas: List[Iba] = []
