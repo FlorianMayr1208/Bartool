@@ -49,11 +49,29 @@ export interface Recipe {
   name: string;
 }
 
+export interface RecipeSearchResult {
+  name: string;
+  alcoholic?: string | null;
+  instructions?: string | null;
+  thumb?: string | null;
+  tags?: string[];
+  categories?: string[];
+  ibas?: string[];
+}
+
+export interface NamedItem {
+  id: number;
+  name: string;
+}
+
 export interface RecipeDetail {
   id: number;
   name: string;
   instructions?: string | null;
   thumb?: string | null;
+  tags?: NamedItem[];
+  categories?: NamedItem[];
+  ibas?: NamedItem[];
   ingredients: RecipeIngredient[];
 }
 
@@ -146,7 +164,7 @@ export async function listRecipes() {
   return res.json();
 }
 
-export async function searchRecipes(q: string) {
+export async function searchRecipes(q: string): Promise<RecipeSearchResult[]> {
   const res = await fetch(
     `${API_BASE}/recipes/search?q=${encodeURIComponent(q)}`,
   );

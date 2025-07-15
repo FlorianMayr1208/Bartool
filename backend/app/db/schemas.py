@@ -90,6 +90,14 @@ class RecipeCreate(RecipeBase):
     ingredients: List[RecipeIngredientCreate] = []
 
 
+class RecipePreview(RecipeBase):
+    """Basic recipe info including tags used for search results."""
+
+    tags: List[str] = []
+    categories: List[str] = []
+    ibas: List[str] = []
+
+
 class Recipe(RecipeBase):
     id: int
     tags: List[Tag] = []

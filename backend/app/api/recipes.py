@@ -11,7 +11,7 @@ from ..services.cocktaildb import (
 router = APIRouter()
 
 
-@router.get("/search", response_model=list[schemas.RecipeBase])
+@router.get("/search", response_model=list[schemas.RecipePreview])
 async def search_recipes_endpoint(q: str):
     return await search_recipes_details(q)
 

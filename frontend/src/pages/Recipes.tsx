@@ -11,6 +11,9 @@ interface Recipe {
   alcoholic?: string | null;
   instructions?: string | null;
   thumb?: string | null;
+  tags?: string[];
+  categories?: string[];
+  ibas?: string[];
 }
 
 export default function Recipes() {
@@ -129,9 +132,22 @@ export default function Recipes() {
                           )}
                           {/* Instructions section */}
                           {r.instructions && (
-                            <div className="ml-2 flex-1 min-w-[500px] max-w-[700px]">
+                            <div className="ml-2 flex-1 min-w-[500px] max-w-[700px] space-y-2">
                               <h3 className="font-semibold text-[var(--text-primary)] mb-1">Instructions</h3>
                               <p>{r.instructions}</p>
+                              {(r.categories?.length || r.tags?.length || r.ibas?.length) && (
+                                <div className="space-y-1 text-[var(--text-secondary)]">
+                                  {r.categories && r.categories.length > 0 && (
+                                    <p>Category: {r.categories.join(', ')}</p>
+                                  )}
+                                  {r.tags && r.tags.length > 0 && (
+                                    <p>Tags: {r.tags.join(', ')}</p>
+                                  )}
+                                  {r.ibas && r.ibas.length > 0 && (
+                                    <p>IBA: {r.ibas.join(', ')}</p>
+                                  )}
+                                </div>
+                              )}
                             </div>
                           )}
                         </div>
@@ -205,9 +221,22 @@ export default function Recipes() {
                           )}
                           {/* Instructions section */}
                           {s.instructions && (
-                            <div className="ml-2 flex-1 min-w-[300px] max-w-[500px]">
+                            <div className="ml-2 flex-1 min-w-[300px] max-w-[500px] space-y-2">
                               <h3 className="font-semibold text-[var(--text-primary)] mb-1">Instructions</h3>
                               <p>{s.instructions}</p>
+                              {(s.categories?.length || s.tags?.length || s.ibas?.length) && (
+                                <div className="space-y-1 text-[var(--text-secondary)]">
+                                  {s.categories && s.categories.length > 0 && (
+                                    <p>Category: {s.categories.join(', ')}</p>
+                                  )}
+                                  {s.tags && s.tags.length > 0 && (
+                                    <p>Tags: {s.tags.join(', ')}</p>
+                                  )}
+                                  {s.ibas && s.ibas.length > 0 && (
+                                    <p>IBA: {s.ibas.join(', ')}</p>
+                                  )}
+                                </div>
+                              )}
                             </div>
                           )}
                         </div>
