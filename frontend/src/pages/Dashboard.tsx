@@ -57,7 +57,7 @@ export default function Dashboard() {
             <button
               key={f.title}
               onClick={triggerExport}
-              className="card flex items-center gap-2"
+              className="card flex items-center gap-2 cursor-pointer transition hover:bg-blue-100 hover:shadow text-lg font-semibold"
             >
               {f.icon}
               {f.title}
@@ -66,7 +66,7 @@ export default function Dashboard() {
             <button
               key={f.title}
               onClick={triggerImport}
-              className="card flex items-center gap-2"
+              className="card flex items-center gap-2 cursor-pointer transition hover:bg-blue-100 hover:shadow text-lg font-semibold"
             >
               {f.icon}
               {f.title}
