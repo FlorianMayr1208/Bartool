@@ -54,7 +54,38 @@ export default function RecipeList({
                 className="flex items-center gap-2 p-4 cursor-pointer mb-[5px] mt-[5px]"
                 onClick={() => setExpanded(expandedKey ? null : key)}
               >
-                <span className="flex-1 truncate font-semibold">{r.name}</span>
+                <span className="flex-1 truncate font-semibold flex items-center gap-2">
+                  {r.name}
+                  {getName(r.alcoholic) === 'Alcoholic' && (
+                    <span title="Alcoholic">
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="20"
+                        height="20"
+                        fill="currentColor"
+                        viewBox="0 0 20 20"
+                      >
+                        <circle
+                          cx="10"
+                          cy="10"
+                          r="8"
+                          stroke="currentColor"
+                          strokeWidth="2"
+                          fill="none"
+                        />
+                        <text
+                          x="10"
+                          y="14"
+                          textAnchor="middle"
+                          fontSize="10"
+                          fill="currentColor"
+                        >
+                          %
+                        </text>
+                      </svg>
+                    </span>
+                  )}
+                </span>
                 {showCounts &&
                   typeof r.available_count === 'number' &&
                   typeof r.missing_count === 'number' && (
@@ -69,7 +100,7 @@ export default function RecipeList({
               {expandedKey && (
                 <div
                   className="grid grid-cols-4 gap-4 h-52 w-full p-2 text-sm text-[var(--text-muted)] mb-4"
-                  style={{ gridTemplateColumns: '1fr 1fr 2fr 1fr' }}
+                  // style={{ gridTemplateColumns: '1fr 1fr 2fr 1fr' }}
                 >
                   {/* Image */}
                   <div className="flex items-center justify-center">
@@ -112,44 +143,7 @@ export default function RecipeList({
                     )}
                   </div>
                   {/* Alcoholic/Non-Alcoholic */}
-                  <div className="flex flex-col justify-center items-end">
-                    {r.alcoholic && (
-                      <div className="flex flex-col items-end space-y-2">
-                        <span className="font-semibold">
-                          {getName(r.alcoholic)}
-                        </span>
-                        {getName(r.alcoholic) === 'Alcoholic' && (
-                          <span title="Alcoholic">
-                            <svg
-                              xmlns="http://www.w3.org/2000/svg"
-                              width="20"
-                              height="20"
-                              fill="currentColor"
-                              viewBox="0 0 20 20"
-                            >
-                              <circle
-                                cx="10"
-                                cy="10"
-                                r="8"
-                                stroke="currentColor"
-                                strokeWidth="2"
-                                fill="none"
-                              />
-                              <text
-                                x="10"
-                                y="14"
-                                textAnchor="middle"
-                                fontSize="10"
-                                fill="currentColor"
-                              >
-                                %
-                              </text>
-                            </svg>
-                          </span>
-                        )}
-                      </div>
-                    )}
-                  </div>
+                  {/* Alcoholic/Non-Alcoholic removed from detail view */}
                 </div>
               )}
             </li>
