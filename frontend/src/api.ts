@@ -294,3 +294,16 @@ export async function addMissingFromRecipe(recipe_id: number) {
     { method: "POST" },
   );
 }
+
+export async function exportDatabase(): Promise<Blob> {
+  const res = await fetch(`${API_BASE}/db/export`);
+  if (!res.ok) throw new Error("Export failed");
+  return res.blob();
+}
+
+export async function importDatabase(file: File) {
+  const form = new FormData();
+  form.append("file", file);
+  const res = await fetch(`${API_BASE}/db/import`, { method: "POST", body: form });
+  if (!res.ok) throw new Error("Import failed");
+}

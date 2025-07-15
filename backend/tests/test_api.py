@@ -631,3 +631,25 @@ async def test_clear_shopping_list(monkeypatch, async_client):
     resp = await async_client.get("/shopping-list/")
     assert resp.status_code == 200
     assert resp.json() == []
+
+
+@pytest.mark.asyncio
+async def test_db_export_import(monkeypatch, async_client, tmp_path):
+    tmp_db = tmp_path / "db.sqlite"
+    tmp_db.write_text("old")
+    from backend.app.api import db_admin
+    monkeypatch.setattr(db_admin, "_DB_PATH", tmp_db)
+
+    resp = await async_client.get("/db/export")
+    assert resp.status_code == 200
+    assert resp.content == b"old"
+
+    new_file = tmp_path / "new.sqlite"
+    new_file.write_text("new")
+    with new_file.open("rb") as f:
+        resp = await async_client.post(
+            "/db/import",
+            files={"file": ("new.sqlite", f, "application/octet-stream")},
+        )
+    assert resp.status_code == 201
+    assert tmp_db.read_text() == "new"
