@@ -102,19 +102,39 @@ export default function Recipes() {
                     </div>
                     {/* Expanded recipe details */}
                     {expandedKey && (
-                      <div className="space-y-1 p-2 text-sm text-[var(--text-muted)]">
+                      <div className="flex h-52 w-96 space-x-4 p-2 text-sm text-[var(--text-muted)] mb-4">
                         {/* Recipe thumbnail */}
                         {r.thumb && (
-                        <img
-                          src={r.thumb}
-                          alt={r.name}
-                          className="h-24 w-24 rounded object-cover"
-                        />
-                      )}
-                        {/* Alcoholic info */}
-                        {r.alcoholic && <p>{r.alcoholic}</p>}
-                        {/* Instructions */}
-                        {r.instructions && <p>{r.instructions}</p>}
+                          <img
+                            src={r.thumb}
+                            alt={r.name}
+                            className="h-48 w-48 rounded object-cover"
+                          />
+                        )}
+                        <div className="flex flex-row items-start space-x-16 w-full">
+                          {/* Alcoholic info with promille icon if alcoholic */}
+                          {r.alcoholic && (
+                            <div className="ml-16 flex items-center space-x-2">
+                              <p>{r.alcoholic}</p>
+                              {r.alcoholic === "Alcoholic" && (
+                                <span title="Alcoholic">
+                                  {/* Promille SVG icon */}
+                                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 20 20">
+                                    <circle cx="10" cy="10" r="8" stroke="currentColor" strokeWidth="2" fill="none" />
+                                    <text x="10" y="14" textAnchor="middle" fontSize="10" fill="currentColor">%</text>
+                                  </svg>
+                                </span>
+                              )}
+                            </div>
+                          )}
+                          {/* Instructions section */}
+                          {r.instructions && (
+                            <div className="ml-2 flex-1 min-w-[500px] max-w-[700px]">
+                              <h3 className="font-semibold text-[var(--text-primary)] mb-1">Instructions</h3>
+                              <p>{r.instructions}</p>
+                            </div>
+                          )}
+                        </div>
                       </div>
                     )}
                   </li>
