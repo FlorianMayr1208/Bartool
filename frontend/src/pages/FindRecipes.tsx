@@ -3,10 +3,15 @@ import { findRecipes } from "../api";
 import { Link } from "react-router-dom";
 import { Search } from "lucide-react";
 
+interface NamedItem {
+  id: number;
+  name: string;
+}
+
 interface Recipe {
   id: number;
   name: string;
-  alcoholic?: string | null;
+  alcoholic?: string | NamedItem | null;
   instructions?: string | null;
   thumb?: string | null;
   available_count?: number;
@@ -19,6 +24,11 @@ export default function FindRecipes() {
   const [orderMissing, setOrderMissing] = useState(false);
   const [results, setResults] = useState<Recipe[]>([]);
   const [expanded, setExpanded] = useState<number | null>(null);
+
+  const getName = (value: string | NamedItem | undefined | null) =>
+    typeof value === 'string' || value === null || value === undefined
+      ? value
+      : value.name;
 
   const runSearch = async () => {
     const data = await findRecipes({
@@ -102,8 +112,8 @@ export default function FindRecipes() {
                         {/* Alcoholic info with promille icon if alcoholic */}
                         {r.alcoholic && (
                           <div className="ml-16 flex items-center space-x-2">
-                            <p>{r.alcoholic}</p>
-                            {r.alcoholic === "Alcoholic" && (
+                            <p>{getName(r.alcoholic)}</p>
+                            {getName(r.alcoholic) === "Alcoholic" && (
                               <span title="Alcoholic">
                                 {/* Promille SVG icon */}
                                 <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 20 20">
