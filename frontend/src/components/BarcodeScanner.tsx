@@ -29,9 +29,18 @@ export default function BarcodeScanner({ onDetected }: { onDetected: (code: stri
           return
         }
         Quagga.start()
+        const overlay = Quagga.canvas?.dom?.overlay as HTMLCanvasElement | undefined
+        if (overlay) {
+          overlay.style.position = 'absolute'
+          overlay.style.top = '0'
+          overlay.style.left = '0'
+          overlay.style.zIndex = '1'
+          overlay.style.pointerEvents = 'none'
+        }
       }
     )
 
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     Quagga.onProcessed((result: any) => {
       const drawingCtx = Quagga.canvas.ctx.overlay;
       const drawingCanvas = Quagga.canvas.dom.overlay;
@@ -46,9 +55,14 @@ export default function BarcodeScanner({ onDetected }: { onDetected: (code: stri
       if (result) {
         drawingCtx.clearRect(0, 0, drawingCanvas.width, drawingCanvas.height);
         if (result.boxes) {
-          result.boxes
-            .filter((box: any) => box !== result.box)
-            .forEach((box: any) => {
+            result.boxes
+              .filter(
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                (box: any) => box !== result.box
+              )
+              .forEach(
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                (box: any) => {
               Quagga.ImageDebug.drawPath(box, { x: 0, y: 1 }, drawingCtx, {
                 color: 'green',
                 lineWidth: 2
@@ -70,6 +84,7 @@ export default function BarcodeScanner({ onDetected }: { onDetected: (code: stri
       }
     });
 
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     Quagga.onDetected((res: any) => {
       onDetected(res.codeResult.code)
       Quagga.stop()
@@ -81,5 +96,5 @@ export default function BarcodeScanner({ onDetected }: { onDetected: (code: stri
     }
   }, [onDetected])
 
-  return <div ref={ref} className="w-full h-48 bg-gray-200" />
+  return <div ref={ref} className="relative w-full h-48 bg-gray-200" />
 }
