@@ -51,7 +51,7 @@ export default function Dashboard() {
     <div className="space-y-6">
       <h1 className="text-3xl font-bold font-display">Dashboard</h1>
       <p className="text-[var(--text-muted)]">Welcome to BarTool. Select an action below.</p>
-      <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="grid gap-6 sm:grid-cols-2 md:grid-cols-4">
         {features.map((f) => (
           f.action === 'export' ? (
             <button

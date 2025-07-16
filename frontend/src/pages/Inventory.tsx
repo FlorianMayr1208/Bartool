@@ -1,5 +1,7 @@
 import { useEffect, useState } from 'react'
 import BarcodeScanner from '../components/BarcodeScanner'
+import Drawer from '../components/Drawer'
+import { X } from 'lucide-react'
 import {
   listInventory,
   createIngredient,
@@ -149,21 +151,17 @@ export default function Inventory() {
 
       <section className="space-y-4 p-4 mb-6 rounded-lg shadow">
         <h2 className="text-xl font-semibold">Barcode Lookup</h2>
-        {scanning ? (
-          <div>
-            <BarcodeScanner onDetected={onDetected} />
-            <button
-              onClick={() => setScanning(false)}
-              className="mt-2 rounded bg-gray-200 px-2 py-1"
-            >
-              Cancel
+        <button onClick={() => setScanning(true)} className="button-send">
+          Scan Barcode
+        </button>
+        <Drawer open={scanning} onClose={() => setScanning(false)}>
+          <div className="p-4 space-y-2">
+            <button className="p-2 rounded" onClick={() => setScanning(false)}>
+              <X size={20} />
             </button>
+            <BarcodeScanner onDetected={onDetected} />
           </div>
-        ) : (
-          <button onClick={() => setScanning(true)} className="button-send">
-            Scan Barcode
-          </button>
-        )}
+        </Drawer>
         <div className="flex gap-4 items-center">
           <input
             placeholder="Enter barcode"

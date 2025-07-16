@@ -23,7 +23,7 @@ export default function App() {
   return (
     <Router>
       <Navbar />
-      <main className="container mx-auto p-4">
+      <main className="mx-auto max-w-screen-xl px-4 md:px-6 py-4">
         {health && (
           <div className="mb-4 text-sm text-gray-500">Health: {health}</div>
         )}
