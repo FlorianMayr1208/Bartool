@@ -39,8 +39,10 @@ export default function FindRecipes() {
   };
 
   useEffect(() => {
-    listTags().then((t) => setTags(t.map((x) => (typeof x === "string" ? x : x.name))));
-    listCategories().then((c) =>
+    listTags().then((t: Array<string | { name: string }>) =>
+      setTags(t.map((x) => (typeof x === "string" ? x : x.name)))
+    );
+    listCategories().then((c: Array<string | { name: string }>) =>
       setCategories(c.map((x) => (typeof x === "string" ? x : x.name)))
     );
   }, []);
