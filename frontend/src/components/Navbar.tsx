@@ -2,6 +2,7 @@ import { NavLink } from "react-router-dom";
 import { Menu, X } from "lucide-react";
 import { useState } from "react";
 import Drawer from "./Drawer";
+import TabletSwitch from "./TabletSwitch";
 
 
 
@@ -68,6 +69,7 @@ export default function Navbar() {
           <nav className="flex flex-col gap-2">
             <Links />
           </nav>
+          <TabletSwitch />
         </div>
       </Drawer>
     </header>
