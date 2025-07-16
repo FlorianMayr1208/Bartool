@@ -1,7 +1,7 @@
 import { NavLink } from "react-router-dom";
-import { Menu, X } from 'lucide-react';
-import { useState } from 'react';
-import Drawer from './Drawer';
+import { Menu, X } from "lucide-react";
+import { useState } from "react";
+import Drawer from "./Drawer";
 
 
 
@@ -11,10 +11,9 @@ export default function Navbar() {
 
   const linkClass = ({ isActive }: { isActive: boolean }) =>
     [
-      "relative px-4 py-2 rounded-full font-semibold transition-all duration-300 no-underline",
+      "relative flex items-center justify-center px-3 py-2 rounded-full font-semibold transition-all duration-300 no-underline",
       isActive
-        ? "bg-[var(--accent)] text-black shadow-md" +
-          " p-3 flex items-center justify-center pl-[10px] pr-[10px] pt-[5px] pb-[5px]"
+        ? "bg-[var(--accent)] text-black shadow-md"
         : "text-[var(--text-muted)] hover:text-[var(--accent)] hover:bg-[var(--bg-primary)]",
       "hover:scale-105",
     ].join(" ");
