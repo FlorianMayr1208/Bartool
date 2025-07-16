@@ -36,9 +36,9 @@ export default function Navbar() {
       <NavLink to="/shopping-list" className={linkClass} onClick={() => setOpen(false)}>
         Shopping List
       </NavLink>
-      <NavLink to="/stats" className={linkClass} onClick={() => setOpen(false)}>
+      {/* <NavLink to="/stats" className={linkClass} onClick={() => setOpen(false)}>
         Stats
-      </NavLink>
+      </NavLink> */}
       <NavLink to="/synonyms" className={linkClass} onClick={() => setOpen(false)}>
         Synonyms
       </NavLink>

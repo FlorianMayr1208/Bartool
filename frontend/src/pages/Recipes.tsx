@@ -1,5 +1,5 @@
 // Recipes.tsx - Page for searching, saving, and viewing cocktail recipes
-import { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { listRecipes, searchRecipes, createRecipe } from '../api';
 import { Link } from 'react-router-dom';
 import { Search } from 'lucide-react';
@@ -13,6 +13,8 @@ export default function Recipes() {
   const [query, setQuery] = useState('');
   const [results, setResults] = useState<Recipe[]>([]);
   const [saved, setSaved] = useState<Recipe[]>([]);
+  // Ref for search input
+  const inputRef = useRef<HTMLInputElement>(null);
 
   // Fetch saved recipes from backend
   const refresh = () => {
@@ -48,10 +50,13 @@ export default function Recipes() {
       {/* Search bar */}
       <div className="flex max-w-md items-center overflow-hidden rounded border border-[var(--border)]">
         <input
+          ref={inputRef}
           value={query}
           onChange={(e) => setQuery(e.target.value)}
           placeholder="Search cocktails"
           className="w-full bg-transparent p-2 focus:outline-none text-[var(--text-primary)] border-none"
+          onClick={() => inputRef.current && inputRef.current.focus()}
+          onTouchStart={() => inputRef.current && inputRef.current.focus()}
         />
         <button
           onClick={runSearch}
