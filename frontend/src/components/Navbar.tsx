@@ -3,6 +3,7 @@ import { Menu, X } from "lucide-react";
 import { useState } from "react";
 import Drawer from "./Drawer";
 import TabletSwitch from "./TabletSwitch";
+import ForceTabletButton from "./ForceTabletButton";
 
 
 
@@ -57,8 +58,9 @@ export default function Navbar() {
         >
           <Menu size={20} />
         </button>
-        <div className="hidden md:flex gap-4 md:gap-6">
+        <div className="hidden md:flex gap-4 md:gap-6 items-center">
           <Links />
+          <ForceTabletButton />
         </div>
       </nav>
       <Drawer open={open} onClose={() => setOpen(false)}>
@@ -70,6 +72,7 @@ export default function Navbar() {
             <Links />
           </nav>
           <TabletSwitch />
+          <ForceTabletButton />
         </div>
       </Drawer>
     </header>
