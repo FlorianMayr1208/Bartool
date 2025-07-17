@@ -73,7 +73,7 @@
          |                          |
          v                          |
     Frontend Barcode-Library         |
-        (z.B. QuaggaJS)             |
+        (z.B. html5-qrcode)         |
                                     |
     Rezepte & Inventar-Logik <------+
 ```
@@ -89,7 +89,7 @@
 - **Jinja2** (wenn klassisches Templating im Backend)
 - **React/Vue** oder HTML5/Bootstrap für UI
 - **pyzbar** oder **zxing** (für Barcode-Erkennung im Backend)
-- **quaggaJS** (für Barcode-Scan direkt im Browser)
+- **html5-qrcode** (für Barcode-Scan direkt im Browser)
 - **thecocktaildb API** (Datenimport Rezepte, falls gewünscht)
 
 ---
