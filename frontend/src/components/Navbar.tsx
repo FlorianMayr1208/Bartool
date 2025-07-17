@@ -60,7 +60,7 @@ export default function Navbar() {
         </button>
         <div className="hidden md:flex gap-4 md:gap-6 items-center">
           <Links />
-          <ForceTabletButton />
+          {/* <ForceTabletButton /> */}
         </div>
       </nav>
       <Drawer open={open} onClose={() => setOpen(false)}>
@@ -72,7 +72,7 @@ export default function Navbar() {
             <Links />
           </nav>
           <TabletSwitch />
-          <ForceTabletButton />
+          {/* <ForceTabletButton /> */}
         </div>
       </Drawer>
     </header>
