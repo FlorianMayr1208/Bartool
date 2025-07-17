@@ -32,7 +32,7 @@ Below is a step‑by‑step plan sliced into iterations.
 ---
 
 ## 4  |  Core Feature – Inventory Management
-1. Integrate QuaggaJS barcode scanner; fallback to manual form.  
+1. Integrate html5-qrcode barcode scanner; fallback to manual form.
 2. Inventory table with editable quantity & delete.  
 3. Backend barcode lookup route `GET /barcode/{ean}` with cache.  
 

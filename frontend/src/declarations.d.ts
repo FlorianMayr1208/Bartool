@@ -1,1 +1,1 @@
-declare module 'quagga';
+declare module 'html5-qrcode';
