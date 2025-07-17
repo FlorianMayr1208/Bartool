@@ -3,7 +3,6 @@ import { Menu, X } from "lucide-react";
 import { useState } from "react";
 import Drawer from "./Drawer";
 import TabletSwitch from "./TabletSwitch";
-import ForceTabletButton from "./ForceTabletButton";
 
 
 
