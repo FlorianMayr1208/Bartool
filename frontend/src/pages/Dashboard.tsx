@@ -11,6 +11,7 @@ import {
 } from 'lucide-react';
 import { exportDatabase, importDatabase, healthCheck, getSuggestions } from '../api';
 import { useRef, useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
 import type { RecipeItem } from '../components/RecipeList';
 
 export default function Dashboard() {
@@ -91,19 +92,27 @@ export default function Dashboard() {
       {suggestions.length > 0 && (
         <div className="space-y-2">
           <h2 className="text-2xl font-semibold">Suggestions</h2>
-          <div className="flex gap-4 overflow-x-auto pb-2">
+          <div className="grid gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
             {suggestions.map((s, idx) => (
-              <div key={s.id ?? idx} className="min-w-[10rem] card p-2 flex-shrink-0">
+              <Link
+                key={s.id ?? idx}
+                to={s.id ? `/recipes/${s.id}` : '#'}
+                className="card flex flex-col transition-transform duration-200 hover:-translate-y-1 hover:shadow-lg"
+              >
                 {s.thumb && (
-                  <img src={s.thumb} alt={s.name} className="h-24 w-full object-cover rounded" />
+                  <img
+                    src={s.thumb}
+                    alt={s.name}
+                    className="h-40 w-full object-cover rounded"
+                  />
                 )}
-                <div className="font-semibold text-center mt-2">{s.name}</div>
+                <div className="font-semibold mt-3">{s.name}</div>
                 {typeof s.missing_count === 'number' && (
-                  <div className="text-sm text-[var(--text-muted)] text-center">
+                  <div className="text-sm text-[var(--text-muted)] mt-1">
                     Missing {s.missing_count}
                   </div>
                 )}
-              </div>
+              </Link>
             ))}
           </div>
         </div>
