@@ -469,7 +469,7 @@ def add_to_shopping_list(
             unit=unit,
         )
         db.add(item)
-    db.commit()
+    db.flush()
     db.refresh(item)
     return item
 
@@ -494,11 +494,23 @@ def add_missing_ingredients_to_shopping_list(db: Session, recipe_id: int):
     if not recipe:
         return None
     missing = recipe_missing_ingredients(db, recipe)
-    items = [
-        add_to_shopping_list(db, ing, 1, recipe_id, unit)
-        for ing, unit in missing
-    ]
-    return items
+    item_ids = []
+    for ing, unit in missing:
+        item = add_to_shopping_list(db, ing, 1, recipe_id, unit)
+        item_ids.append(item.id)
+    db.commit()
+
+    from sqlalchemy.orm import selectinload
+
+    return (
+        db.query(models.ShoppingListItem)
+        .filter(models.ShoppingListItem.id.in_(item_ids))
+        .options(
+            selectinload(models.ShoppingListItem.ingredient),
+            selectinload(models.ShoppingListItem.recipe),
+        )
+        .all()
+    )
 
 
 def clear_shopping_list(db: Session):
