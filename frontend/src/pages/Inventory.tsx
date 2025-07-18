@@ -149,9 +149,9 @@ export default function Inventory() {
     <div className="space-y-6">
       <h1 className="text-4xl font-bold font-display">Inventory</h1>
 
-      <section className="space-y-4 p-4 mb-6 rounded-lg shadow">
-        <h2 className="text-xl font-semibold">Barcode Lookup</h2>
-        <button onClick={() => setScanning(true)} className="button-send">
+      <section className="card p-4">
+        <h2 className="text-xl font-semibold mb-4">Barcode Lookup</h2>
+        <button onClick={() => setScanning(true)} className="button-send mb-4">
           Scan Barcode
         </button>
         <Drawer open={scanning} onClose={() => setScanning(false)}>
@@ -197,20 +197,20 @@ export default function Inventory() {
         )}
       </section>
 
-      <div className="space-x-4">
+      <div className="card p-4">
         <input
           placeholder="Name"
           value={name}
           onChange={(e) => setName(e.target.value)}
-          className="border border-[var(--border)] p-1"
+          className="border border-[var(--border)] p-1 mr-4"
         />
         <input
           type="number"
           value={quantity}
           onChange={(e) => setQuantity(parseInt(e.target.value))}
-          className="w-20 border border-[var(--border)] p-1"
+          className="w-20 border border-[var(--border)] p-1 mr-4"
         />
-        <button onClick={submit} className="button-search">
+        <button onClick={submit} className="button-search mr-4">
           Add
         </button>
         <button
@@ -221,7 +221,7 @@ export default function Inventory() {
           }}
           className="button-send"
         >
-          Aggregate Synonyms
+          Apply Synonyms
         </button>
       </div>
       <div className="card p-0">

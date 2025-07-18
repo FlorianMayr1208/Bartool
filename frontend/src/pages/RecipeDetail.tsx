@@ -143,7 +143,7 @@ export default function RecipeDetail() {
         </div>
       </div>
       {recipe.ingredients && recipe.ingredients.length > 0 && (
-        <section className="mt-6 p-4 bg-[var(--bg-elevated)] rounded-lg shadow border border-[var(--border)]">
+        <section className="card p-4">
           <h2 className="text-xl font-semibold mb-2">Ingredients</h2>
           <ul className="space-y-2">
             {recipe.ingredients.map((ing) => (
