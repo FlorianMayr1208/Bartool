@@ -77,6 +77,28 @@ paths:
           name: max_missing
           schema:
             type: integer
+  /suggestions/by-ingredients:
+    get:
+      summary: Suggest recipes filtered by ingredients
+      parameters:
+        - in: query
+          name: ingredients
+          schema:
+            type: array
+            items:
+              type: integer
+        - in: query
+          name: mode
+          schema:
+            type: string
+        - in: query
+          name: max_missing
+          schema:
+            type: integer
+        - in: query
+          name: limit
+          schema:
+            type: integer
   /recipes:
     get:
       summary: List recipes

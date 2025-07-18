@@ -29,6 +29,9 @@ export default function Navbar() {
       <NavLink to="/recipes" className={linkClass} onClick={() => setOpen(false)}>
         Recipes
       </NavLink>
+      <NavLink to="/suggest" className={linkClass} onClick={() => setOpen(false)}>
+        Suggestions
+      </NavLink>
       <NavLink to="/search" className={linkClass} onClick={() => setOpen(false)}>
         Recipe Search
       </NavLink>
