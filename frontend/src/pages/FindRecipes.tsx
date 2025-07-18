@@ -3,6 +3,7 @@ import { findRecipes, listTags, listCategories } from "../api";
 import { Link, useSearchParams } from "react-router-dom";
 import { Search } from "lucide-react";
 import RecipeList, { type RecipeItem } from "../components/RecipeList";
+import Suggestions from "../components/Suggestions";
 
 import { Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/react';
 import { ChevronDownIcon } from '@heroicons/react/20/solid';
@@ -67,6 +68,7 @@ export default function FindRecipes() {
   return (
     <div className="space-y-6">
       <h1 className="text-4xl font-bold font-display">Recipe Finder</h1>
+      <Suggestions limit={4} />
       <div className="flex max-w-md items-center overflow-hidden rounded border border-[var(--border)]">
         <input
           value={query}

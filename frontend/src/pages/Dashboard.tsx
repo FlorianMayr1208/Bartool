@@ -9,19 +9,16 @@ import {
   Download,
   Upload,
 } from 'lucide-react';
-import { exportDatabase, importDatabase, healthCheck, getSuggestions } from '../api';
+import { exportDatabase, importDatabase, healthCheck } from '../api';
 import { useRef, useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
-import type { RecipeItem } from '../components/RecipeList';
+import Suggestions from '../components/Suggestions';
 
 export default function Dashboard() {
   const [health, setHealth] = useState<string | null>(null);
-  const [suggestions, setSuggestions] = useState<RecipeItem[]>([]);
   useEffect(() => {
     healthCheck()
       .then((res) => setHealth(res.status))
       .catch(() => setHealth('error'));
-    getSuggestions(3).then(setSuggestions).catch(() => setSuggestions([]));
   }, []);
   const features = [
     { to: '/inventory', title: 'Inventory', icon: <Box size={20} /> },
@@ -89,34 +86,7 @@ export default function Dashboard() {
           )
         ))}
       </div>
-      {suggestions.length > 0 && (
-        <div className="space-y-2">
-          <h2 className="text-2xl font-semibold">Suggestions</h2>
-          <div className="grid gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
-            {suggestions.map((s, idx) => (
-              <Link
-                key={s.id ?? idx}
-                to={s.id ? `/recipes/${s.id}` : '#'}
-                className="card flex flex-col transition-transform duration-200 hover:-translate-y-1 hover:shadow-lg"
-              >
-                {s.thumb && (
-                  <img
-                    src={s.thumb}
-                    alt={s.name}
-                    className="h-64 w-full object-cover rounded"
-                  />
-                )}
-                <div className="font-semibold mt-3">{s.name}</div>
-                {typeof s.missing_count === 'number' && (
-                  <div className="text-sm text-[var(--text-muted)] mt-1">
-                    Missing {s.missing_count}
-                  </div>
-                )}
-              </Link>
-            ))}
-          </div>
-        </div>
-      )}
+      <Suggestions limit={4} />
       <input
         type="file"
         ref={fileRef}
