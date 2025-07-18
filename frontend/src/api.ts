@@ -212,10 +212,25 @@ export async function findRecipes(options: FindRecipesOptions = {}) {
   return res.json();
 }
 
-export async function getSuggestions(limit = 3, max_missing?: number) {
+export async function listMacros() {
+  const res = await fetch(`${API_BASE}/macros`);
+  return res.json();
+}
+
+export async function getSuggestions(options: {
+  limit?: number;
+  max_missing?: number;
+  macros?: string[];
+  macro_mode?: 'and' | 'or';
+} = {}) {
   const params = new URLSearchParams();
-  if (limit !== undefined) params.append('limit', String(limit));
-  if (max_missing !== undefined) params.append('max_missing', String(max_missing));
+  if (options.limit !== undefined) params.append('limit', String(options.limit));
+  if (options.max_missing !== undefined)
+    params.append('max_missing', String(options.max_missing));
+  if (options.macros)
+    for (const m of options.macros) params.append('macros', m);
+  if (options.macro_mode)
+    params.append('macro_mode', options.macro_mode);
   const query = params.toString();
   const res = await fetch(`${API_BASE}/suggestions${query ? `?${query}` : ''}`);
   return res.json();
@@ -224,6 +239,8 @@ export async function getSuggestions(limit = 3, max_missing?: number) {
 export async function getSuggestionsByIngredients(options: {
   ingredients: number[];
   mode?: 'and' | 'or';
+  macros?: string[];
+  macro_mode?: 'and' | 'or';
   max_missing?: number;
   limit?: number;
 }) {
@@ -232,6 +249,10 @@ export async function getSuggestionsByIngredients(options: {
     params.append('ingredients', String(id));
   }
   if (options.mode) params.append('mode', options.mode);
+  if (options.macros)
+    for (const m of options.macros) params.append('macros', m);
+  if (options.macro_mode)
+    params.append('macro_mode', options.macro_mode);
   if (options.max_missing !== undefined)
     params.append('max_missing', String(options.max_missing));
   if (options.limit !== undefined) params.append('limit', String(options.limit));

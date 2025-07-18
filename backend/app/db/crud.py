@@ -1,7 +1,7 @@
 from sqlalchemy.orm import Session
 from sqlalchemy import func
 
-from ..services import synonyms, unit_synonyms, unit_conversion
+from ..services import synonyms, unit_synonyms, unit_conversion, macros as macros_service
 from . import models, schemas
 
 
@@ -520,15 +520,27 @@ def clear_shopping_list(db: Session):
 
 
 def suggest_recipes(
-    db: Session, limit: int = 3, max_missing: int | None = None
+    db: Session,
+    limit: int = 3,
+    max_missing: int | None = None,
+    *,
+    macros: list[str] | None = None,
+    macro_mode: str = "and",
 ) -> list[schemas.RecipeWithInventory]:
     """Return a few random recipe suggestions prioritising available ones."""
     recipes = list_recipes(db)
+    macros = [m.lower() for m in (macros or [])]
     data: list[tuple[models.Recipe, int, int]] = []
     for r in recipes:
         missing = recipe_missing_count(db, r)
         if max_missing is not None and missing > max_missing:
             continue
+        r_macros = macros_service.macros_for_recipe(r)
+        if macros:
+            if macro_mode == "and" and not all(m in r_macros for m in macros):
+                continue
+            if macro_mode == "or" and not any(m in r_macros for m in macros):
+                continue
         available = len(r.ingredients) - missing
         data.append((r, available, missing))
 
@@ -562,6 +574,8 @@ def suggest_recipes_by_ingredients(
     ingredient_ids: list[int] | None = None,
     *,
     mode: str = "and",
+    macros: list[str] | None = None,
+    macro_mode: str = "and",
     max_missing: int | None = None,
     limit: int = 100,
 ) -> list[schemas.RecipeWithInventory]:
@@ -574,6 +588,7 @@ def suggest_recipes_by_ingredients(
     """
 
     ingredient_ids = ingredient_ids or []
+    macros = [m.lower() for m in (macros or [])]
     weights = {iid: len(ingredient_ids) - idx for idx, iid in enumerate(ingredient_ids)}
 
     recipes = list_recipes(db)
@@ -593,6 +608,13 @@ def suggest_recipes_by_ingredients(
             if mode == "and" and not all(i in r_ids for i in ingredient_ids):
                 continue
             if mode == "or" and not any(i in r_ids for i in ingredient_ids):
+                continue
+
+        r_macros = macros_service.macros_for_recipe(r)
+        if macros:
+            if macro_mode == "and" and not all(m in r_macros for m in macros):
+                continue
+            if macro_mode == "or" and not any(m in r_macros for m in macros):
                 continue
 
         score = sum(weights.get(i, 0) for i in r_ids)

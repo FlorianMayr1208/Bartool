@@ -14,6 +14,7 @@ from .api import (
     synonyms,
     unit_synonyms,
     shopping_list,
+    macros as macros_api,
     suggestions,
     db_admin,
 )
@@ -61,4 +62,5 @@ app.include_router(unit_synonyms.router, prefix="/unit-synonyms")
 app.include_router(shopping_list.router, prefix="/shopping-list")
 app.include_router(db_admin.router, prefix="/db")
 app.include_router(suggestions.router, prefix="/suggestions")
+app.include_router(macros_api.router, prefix="/macros")
 

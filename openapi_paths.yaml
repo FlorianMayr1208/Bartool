@@ -77,6 +77,16 @@ paths:
           name: max_missing
           schema:
             type: integer
+        - in: query
+          name: macros
+          schema:
+            type: array
+            items:
+              type: string
+        - in: query
+          name: macro_mode
+          schema:
+            type: string
   /suggestions/by-ingredients:
     get:
       summary: Suggest recipes filtered by ingredients
@@ -89,6 +99,16 @@ paths:
               type: integer
         - in: query
           name: mode
+          schema:
+            type: string
+        - in: query
+          name: macros
+          schema:
+            type: array
+            items:
+              type: string
+        - in: query
+          name: macro_mode
           schema:
             type: string
         - in: query
@@ -224,3 +244,6 @@ paths:
           name: limit
           schema:
             type: integer
+  /macros:
+    get:
+      summary: List flavour macros
