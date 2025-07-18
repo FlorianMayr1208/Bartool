@@ -205,6 +205,15 @@ def list_recipes(db: Session, skip: int = 0, limit: int = 100):
     return db.query(models.Recipe).offset(skip).limit(limit).all()
 
 
+def delete_recipe(db: Session, recipe_id: int) -> bool:
+    recipe = get_recipe(db, recipe_id)
+    if not recipe:
+        return False
+    db.delete(recipe)
+    db.commit()
+    return True
+
+
 # InventoryItem CRUD
 
 

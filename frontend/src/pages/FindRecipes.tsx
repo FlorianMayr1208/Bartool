@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { findRecipes, listTags, listCategories } from "../api";
+import { findRecipes, listTags, listCategories, deleteRecipe } from "../api";
 import { Link, useSearchParams } from "react-router-dom";
 import { Search } from "lucide-react";
 import RecipeList, { type RecipeItem } from "../components/RecipeList";
@@ -37,6 +37,11 @@ export default function FindRecipes() {
       order_missing: orderMissing,
     });
     setResults(data);
+  };
+
+  const remove = async (id: number) => {
+    await deleteRecipe(id);
+    runSearch();
   };
 
   useEffect(() => {
@@ -215,11 +220,18 @@ export default function FindRecipes() {
         <RecipeList
           recipes={results}
           showCounts
-          renderAction={(r) => (
-            <Link to={`/recipes/${r.id}`} className="button-search">
-              Open
-            </Link>
-          )}
+          renderAction={(r) =>
+            r.id ? (
+              <span className="flex gap-2">
+                <Link to={`/recipes/${r.id}`} className="button-search">
+                  Open
+                </Link>
+                <button onClick={() => remove(r.id!)} className="button-search">
+                  Delete
+                </button>
+              </span>
+            ) : null
+          }
         />
       )}
     </div>

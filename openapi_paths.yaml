@@ -142,6 +142,14 @@ paths:
           required: true
           schema:
             type: integer
+    delete:
+      summary: Delete recipe
+      parameters:
+        - in: path
+          name: recipe_id
+          required: true
+          schema:
+            type: integer
   /inventory/{id}:
     get:
       summary: Get inventory item

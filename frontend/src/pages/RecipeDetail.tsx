@@ -1,9 +1,10 @@
 import { useEffect, useState } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { useParams, Link, useNavigate } from 'react-router-dom';
 import {
   getRecipe,
   addMissingFromRecipe,
   updateInventory,
+  deleteRecipe,
   listSynonyms,
   type RecipeDetail,
   type RecipeIngredient,
@@ -13,6 +14,7 @@ import {
 
 export default function RecipeDetail() {
   const { id } = useParams<{ id: string }>();
+  const navigate = useNavigate();
   const [recipe, setRecipe] = useState<RecipeDetail | null>(null);
   const [added, setAdded] = useState<number | null>(null);
   const [synonyms, setSynonyms] = useState<Synonym[]>([]);
@@ -140,6 +142,17 @@ export default function RecipeDetail() {
                 : "All ingredients already in inventory"}
             </p>
           )}
+          <button
+            onClick={async () => {
+              if (recipe) {
+                await deleteRecipe(recipe.id);
+                navigate('/search');
+              }
+            }}
+            className="button-search mt-4"
+          >
+            Delete recipe
+          </button>
         </div>
       </div>
       {recipe.ingredients && recipe.ingredients.length > 0 && (

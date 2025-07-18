@@ -133,6 +133,37 @@ async def test_get_recipe(monkeypatch, async_client):
 
 
 @pytest.mark.asyncio
+async def test_recipe_delete(monkeypatch, async_client):
+    async def fake_fetch(name: str):
+        return {
+            "name": "Delete Drink",
+            "alcoholic": "Alcoholic",
+            "glass": None,
+            "instructions": "Mix",
+            "thumb": None,
+            "tags": [],
+            "categories": [],
+            "ibas": [],
+            "ingredients": [],
+        }
+
+    monkeypatch.setattr(
+        "backend.app.services.cocktaildb.fetch_recipe_details", fake_fetch
+    )
+    monkeypatch.setattr("backend.app.api.recipes.fetch_recipe_details", fake_fetch)
+
+    resp = await async_client.post("/recipes/", json={"name": "delete drink"})
+    assert resp.status_code == 201
+    recipe_id = resp.json()["id"]
+
+    resp = await async_client.delete(f"/recipes/{recipe_id}")
+    assert resp.status_code == 204
+
+    resp = await async_client.get(f"/recipes/{recipe_id}")
+    assert resp.status_code == 404
+
+
+@pytest.mark.asyncio
 async def test_recipe_search(monkeypatch, async_client):
     async def fake_search(name: str):
         return [

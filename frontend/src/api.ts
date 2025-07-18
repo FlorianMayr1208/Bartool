@@ -280,6 +280,13 @@ export async function createRecipe(data: { name: string }) {
   return res.json();
 }
 
+export async function deleteRecipe(id: number) {
+  const res = await fetch(`${API_BASE}/recipes/${id}`, { method: "DELETE" });
+  if (!res.ok) {
+    throw new Error("Delete failed");
+  }
+}
+
 export async function listSynonyms() {
   return fetchJson<Synonym[]>(`${API_BASE}/synonyms/`);
 }
