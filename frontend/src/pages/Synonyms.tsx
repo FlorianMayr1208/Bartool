@@ -152,28 +152,21 @@ export default function Synonyms() {
           </button>
         </div>
       )}
-      <table className="min-w-full border text-left" style={{ border: '1px solid var(--border)' }}>
-        <thead>
-          <tr>
-            <th className="px-2">Alias</th>
-            <th className="px-2">Canonical</th>
-            <th></th>
-          </tr>
-        </thead>
-        <tbody>
+      <div className="card p-0">
+        <div className="flex items-center px-4 py-2 font-semibold">
+          <span className="flex-1">Alias</span>
+          <span className="w-32">Canonical</span>
+        </div>
+        <ul className="divide-y divide-[var(--border)]">
           {synonyms.map((s) => (
-            <tr key={s.alias} className="border-t" style={{ borderTop: '1px solid var(--border)' }}>
-              <td className="px-2 py-1">{s.alias}</td>
-              <td className="px-2 py-1">{s.canonical}</td>
-              <td className="px-2 py-1">
-                <button onClick={() => remove(s.alias)} className="button-search">
-                  Delete
-                </button>
-              </td>
-            </tr>
+            <li key={s.alias} className="flex items-center px-4 py-2 gap-4 justify-between">
+              <span className="flex-1">{s.alias}</span>
+              <span className="w-32">{s.canonical}</span>
+              <button onClick={() => remove(s.alias)} className="button-search">Delete</button>
+            </li>
           ))}
-        </tbody>
-      </table>
+        </ul>
+      </div>
 
       <h1 className="text-xl font-bold">Unit Synonyms</h1>
       <div className="space-x-2">
@@ -215,28 +208,21 @@ export default function Synonyms() {
           </button>
         </div>
       )}
-      <table className="min-w-full border text-left" style={{ border: '1px solid var(--border)' }}>
-        <thead>
-          <tr>
-            <th className="px-2">Alias</th>
-            <th className="px-2">Canonical</th>
-            <th></th>
-          </tr>
-        </thead>
-        <tbody>
+      <div className="card p-0">
+        <div className="flex items-center px-4 py-2 font-semibold">
+          <span className="flex-1">Alias</span>
+          <span className="w-32">Canonical</span>
+        </div>
+        <ul className="divide-y divide-[var(--border)]">
           {unitSynonyms.map((s) => (
-            <tr key={s.alias} className="border-t" style={{ borderTop: '1px solid var(--border)' }}>
-              <td className="px-2 py-1">{s.alias}</td>
-              <td className="px-2 py-1">{s.canonical}</td>
-              <td className="px-2 py-1">
-                <button onClick={() => removeUnit(s.alias)} className="button-search">
-                  Delete
-                </button>
-              </td>
-            </tr>
+            <li key={s.alias} className="flex items-center px-4 py-2 gap-4 justify-between">
+              <span className="flex-1">{s.alias}</span>
+              <span className="w-32">{s.canonical}</span>
+              <button onClick={() => removeUnit(s.alias)} className="button-search">Delete</button>
+            </li>
           ))}
-        </tbody>
-      </table>
+        </ul>
+      </div>
         {debugLog.length > 0 && (
         <div className="mt-4 space-y-2">
           <button

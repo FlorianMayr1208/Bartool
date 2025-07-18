@@ -224,35 +224,33 @@ export default function Inventory() {
           Aggregate Synonyms
         </button>
       </div>
-      <table className="min-w-full border border-[var(--border)] text-left">
-        <thead>
-          <tr>
-            <th className="px-2">Name</th>
-            <th className="px-2">Qty</th>
-            <th></th>
-          </tr>
-        </thead>
-        <tbody>
+      <div className="card p-0">
+        <div className="flex items-center px-4 py-2 font-semibold">
+          <span className="flex-1">Name</span>
+          <span className="w-20">Qty</span>
+        </div>
+        <ul className="divide-y divide-[var(--border)]">
           {items.map((it) => (
-            <tr key={it.id} className="border-t border-[var(--border)]">
-              <td className="px-2 py-1">{it.ingredient?.name || it.ingredient_id}</td>
-              <td className="px-2 py-1">
-                <input
-                  type="number"
-                  value={it.quantity}
-                  onChange={(e) => updateQty(it.id, parseInt(e.target.value))}
-                  className="w-16 border border-[var(--border)]"
-                />
-              </td>
-              <td className="px-2 py-1">
-                <button onClick={() => remove(it.id)} className="button-search">
-                  Delete
-                </button>
-              </td>
-            </tr>
+            <li
+              key={it.id}
+              className="flex items-center px-4 py-2 gap-4 justify-between"
+            >
+              <span className="flex-1">
+                {it.ingredient?.name || it.ingredient_id}
+              </span>
+              <input
+                type="number"
+                value={it.quantity}
+                onChange={(e) => updateQty(it.id, parseInt(e.target.value))}
+                className="w-16 border border-[var(--border)] bg-transparent"
+              />
+              <button onClick={() => remove(it.id)} className="button-search">
+                Delete
+              </button>
+            </li>
           ))}
-        </tbody>
-      </table>
+        </ul>
+      </div>
       {debugLog.length > 0 && (
         <div className="mt-4 space-y-2">
           <button
