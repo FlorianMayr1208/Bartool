@@ -37,3 +37,11 @@ async def create_recipe(recipe: schemas.RecipeCreate, db: Session = Depends(sess
     db_recipe = crud.create_recipe(db, recipe)
     crud.ensure_inventory_for_ingredients(db, recipe.ingredients)
     return db_recipe
+
+
+@router.delete("/{recipe_id}", status_code=204)
+def delete_recipe(recipe_id: int, db: Session = Depends(session.get_db)):
+    success = crud.delete_recipe(db, recipe_id)
+    if not success:
+        raise HTTPException(status_code=404, detail="Recipe not found")
+    return None
