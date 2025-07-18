@@ -21,15 +21,13 @@ export default function SuggestionsPage() {
   }, []);
 
   useEffect(() => {
-    if (selected.length === 0) {
-      setRecipes([]);
-      return;
-    }
     getSuggestionsByIngredients({
       ingredients: selected,
       mode,
       max_missing: maxMissing === 3 ? undefined : maxMissing,
-    }).then(setRecipes);
+    })
+      .then(setRecipes)
+      .catch(() => setRecipes([]));
   }, [selected, mode, maxMissing]);
 
   const toggle = (id: number) => {
