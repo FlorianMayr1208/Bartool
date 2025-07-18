@@ -103,7 +103,7 @@ export default function Dashboard() {
                   <img
                     src={s.thumb}
                     alt={s.name}
-                    className="h-40 w-full object-cover rounded"
+                    className="h-64 w-full object-cover rounded"
                   />
                 )}
                 <div className="font-semibold mt-3">{s.name}</div>

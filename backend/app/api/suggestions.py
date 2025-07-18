@@ -7,7 +7,7 @@ router = APIRouter()
 
 @router.get("", response_model=list[schemas.RecipeWithInventory])
 def get_suggestions(
-    limit: int = 3,
+    limit: int = 4,
     max_missing: int | None = None,
     db: Session = Depends(session.get_db),
 ):
