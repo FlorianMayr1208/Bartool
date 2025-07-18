@@ -89,7 +89,7 @@ export default function ShoppingList() {
 
   return (
     <div className="space-y-6">
-      <h1 className="font-display text-3xl font-semibold">Shopping List</h1>
+      <h1 className="font-display text-4xl font-semibold">Shopping List</h1>
       <div className="flex gap-4">
         <button onClick={download} className="button-search">
           Download

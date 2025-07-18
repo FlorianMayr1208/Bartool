@@ -56,7 +56,7 @@ export default function RecipeDetail() {
   }
 
   return (
-    <div className="space-y-4 text-white">
+    <div className="space-y-6 text-white">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-start">
         {recipe.thumb && (
           <img
@@ -66,7 +66,7 @@ export default function RecipeDetail() {
           />
         )}
         <div>
-          <h1 className="text-3xl font-bold mb-2 font-display">{recipe.name}</h1>
+          <h1 className="text-4xl font-bold mb-2 font-display">{recipe.name}</h1>
           {(recipe.categories?.length || recipe.tags?.length || recipe.ibas?.length) && (
             <div className="space-y-1 mb-2 text-sm text-[var(--text-secondary)]">
               {recipe.categories && recipe.categories.length > 0 && (
