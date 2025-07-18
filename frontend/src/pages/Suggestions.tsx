@@ -105,6 +105,26 @@ export default function SuggestionsPage() {
             </div>
           ))}
         </div>
+        <div className="flex gap-1 mt-2">
+          <button
+            onClick={() => setMode('and')}
+            className={`px-2 py-1 border rounded ${
+              mode === 'and' ? 'bg-[var(--accent)] text-black' : 'border-[var(--border)]'
+            }`}
+            title="All selected ingredients must be present"
+          >
+            Alle
+          </button>
+          <button
+            onClick={() => setMode('or')}
+            className={`px-2 py-1 border rounded ${
+              mode === 'or' ? 'bg-[var(--accent)] text-black' : 'border-[var(--border)]'
+            }`}
+            title="Any selected ingredient may be present"
+          >
+            Beliebige
+          </button>
+        </div>
       </section>
 
       {/* Macros Section */}
@@ -123,6 +143,30 @@ export default function SuggestionsPage() {
               </div>
             ))}
           </div>
+          <div className="flex gap-1 mt-2">
+            <button
+              onClick={() => setMacroMode('and')}
+              className={`px-2 py-1 border rounded ${
+                macroMode === 'and'
+                  ? 'bg-[var(--accent)] text-black'
+                  : 'border-[var(--border)]'
+              }`}
+              title="All selected macros must be present"
+            >
+              AND
+            </button>
+            <button
+              onClick={() => setMacroMode('or')}
+              className={`px-2 py-1 border rounded ${
+                macroMode === 'or'
+                  ? 'bg-[var(--accent)] text-black'
+                  : 'border-[var(--border)]'
+              }`}
+              title="Any selected macro may be present"
+            >
+              OR
+            </button>
+          </div>
         </section>
       )}
 
@@ -130,60 +174,6 @@ export default function SuggestionsPage() {
       <section className="card p-0 flex flex-col gap-4">
         <h2 className="font-semibold text-lg mb-2">Filter Options</h2>
         <div className="flex flex-wrap gap-4 items-center">
-          <div className="flex flex-col items-start gap-1">
-            <span className="text-xs font-medium text-gray-500">Ingredient Filter</span>
-            <div className="flex gap-1">
-              <button
-                onClick={() => setMode('and')}
-                className={`px-2 py-1 border rounded ${
-                  mode === 'and'
-                    ? 'bg-[var(--accent)] text-black'
-                    : 'border-[var(--border)]'
-                }`}
-                title="All selected ingredients must be present"
-              >
-                Alle
-              </button>
-              <button
-                onClick={() => setMode('or')}
-                className={`px-2 py-1 border rounded ${
-                  mode === 'or'
-                    ? 'bg-[var(--accent)] text-black'
-                    : 'border-[var(--border)]'
-                }`}
-                title="Any selected ingredient may be present"
-              >
-                Beliebige
-              </button>
-            </div>
-          </div>
-          <div className="flex flex-col items-start gap-1">
-            <span className="text-xs font-medium text-gray-500">Macro Filter</span>
-            <div className="flex gap-1">
-              <button
-                onClick={() => setMacroMode('and')}
-                className={`px-2 py-1 border rounded ${
-                  macroMode === 'and'
-                    ? 'bg-[var(--accent)] text-black'
-                    : 'border-[var(--border)]'
-                }`}
-                title="All selected macros must be present"
-              >
-                Macro AND
-              </button>
-              <button
-                onClick={() => setMacroMode('or')}
-                className={`px-2 py-1 border rounded ${
-                  macroMode === 'or'
-                    ? 'bg-[var(--accent)] text-black'
-                    : 'border-[var(--border)]'
-                }`}
-                title="Any selected macro may be present"
-              >
-                Macro OR
-              </button>
-            </div>
-          </div>
           <div className="flex flex-col items-start gap-1">
             <span className="text-xs font-medium text-gray-500">Maximum number of missing ingredients allowed</span>
             <div className="flex items-center gap-2">
