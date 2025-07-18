@@ -65,6 +65,18 @@ paths:
           name: limit
           schema:
             type: integer
+  /suggestions:
+    get:
+      summary: Suggest random recipes prioritising available ones
+      parameters:
+        - in: query
+          name: limit
+          schema:
+            type: integer
+        - in: query
+          name: max_missing
+          schema:
+            type: integer
   /recipes:
     get:
       summary: List recipes
