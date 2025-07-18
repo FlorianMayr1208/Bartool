@@ -84,7 +84,7 @@ export default function SuggestionsPage() {
 
   return (
     <div className="space-y-6">
-      <h1 className="text-4xl font-bold font-display mb-2">Suggestions</h1>
+      <h1 className="text-4xl font-bold font-display mb-8">Suggestions</h1>
 
       {/* Ingredients Section */}
       <section className="card p-0">

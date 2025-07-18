@@ -27,13 +27,13 @@ export default function Navbar() {
         Inventory
       </NavLink>
       <NavLink to="/recipes" className={linkClass} onClick={() => setOpen(false)}>
-        Recipes
+        New Recipes
       </NavLink>
       <NavLink to="/suggest" className={linkClass} onClick={() => setOpen(false)}>
         Suggestions
       </NavLink>
       <NavLink to="/search" className={linkClass} onClick={() => setOpen(false)}>
-        Recipe Search
+        Recipe Library
       </NavLink>
       <NavLink to="/shopping-list" className={linkClass} onClick={() => setOpen(false)}>
         Shopping List

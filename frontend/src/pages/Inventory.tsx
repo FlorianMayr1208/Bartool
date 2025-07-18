@@ -238,13 +238,32 @@ export default function Inventory() {
               <span className="flex-1">
                 {it.ingredient?.name || it.ingredient_id}
               </span>
-              <input
-                type="number"
-                value={it.quantity}
-                onChange={(e) => updateQty(it.id, parseInt(e.target.value))}
-                className="w-16 border border-[var(--border)] bg-transparent"
-              />
-              <button onClick={() => remove(it.id)} className="button-search">
+              <div className="flex items-center gap-2">
+                <button
+                  aria-label="Decrease quantity"
+                  className="rounded-full w-8 h-8 flex items-center justify-center text-xl font-bold select-none touch-manipulation"
+                  style={{ minWidth: 32, minHeight: 32, backgroundColor: 'var(--danger)', color: 'black' }}
+                  onClick={() => updateQty(it.id, Math.max(0, it.quantity - 1))}
+                >
+                  -
+                </button>
+                <input
+                  type="number"
+                  value={it.quantity}
+                  onChange={(e) => updateQty(it.id, parseInt(e.target.value))}
+                  className="w-16 border border-[var(--border)] bg-transparent text-center"
+                  style={{ minWidth: 48 }}
+                />
+                <button
+                  aria-label="Increase quantity"
+                  className="rounded-full w-8 h-8 flex items-center justify-center text-xl font-bold select-none touch-manipulation"
+                  style={{ minWidth: 32, minHeight: 32, backgroundColor: 'var(--success)', color: 'black' }}
+                  onClick={() => updateQty(it.id, it.quantity + 1)}
+                >
+                  +
+                </button>
+              </div>
+              <button onClick={() => remove(it.id)} className="button-search ml-6">
                 Delete
               </button>
             </li>

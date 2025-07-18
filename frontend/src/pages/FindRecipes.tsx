@@ -67,7 +67,7 @@ export default function FindRecipes() {
 
   return (
     <div className="space-y-6">
-      <h1 className="text-4xl font-bold font-display">Recipe Finder</h1>
+      <h1 className="text-4xl font-bold font-display">Recipe Library</h1>
       <Suggestions limit={4} />
       <div className="flex max-w-md items-center overflow-hidden rounded border border-[var(--border)]">
         <input
