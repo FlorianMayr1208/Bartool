@@ -7,6 +7,7 @@ import RecipeDetail from "./pages/RecipeDetail";
 import ShoppingList from "./pages/ShoppingList";
 import Stats from "./pages/Stats";
 import Synonyms from "./pages/Synonyms";
+import SuggestionsPage from "./pages/Suggestions";
 import Navbar from "./components/Navbar";
 import "./App.css";
 
@@ -22,6 +23,7 @@ export default function App() {
           <Route path="/recipes" element={<Recipes />} />
           <Route path="/search" element={<FindRecipes />} />
           <Route path="/recipes/:id" element={<RecipeDetail />} />
+          <Route path="/suggest" element={<SuggestionsPage />} />
           <Route path="/shopping-list" element={<ShoppingList />} />
           <Route path="/stats" element={<Stats />} />
           <Route path="/synonyms" element={<Synonyms />} />

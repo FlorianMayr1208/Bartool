@@ -832,3 +832,69 @@ async def test_suggestions(monkeypatch, async_client):
     data = resp.json()
     assert len(data) == 1
     assert data[0]["missing_count"] == 0
+
+
+@pytest.mark.asyncio
+async def test_suggestions_by_ingredients(monkeypatch, async_client):
+    async def fake_fetch(name: str):
+        if name == "vodka only":
+            return {
+                "name": "Vodka Only",
+                "alcoholic": "Alcoholic",
+                "instructions": "Mix",
+                "thumb": None,
+                "tags": [],
+                "categories": [],
+                "ibas": [],
+                "ingredients": [{"name": "Vodka", "measure": "1 oz"}],
+            }
+        if name == "vodka gin":
+            return {
+                "name": "Vodka Gin",
+                "alcoholic": "Alcoholic",
+                "instructions": "Mix",
+                "thumb": None,
+                "tags": [],
+                "categories": [],
+                "ibas": [],
+                "ingredients": [
+                    {"name": "Vodka", "measure": "1 oz"},
+                    {"name": "Gin", "measure": "1 oz"},
+                ],
+            }
+        return {
+            "name": "Rum Drink",
+            "alcoholic": "Alcoholic",
+            "instructions": "Mix",
+            "thumb": None,
+            "tags": [],
+            "categories": [],
+            "ibas": [],
+            "ingredients": [{"name": "Rum", "measure": "1 oz"}],
+        }
+
+    monkeypatch.setattr(
+        "backend.app.services.cocktaildb.fetch_recipe_details", fake_fetch
+    )
+    monkeypatch.setattr("backend.app.api.recipes.fetch_recipe_details", fake_fetch)
+
+    await async_client.post("/recipes/", json={"name": "vodka only"})
+    await async_client.post("/recipes/", json={"name": "vodka gin"})
+    await async_client.post("/recipes/", json={"name": "rum drink"})
+
+    resp = await async_client.post("/ingredients/", json={"name": "Vodka"})
+    vodka_id = resp.json()["id"]
+    resp = await async_client.post("/ingredients/", json={"name": "Gin"})
+    gin_id = resp.json()["id"]
+
+    await async_client.post(
+        "/inventory/", json={"ingredient_id": vodka_id, "quantity": 1}
+    )
+
+    resp = await async_client.get(
+        "/suggestions/by-ingredients",
+        params=[("ingredients", vodka_id), ("ingredients", gin_id), ("mode", "or")],
+    )
+    assert resp.status_code == 200
+    data = resp.json()
+    assert data[0]["name"] == "Vodka Gin"

@@ -221,6 +221,27 @@ export async function getSuggestions(limit = 3, max_missing?: number) {
   return res.json();
 }
 
+export async function getSuggestionsByIngredients(options: {
+  ingredients: number[];
+  mode?: 'and' | 'or';
+  max_missing?: number;
+  limit?: number;
+}) {
+  const params = new URLSearchParams();
+  for (const id of options.ingredients) {
+    params.append('ingredients', String(id));
+  }
+  if (options.mode) params.append('mode', options.mode);
+  if (options.max_missing !== undefined)
+    params.append('max_missing', String(options.max_missing));
+  if (options.limit !== undefined) params.append('limit', String(options.limit));
+  const query = params.toString();
+  const res = await fetch(
+    `${API_BASE}/suggestions/by-ingredients${query ? `?${query}` : ''}`,
+  );
+  return res.json();
+}
+
 export async function getRecipe(id: number): Promise<RecipeDetail> {
   const res = await fetch(`${API_BASE}/recipes/${id}`);
   if (!res.ok) {

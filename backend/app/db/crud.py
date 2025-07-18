@@ -555,3 +555,57 @@ def suggest_recipes(
         )
         for r, a, m in results[:limit]
     ]
+
+
+def suggest_recipes_by_ingredients(
+    db: Session,
+    ingredient_ids: list[int] | None = None,
+    *,
+    mode: str = "and",
+    max_missing: int | None = None,
+    limit: int = 100,
+) -> list[schemas.RecipeWithInventory]:
+    """Return recipes filtered by selected ingredients.
+
+    When ``mode`` is ``"and"`` all selected ingredients must be present.
+    In ``"or"`` mode at least one of them must match.  The order of
+    ``ingredient_ids`` influences the score: earlier ids carry more weight
+    when ranking results.
+    """
+
+    ingredient_ids = ingredient_ids or []
+    weights = {iid: len(ingredient_ids) - idx for idx, iid in enumerate(ingredient_ids)}
+
+    recipes = list_recipes(db)
+    data: list[tuple[float, models.Recipe, int, int]] = []
+    for r in recipes:
+        missing = recipe_missing_count(db, r)
+        if max_missing is not None and missing > max_missing:
+            continue
+
+        r_ids: list[int] = []
+        for ri in r.ingredients:
+            ing = get_ingredient_by_name(db, synonyms.canonical_name(ri.name))
+            if ing:
+                r_ids.append(ing.id)
+
+        if ingredient_ids:
+            if mode == "and" and not all(i in r_ids for i in ingredient_ids):
+                continue
+            if mode == "or" and not any(i in r_ids for i in ingredient_ids):
+                continue
+
+        score = sum(weights.get(i, 0) for i in r_ids)
+        available = len(r.ingredients) - missing
+        data.append((score, r, available, missing))
+
+    data.sort(key=lambda t: (-t[0], t[3]))
+
+    return [
+        schemas.RecipeWithInventory(
+            **schemas.Recipe.model_validate(r, from_attributes=True).model_dump(),
+            available_count=a,
+            missing_count=m,
+        )
+        for _, r, a, m in data[:limit]
+    ]
