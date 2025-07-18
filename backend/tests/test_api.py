@@ -127,6 +127,7 @@ async def test_get_recipe(monkeypatch, async_client):
     assert data["glass"]["name"] == "Highball glass"
     assert data["alcoholic"]["name"] == "Alcoholic"
     ing = next(i for i in data["ingredients"] if i["name"] == "Rum")
+    assert ing["measure"] == "2 oz (60 ml)"
     assert ing["inventory_quantity"] == 0
     assert ing["inventory_item_id"] is not None
 

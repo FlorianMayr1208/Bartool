@@ -1,7 +1,7 @@
 from sqlalchemy.orm import Session
 from sqlalchemy import func
 
-from ..services import synonyms, unit_synonyms
+from ..services import synonyms, unit_synonyms, unit_conversion
 from . import models, schemas
 
 
@@ -142,11 +142,12 @@ def get_recipe_with_inventory(db: Session, recipe_id: int):
         canonical = synonyms.canonical_name(r_ing.name)
         ing = get_or_create_ingredient(db, schemas.IngredientCreate(name=canonical))
         item = get_inventory_by_ingredient(db, ing.id)
+        measure = unit_conversion.with_metric(r_ing.measure)
         ingredients.append(
             schemas.RecipeIngredientWithInventory(
                 id=r_ing.id,
                 name=r_ing.name,
-                measure=r_ing.measure,
+                measure=measure,
                 inventory_item_id=item.id if item else None,
                 inventory_quantity=item.quantity if item else 0,
             )
