@@ -117,7 +117,7 @@ export default function RecipeList({
               </div>
               {expandedKey && (
                 <div
-                  className="grid grid-cols-4 gap-4 h-52 w-full p-2 text-sm text-[var(--text-muted)] mb-4"
+                  className="grid grid-cols-1 w-full gap-4 p-2 text-sm text-[var(--text-muted)] mb-4 md:grid-cols-4 md:h-52"
                   // style={{ gridTemplateColumns: '1fr 1fr 2fr 1fr' }}
                 >
                   {/* Image */}
