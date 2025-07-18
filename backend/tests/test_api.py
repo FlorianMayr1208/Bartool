@@ -898,3 +898,57 @@ async def test_suggestions_by_ingredients(monkeypatch, async_client):
     assert resp.status_code == 200
     data = resp.json()
     assert data[0]["name"] == "Vodka Gin"
+
+
+@pytest.mark.asyncio
+async def test_suggestions_macro_filter(monkeypatch, async_client):
+    async def fake_fetch(name: str):
+        if name == "sweet":
+            return {
+                "name": "Sweet",
+                "alcoholic": "Alcoholic",
+                "instructions": "Mix",
+                "thumb": None,
+                "tags": [],
+                "categories": [],
+                "ibas": [],
+                "ingredients": [{"name": "Simple Syrup", "measure": "1 oz"}],
+            }
+        if name == "bitter":
+            return {
+                "name": "Bitter",
+                "alcoholic": "Alcoholic",
+                "instructions": "Mix",
+                "thumb": None,
+                "tags": [],
+                "categories": [],
+                "ibas": [],
+                "ingredients": [{"name": "Campari", "measure": "1 oz"}],
+            }
+        return {
+            "name": "Neutral",
+            "alcoholic": "Alcoholic",
+            "instructions": "Mix",
+            "thumb": None,
+            "tags": [],
+            "categories": [],
+            "ibas": [],
+            "ingredients": [{"name": "Vodka", "measure": "1 oz"}],
+        }
+
+    monkeypatch.setattr(
+        "backend.app.services.cocktaildb.fetch_recipe_details", fake_fetch
+    )
+    monkeypatch.setattr("backend.app.api.recipes.fetch_recipe_details", fake_fetch)
+
+    await async_client.post("/recipes/", json={"name": "sweet"})
+    await async_client.post("/recipes/", json={"name": "bitter"})
+    await async_client.post("/recipes/", json={"name": "neutral"})
+
+    resp = await async_client.get(
+        "/suggestions/by-ingredients",
+        params=[("macros", "sweet"), ("macro_mode", "and")],
+    )
+    assert resp.status_code == 200
+    names = [r["name"] for r in resp.json()]
+    assert names == ["Sweet"]

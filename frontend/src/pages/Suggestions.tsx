@@ -1,14 +1,22 @@
 import { useEffect, useState } from 'react';
-import { listInventory, type InventoryItem, getSuggestionsByIngredients } from '../api';
+import {
+  listInventory,
+  type InventoryItem,
+  getSuggestionsByIngredients,
+  listMacros,
+} from '../api';
 import RecipeList, { type RecipeItem } from '../components/RecipeList';
 
 export default function SuggestionsPage() {
   const [items, setItems] = useState<InventoryItem[]>([]);
   const [selected, setSelected] = useState<number[]>([]);
   const [mode, setMode] = useState<'and' | 'or'>('and');
+  const [macroMode, setMacroMode] = useState<'and' | 'or'>('or');
   const [maxMissing, setMaxMissing] = useState(0);
   const [recipes, setRecipes] = useState<RecipeItem[]>([]);
   const [drag, setDrag] = useState<number | null>(null);
+  const [macros, setMacros] = useState<string[]>([]);
+  const [selectedMacros, setSelectedMacros] = useState<string[]>([]);
 
   useEffect(() => {
     listInventory().then(({ data }) => {
@@ -18,21 +26,30 @@ export default function SuggestionsPage() {
         setItems([]);
       }
     });
+    listMacros().then(setMacros).catch(() => setMacros([]));
   }, []);
 
   useEffect(() => {
     getSuggestionsByIngredients({
       ingredients: selected,
       mode,
+      macros: selectedMacros,
+      macro_mode: macroMode,
       max_missing: maxMissing === 3 ? undefined : maxMissing,
     })
       .then(setRecipes)
       .catch(() => setRecipes([]));
-  }, [selected, mode, maxMissing]);
+  }, [selected, mode, maxMissing, selectedMacros, macroMode]);
 
   const toggle = (id: number) => {
     setSelected((s) =>
       s.includes(id) ? s.filter((x) => x !== id) : [...s, id],
+    );
+  };
+
+  const toggleMacro = (name: string) => {
+    setSelectedMacros((s) =>
+      s.includes(name) ? s.filter((x) => x !== name) : [...s, name],
     );
   };
 
@@ -73,6 +90,19 @@ export default function SuggestionsPage() {
           </div>
         ))}
       </div>
+      {macros.length > 0 && (
+        <div className="flex flex-wrap gap-2">
+          {macros.map((m) => (
+            <div
+              key={m}
+              onClick={() => toggleMacro(m)}
+              className={chipClass(selectedMacros.includes(m))}
+            >
+              {m}
+            </div>
+          ))}
+        </div>
+      )}
       <div className="flex items-center gap-4">
         <div className="flex items-center gap-1">
           <button
@@ -94,6 +124,28 @@ export default function SuggestionsPage() {
             }`}
           >
             Beliebige
+          </button>
+        </div>
+        <div className="flex items-center gap-1">
+          <button
+            onClick={() => setMacroMode('and')}
+            className={`px-2 py-1 border rounded ${
+              macroMode === 'and'
+                ? 'bg-[var(--accent)] text-black'
+                : 'border-[var(--border)]'
+            }`}
+          >
+            Macro AND
+          </button>
+          <button
+            onClick={() => setMacroMode('or')}
+            className={`px-2 py-1 border rounded ${
+              macroMode === 'or'
+                ? 'bg-[var(--accent)] text-black'
+                : 'border-[var(--border)]'
+            }`}
+          >
+            Macro OR
           </button>
         </div>
         <label className="flex items-center gap-2">

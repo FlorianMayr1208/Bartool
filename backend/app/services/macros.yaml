@@ -1,0 +1,79 @@
+sour:
+  - lime
+  - limette
+  - "lime juice"
+  - lemon
+  - zitrone
+  - "lemon juice"
+  - grapefruitsaft
+  - verjus
+
+sweet:
+  - syrup
+  - sirup
+  - zucker
+  - sugar
+  - honey
+  - grenadine
+  - orgeat
+  - agaven
+  - "agave syrup"
+
+bitter:
+  - bitters
+  - amaro
+  - campari
+  - fernet
+  - cynar
+  - aperol
+  - suze
+
+smoky:
+  - mezcal
+  - peated
+  - rauch
+  - rauchig
+  - lapsang
+
+creamy:
+  - cream
+  - sahne
+  - milch
+  - "coconut cream"
+  - kokoscreme
+  - baileys
+  - advocaat
+
+fruity:
+  - ananas
+  - pineapple
+  - mango
+  - maracuja
+  - passion
+  - berry
+  - beere
+  - strawberry
+  - erdbeer
+  - raspberry
+  - himbeer
+
+herbal:
+  - mint
+  - minze
+  - basil
+  - basilikum
+  - rosemary
+  - rosmarin
+  - thyme
+  - thymian
+  - sage
+  - salbei
+  - shiso
+
+spicy:
+  - ginger
+  - ingwer
+  - chili
+  - chilisaft
+  - jalapeño
+  - piment
