@@ -12,7 +12,7 @@ export default function SuggestionsPage() {
   const [selected, setSelected] = useState<number[]>([]);
   const [mode, setMode] = useState<'and' | 'or'>('and');
   const [macroMode, setMacroMode] = useState<'and' | 'or'>('or');
-  const [maxMissing, setMaxMissing] = useState(0);
+  const [maxMissing, setMaxMissing] = useState(3); // Default to 'egal'
   const [recipes, setRecipes] = useState<RecipeItem[]>([]);
   const [drag, setDrag] = useState<number | null>(null);
   const [macros, setMacros] = useState<string[]>([]);
@@ -37,7 +37,17 @@ export default function SuggestionsPage() {
       macro_mode: macroMode,
       max_missing: maxMissing === 3 ? undefined : maxMissing,
     })
-      .then(setRecipes)
+      .then((results: RecipeItem[]) => {
+        // Remove duplicates by id (or by name if id is missing)
+        const seen = new Set();
+        const unique = results.filter((r) => {
+          const key = r.id ?? r.name;
+          if (seen.has(key)) return false;
+          seen.add(key);
+          return true;
+        });
+        setRecipes(unique);
+      })
       .catch(() => setRecipes([]));
   }, [selected, mode, maxMissing, selectedMacros, macroMode]);
 
@@ -74,106 +84,139 @@ export default function SuggestionsPage() {
 
   return (
     <div className="space-y-6">
-      <h1 className="text-4xl font-bold font-display">Suggestions</h1>
-      <div className="flex flex-wrap gap-2">
-        {items.map((it) => (
-          <div
-            key={it.id}
-            draggable={selected.includes(it.ingredient_id)}
-            onDragStart={() => setDrag(it.ingredient_id)}
-            onDragOver={(e) => e.preventDefault()}
-            onDrop={() => handleDrop(it.ingredient_id)}
-            onClick={() => toggle(it.ingredient_id)}
-            className={chipClass(selected.includes(it.ingredient_id))}
-          >
-            {it.ingredient?.name}
-          </div>
-        ))}
-      </div>
-      {macros.length > 0 && (
+      <h1 className="text-4xl font-bold font-display mb-2">Suggestions</h1>
+
+      {/* Ingredients Section */}
+      <section className="card p-0">
+        <h2 className="font-semibold text-lg mb-2">Ingredients</h2>
         <div className="flex flex-wrap gap-2">
-          {macros.map((m) => (
+          {items.map((it) => (
             <div
-              key={m}
-              onClick={() => toggleMacro(m)}
-              className={chipClass(selectedMacros.includes(m))}
+              key={it.id}
+              draggable={selected.includes(it.ingredient_id)}
+              onDragStart={() => setDrag(it.ingredient_id)}
+              onDragOver={(e) => e.preventDefault()}
+              onDrop={() => handleDrop(it.ingredient_id)}
+              onClick={() => toggle(it.ingredient_id)}
+              className={chipClass(selected.includes(it.ingredient_id))}
+              title="Select ingredient (drag to reorder)"
             >
-              {m}
+              {it.ingredient?.name}
             </div>
           ))}
         </div>
+      </section>
+
+      {/* Macros Section */}
+      {macros.length > 0 && (
+        <section className="card p-0">
+          <h2 className="font-semibold text-lg mb-2">Macros</h2>
+          <div className="flex flex-wrap gap-2">
+            {macros.map((m) => (
+              <div
+                key={m}
+                onClick={() => toggleMacro(m)}
+                className={chipClass(selectedMacros.includes(m))}
+                title="Select macro filter"
+              >
+                {m}
+              </div>
+            ))}
+          </div>
+        </section>
       )}
-      <div className="flex items-center gap-4">
-        <div className="flex items-center gap-1">
-          <button
-            onClick={() => setMode('and')}
-            className={`px-2 py-1 border rounded ${
-              mode === 'and'
-                ? 'bg-[var(--accent)] text-black'
-                : 'border-[var(--border)]'
-            }`}
-          >
-            Alle
-          </button>
-          <button
-            onClick={() => setMode('or')}
-            className={`px-2 py-1 border rounded ${
-              mode === 'or'
-                ? 'bg-[var(--accent)] text-black'
-                : 'border-[var(--border)]'
-            }`}
-          >
-            Beliebige
-          </button>
+
+      {/* Filter Options Section */}
+      <section className="card p-0 flex flex-col gap-4">
+        <h2 className="font-semibold text-lg mb-2">Filter Options</h2>
+        <div className="flex flex-wrap gap-4 items-center">
+          <div className="flex flex-col items-start gap-1">
+            <span className="text-xs font-medium text-gray-500">Ingredient Filter</span>
+            <div className="flex gap-1">
+              <button
+                onClick={() => setMode('and')}
+                className={`px-2 py-1 border rounded ${
+                  mode === 'and'
+                    ? 'bg-[var(--accent)] text-black'
+                    : 'border-[var(--border)]'
+                }`}
+                title="All selected ingredients must be present"
+              >
+                Alle
+              </button>
+              <button
+                onClick={() => setMode('or')}
+                className={`px-2 py-1 border rounded ${
+                  mode === 'or'
+                    ? 'bg-[var(--accent)] text-black'
+                    : 'border-[var(--border)]'
+                }`}
+                title="Any selected ingredient may be present"
+              >
+                Beliebige
+              </button>
+            </div>
+          </div>
+          <div className="flex flex-col items-start gap-1">
+            <span className="text-xs font-medium text-gray-500">Macro Filter</span>
+            <div className="flex gap-1">
+              <button
+                onClick={() => setMacroMode('and')}
+                className={`px-2 py-1 border rounded ${
+                  macroMode === 'and'
+                    ? 'bg-[var(--accent)] text-black'
+                    : 'border-[var(--border)]'
+                }`}
+                title="All selected macros must be present"
+              >
+                Macro AND
+              </button>
+              <button
+                onClick={() => setMacroMode('or')}
+                className={`px-2 py-1 border rounded ${
+                  macroMode === 'or'
+                    ? 'bg-[var(--accent)] text-black'
+                    : 'border-[var(--border)]'
+                }`}
+                title="Any selected macro may be present"
+              >
+                Macro OR
+              </button>
+            </div>
+          </div>
+          <div className="flex flex-col items-start gap-1">
+            <span className="text-xs font-medium text-gray-500">Maximum number of missing ingredients allowed</span>
+            <div className="flex items-center gap-2">
+              <input
+                type="range"
+                min={0}
+                max={3}
+                value={maxMissing}
+                onChange={(e) => setMaxMissing(parseInt(e.target.value))}
+                className="accent-[var(--accent)]"
+                title="Maximum number of missing ingredients allowed"
+              />
+              <span className="text-sm">
+                {maxMissing === 3 ? 'max' : maxMissing}
+              </span>
+            </div>
+          </div>
         </div>
-        <div className="flex items-center gap-1">
-          <button
-            onClick={() => setMacroMode('and')}
-            className={`px-2 py-1 border rounded ${
-              macroMode === 'and'
-                ? 'bg-[var(--accent)] text-black'
-                : 'border-[var(--border)]'
-            }`}
-          >
-            Macro AND
-          </button>
-          <button
-            onClick={() => setMacroMode('or')}
-            className={`px-2 py-1 border rounded ${
-              macroMode === 'or'
-                ? 'bg-[var(--accent)] text-black'
-                : 'border-[var(--border)]'
-            }`}
-          >
-            Macro OR
-          </button>
-        </div>
-        <label className="flex items-center gap-2">
-          <span className="text-sm">Max. fehlende Zutaten:</span>
-          <input
-            type="range"
-            min={0}
-            max={3}
-            value={maxMissing}
-            onChange={(e) => setMaxMissing(parseInt(e.target.value))}
-          />
-          <span className="text-sm">
-            {maxMissing === 3 ? 'egal' : maxMissing}
-          </span>
-        </label>
-      </div>
+      </section>
+
+      {/* Recipe Results */}
       {recipes.length > 0 && (
-        <RecipeList
-          recipes={recipes}
-          showCounts
-          renderAction={(r) =>
-            r.id ? (
-              <a href={`/recipes/${r.id}`} className="button-search">
-                Open
-              </a>
-            ) : null
-          }
-        />
+          <RecipeList
+            recipes={recipes}
+            showCounts
+            renderAction={(r) =>
+              r.id ? (
+                <a href={`/recipes/${r.id}`} className="button-search">
+                  Open
+                </a>
+              ) : null
+            }
+          />
       )}
     </div>
   );
