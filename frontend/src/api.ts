@@ -212,6 +212,15 @@ export async function findRecipes(options: FindRecipesOptions = {}) {
   return res.json();
 }
 
+export async function getSuggestions(limit = 3, max_missing?: number) {
+  const params = new URLSearchParams();
+  if (limit !== undefined) params.append('limit', String(limit));
+  if (max_missing !== undefined) params.append('max_missing', String(max_missing));
+  const query = params.toString();
+  const res = await fetch(`${API_BASE}/suggestions${query ? `?${query}` : ''}`);
+  return res.json();
+}
+
 export async function getRecipe(id: number): Promise<RecipeDetail> {
   const res = await fetch(`${API_BASE}/recipes/${id}`);
   if (!res.ok) {

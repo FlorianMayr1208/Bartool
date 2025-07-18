@@ -517,3 +517,41 @@ def add_missing_ingredients_to_shopping_list(db: Session, recipe_id: int):
 def clear_shopping_list(db: Session):
     db.query(models.ShoppingListItem).delete()
     db.commit()
+
+
+def suggest_recipes(
+    db: Session, limit: int = 3, max_missing: int | None = None
+) -> list[schemas.RecipeWithInventory]:
+    """Return a few random recipe suggestions prioritising available ones."""
+    recipes = list_recipes(db)
+    data: list[tuple[models.Recipe, int, int]] = []
+    for r in recipes:
+        missing = recipe_missing_count(db, r)
+        if max_missing is not None and missing > max_missing:
+            continue
+        available = len(r.ingredients) - missing
+        data.append((r, available, missing))
+
+    if not data:
+        return []
+
+    # sort recipes by number of missing ingredients
+    data.sort(key=lambda t: t[2])
+    results: list[tuple[models.Recipe, int, int]] = []
+    import random
+    while len(results) < limit and data:
+        current_missing = data[0][2]
+        same = [t for t in data if t[2] == current_missing]
+        random.shuffle(same)
+        take = same[: max(0, limit - len(results))]
+        results.extend(take)
+        data = [t for t in data if t[2] != current_missing]
+
+    return [
+        schemas.RecipeWithInventory(
+            **schemas.Recipe.model_validate(r, from_attributes=True).model_dump(),
+            available_count=a,
+            missing_count=m,
+        )
+        for r, a, m in results[:limit]
+    ]

@@ -9,15 +9,18 @@ import {
   Download,
   Upload,
 } from 'lucide-react';
-import { exportDatabase, importDatabase, healthCheck } from '../api';
+import { exportDatabase, importDatabase, healthCheck, getSuggestions } from '../api';
 import { useRef, useEffect, useState } from 'react';
+import type { RecipeItem } from '../components/RecipeList';
 
 export default function Dashboard() {
   const [health, setHealth] = useState<string | null>(null);
+  const [suggestions, setSuggestions] = useState<RecipeItem[]>([]);
   useEffect(() => {
     healthCheck()
       .then((res) => setHealth(res.status))
       .catch(() => setHealth('error'));
+    getSuggestions(3).then(setSuggestions).catch(() => setSuggestions([]));
   }, []);
   const features = [
     { to: '/inventory', title: 'Inventory', icon: <Box size={20} /> },
@@ -85,6 +88,26 @@ export default function Dashboard() {
           )
         ))}
       </div>
+      {suggestions.length > 0 && (
+        <div className="space-y-2">
+          <h2 className="text-2xl font-semibold">Suggestions</h2>
+          <div className="flex gap-4 overflow-x-auto pb-2">
+            {suggestions.map((s, idx) => (
+              <div key={s.id ?? idx} className="min-w-[10rem] card p-2 flex-shrink-0">
+                {s.thumb && (
+                  <img src={s.thumb} alt={s.name} className="h-24 w-full object-cover rounded" />
+                )}
+                <div className="font-semibold text-center mt-2">{s.name}</div>
+                {typeof s.missing_count === 'number' && (
+                  <div className="text-sm text-[var(--text-muted)] text-center">
+                    Missing {s.missing_count}
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
       <input
         type="file"
         ref={fileRef}
