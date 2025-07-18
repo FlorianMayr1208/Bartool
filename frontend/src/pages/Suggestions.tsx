@@ -80,7 +80,9 @@ export default function SuggestionsPage() {
       active
         ? 'bg-[var(--accent)] text-black'
         : 'border-[var(--border)] text-[var(--text-primary)]'
-    }`;
+    } chip-hover`;
+  // Add chip-hover style for hover effect
+
 
   return (
     <div className="space-y-6">
@@ -105,24 +107,24 @@ export default function SuggestionsPage() {
             </div>
           ))}
         </div>
-        <div className="flex gap-1 mt-2">
+        <div className="flex gap-1 mt-6">
           <button
             onClick={() => setMode('and')}
             className={`px-2 py-1 border rounded ${
-              mode === 'and' ? 'bg-[var(--accent)] text-black' : 'border-[var(--border)]'
+              mode === 'and' ? 'bg-[var(--highlight)] text-black' : 'border-[var(--border)]'
             }`}
             title="All selected ingredients must be present"
           >
-            Alle
+            AND
           </button>
           <button
             onClick={() => setMode('or')}
             className={`px-2 py-1 border rounded ${
-              mode === 'or' ? 'bg-[var(--accent)] text-black' : 'border-[var(--border)]'
+              mode === 'or' ? 'bg-[var(--highlight)] text-black' : 'border-[var(--border)]'
             }`}
             title="Any selected ingredient may be present"
           >
-            Beliebige
+            OR
           </button>
         </div>
       </section>
@@ -143,12 +145,12 @@ export default function SuggestionsPage() {
               </div>
             ))}
           </div>
-          <div className="flex gap-1 mt-2">
+          <div className="flex gap-1 mt-6">
             <button
               onClick={() => setMacroMode('and')}
               className={`px-2 py-1 border rounded ${
                 macroMode === 'and'
-                  ? 'bg-[var(--accent)] text-black'
+                  ? 'bg-[var(--highlight)] text-black'
                   : 'border-[var(--border)]'
               }`}
               title="All selected macros must be present"
@@ -159,7 +161,7 @@ export default function SuggestionsPage() {
               onClick={() => setMacroMode('or')}
               className={`px-2 py-1 border rounded ${
                 macroMode === 'or'
-                  ? 'bg-[var(--accent)] text-black'
+                  ? 'bg-[var(--highlight)] text-black'
                   : 'border-[var(--border)]'
               }`}
               title="Any selected macro may be present"

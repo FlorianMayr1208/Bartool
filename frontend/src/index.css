@@ -53,3 +53,7 @@ body {
   border: none;
   cursor: pointer;
 }
+
+.chip-hover:hover {
+  background-color: color-mix(in srgb, var(--accent) 10%, transparent);
+}
