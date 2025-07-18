@@ -2,7 +2,8 @@
 
 :root {
   --bg-primary:   #242527;
-  --bg-elevated:  #242526;
+  --bg-elevated:  #313234;
+  --bg-elevated-dark: #2D2E30;
   --border:       #3b3b3d;
   --text-primary: #E6E6E8;
   --text-muted:   #9A9A9F;

@@ -69,7 +69,7 @@ export default function RecipeList({
           return (
             <li key={key}>
               <div
-                className="flex items-center gap-2 p-4 cursor-pointer mb-[5px] mt-[5px]"
+                className="flex items-center gap-2 p-4 cursor-pointer mb-[5px] mt-[5px] bg-[var(--bg-elevated-dark)]"
                 onClick={() => setExpanded(expandedKey ? null : key)}
               >
                 <span className="flex-1 truncate font-semibold flex items-center gap-2">
@@ -117,21 +117,29 @@ export default function RecipeList({
               </div>
               {expandedKey && (
                 <div
-                  className="grid grid-cols-1 w-full gap-4 p-2 text-sm text-[var(--text-muted)] mb-4 md:grid-cols-4 md:h-52"
-                  // style={{ gridTemplateColumns: '1fr 1fr 2fr 1fr' }}
+                  className="grid grid-cols-3 gap-4 h-52 w-full p-2 text-sm text-[var(--text-muted)] mb-8 mt-6"
                 >
                   {/* Image */}
-                  <div className="flex items-center justify-center">
+                  <div className="flex  justify-center">
                     {r.thumb && (
                       <img
                         src={r.thumb}
                         alt={r.name}
-                        className="h-40 w-40 rounded object-cover"
+                        className="h-50 w-50 rounded object-cover"
                       />
                     )}
                   </div>
+                  {/* Instructions */}
+                  <div className="flex flex-col justify-start items-start pl-8">
+                    {r.instructions && (
+                      <>
+                        <h3 className="font-semibold text-[var(--text-primary)] mb-1">Instructions</h3>
+                        <p>{truncate(r.instructions, 300)}</p>
+                      </>
+                    )}
+                  </div>
                   {/* Categories, Tags, IBA */}
-                  <div className="flex flex-col justify-start items-start">
+                  <div className="flex flex-col justify-start items-start pl-8">
                     {r.categories && r.categories.length > 0 && (
                       <div className="mb-2">
                         <h4 className="font-semibold text-[var(--text-primary)]">Category</h4>
@@ -151,15 +159,7 @@ export default function RecipeList({
                       </div>
                     )}
                   </div>
-                  {/* Instructions */}
-                  <div className="flex flex-col justify-start items-start">
-                    {r.instructions && (
-                      <>
-                        <h3 className="font-semibold text-[var(--text-primary)] mb-1">Instructions</h3>
-                        <p>{truncate(r.instructions, 300)}</p>
-                      </>
-                    )}
-                  </div>
+                  
                   {/* Alcoholic/Non-Alcoholic */}
                   {/* Alcoholic/Non-Alcoholic removed from detail view */}
                 </div>

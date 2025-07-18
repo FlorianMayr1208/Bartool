@@ -12,11 +12,10 @@ export default function Navbar() {
 
   const linkClass = ({ isActive }: { isActive: boolean }) =>
     [
-      "relative flex items-center justify-center px-3 py-2 rounded-full font-semibold transition-all duration-300 no-underline",
+      "relative flex items-center justify-center px-3 py-2 font-semibold transition-all duration-300 no-underline hover:scale-105",
       isActive
-        ? "bg-[var(--accent)] text-black shadow-md"
+        ? "bg-[var(--accent)] text-black shadow-md rounded-[var(--brand-radius)]"
         : "text-[var(--text-muted)] hover:text-[var(--accent)] hover:bg-[var(--bg-primary)]",
-      "hover:scale-105",
     ].join(" ");
 
   const Links = () => (
@@ -46,13 +45,13 @@ export default function Navbar() {
   );
 
   return (
-    <header className="bg-[var(--bg-elevated)] border-b border-[var(--border)] text-[var(--text-primary)] shadow-lg sticky top-0 z-50">
+    <header className="bg-[var(--bg-elevated)] border-b border-[var(--border)] text-[var(--text-primary)] shadow-lg sticky top-0 z-50 rounded-[var(--brand-radius)]">
       <nav className="max-w-screen-xl mx-auto flex items-center justify-between py-3 px-4 md:px-6">
         <div className="flex items-center gap-3">
           <span className="text-3xl font-bold tracking-tight text-[var(--accent)]">Bartool</span>
         </div>
         <button
-          className="md:hidden p-2 rounded hover:bg-[var(--bg-primary)]"
+          className="md:hidden p-2 hover:bg-[var(--bg-primary)] rounded-[var(--brand-radius)]"
           onClick={() => setOpen(true)}
         >
           <Menu size={20} />
