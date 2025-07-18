@@ -146,8 +146,8 @@ export default function Inventory() {
   }
 
   return (
-    <div className="space-y-4">
-      <h1 className="text-3xl font-bold font-display">Inventory</h1>
+    <div className="space-y-6">
+      <h1 className="text-4xl font-bold font-display">Inventory</h1>
 
       <section className="space-y-4 p-4 mb-6 rounded-lg shadow">
         <h2 className="text-xl font-semibold">Barcode Lookup</h2>

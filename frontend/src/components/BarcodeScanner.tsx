@@ -18,7 +18,7 @@ export default function BarcodeScanner({ onDetected }: { onDetected: (code: stri
     )
 
     scanner.render(
-      (text) => {
+      (text: string) => {
         onDetected(text)
         scanner.clear().catch(() => {})
       },

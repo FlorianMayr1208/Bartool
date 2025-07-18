@@ -9,10 +9,16 @@ import {
   Download,
   Upload,
 } from 'lucide-react';
-import { exportDatabase, importDatabase } from '../api';
-import { useRef } from 'react';
+import { exportDatabase, importDatabase, healthCheck } from '../api';
+import { useRef, useEffect, useState } from 'react';
 
 export default function Dashboard() {
+  const [health, setHealth] = useState<string | null>(null);
+  useEffect(() => {
+    healthCheck()
+      .then((res) => setHealth(res.status))
+      .catch(() => setHealth('error'));
+  }, []);
   const features = [
     { to: '/inventory', title: 'Inventory', icon: <Box size={20} /> },
     { to: '/recipes', title: 'Recipes', icon: <BookOpen size={20} /> },
@@ -49,7 +55,10 @@ export default function Dashboard() {
 
   return (
     <div className="space-y-6">
-      <h1 className="text-3xl font-bold font-display">Dashboard</h1>
+      <h1 className="text-4xl font-bold font-display">Dashboard</h1>
+      {health && (
+        <div className="text-sm text-gray-500">Health: {health}</div>
+      )}
       <p className="text-[var(--text-muted)]">Welcome to BarTool. Select an action below.</p>
       <div className="grid gap-6 sm:grid-cols-2 md:grid-cols-4">
         {features.map((f) => (
