@@ -11,9 +11,9 @@ export default function SuggestionsPage() {
   const [drag, setDrag] = useState<number | null>(null);
 
   useEffect(() => {
-    listInventory().then((res) => {
-      if (Array.isArray(res)) {
-        setItems(res);
+    listInventory().then(({ data }) => {
+      if (Array.isArray(data)) {
+        setItems(data);
       } else {
         setItems([]);
       }
