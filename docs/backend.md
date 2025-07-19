@@ -15,7 +15,7 @@ The database schema is created on start if it does not yet exist. A helper scrip
 
 ### Dependencies
 
-All Python dependencies are declared in `pyproject.toml` and locked via `poetry.lock`. For convenience a `requirements.txt` file is provided as well. To install them run:
+All Python dependencies are listed in `requirements.txt`. Install them with:
 
 ```bash
 pip install -r requirements.txt
