@@ -147,7 +147,7 @@ export default function Inventory() {
 
   return (
     <div className="space-y-6">
-      <h1 className="text-4xl font-bold font-display">Inventory</h1>
+      <h1 className="page-title">Inventory</h1>
 
       <section className="card p-4">
         <h2 className="text-xl font-semibold mb-4">Barcode Lookup</h2>

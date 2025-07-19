@@ -56,7 +56,7 @@ export default function Dashboard() {
 
   return (
     <div className="space-y-6">
-      <h1 className="text-4xl font-bold font-display">Dashboard</h1>
+      <h1 className="page-title">Dashboard</h1>
       {health && (
         <div className="text-sm text-gray-500">Health: {health}</div>
       )}
