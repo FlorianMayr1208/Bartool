@@ -183,7 +183,7 @@ export default function SuggestionsPage() {
           </section>
         )}
 
-        {/* Filter Options Section */}
+        {/* Missing Ingredients Section */}
         <section className="card p-0 flex-1 min-w-[250px] flex flex-col gap-4">
           <h2 className="font-semibold text-lg mb-1">Missing Ingredients</h2>
           <span className="text-xs font-medium text-gray-500">Maximum number of missing ingredients</span>
@@ -197,11 +197,11 @@ export default function SuggestionsPage() {
                   max={3}
                   value={maxMissing}
                   onChange={(e) => setMaxMissing(parseInt(e.target.value))}
-                  className="accent-[var(--accent)] w-128 h-5"
+                  className="accent-[var(--accent)] h-8 w-full max-w-xs sm:max-w-md md:max-w-lg touch-manipulation"
                   title="Maximum number of missing ingredients allowed"
                   style={{ maxWidth: '100%' }}
                 />
-                <span className="text-sm mt-1">
+                <span className="text-base mt-2 font-semibold">
                   {maxMissing === 3 ? 'max' : maxMissing}
                 </span>
               </div>

@@ -225,24 +225,24 @@ export default function Inventory() {
         </button>
       </div>
       <div className="card p-0">
-        <div className="flex items-center px-4 py-2 font-semibold">
+        <div className="flex items-center px-2 sm:px-4 py-2 font-semibold text-xs sm:text-base">
           <span className="flex-1">Name</span>
-          <span className="w-20">Qty</span>
+          <span className="w-16 sm:w-20 text-center">Qty</span>
         </div>
-        <ul className="divide-y divide-[var(--border)]">
+        <ul className="divide-y divide-[var(--border)] overflow-x-auto">
           {items.map((it) => (
             <li
               key={it.id}
-              className="flex items-center px-4 py-2 gap-4 justify-between"
+              className="flex flex-col sm:flex-row items-stretch sm:items-center px-2 sm:px-4 py-2 gap-2 sm:gap-4 justify-between text-sm sm:text-base"
             >
-              <span className="flex-1">
+              <span className="flex-1 min-w-[100px] break-words">
                 {it.ingredient?.name || it.ingredient_id}
               </span>
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-2 justify-center mt-2 sm:mt-0">
                 <button
                   aria-label="Decrease quantity"
-                  className="rounded-full w-8 h-8 flex items-center justify-center text-xl font-bold select-none touch-manipulation"
-                  style={{ minWidth: 32, minHeight: 32, backgroundColor: 'var(--danger)', color: 'black' }}
+                  className="rounded-full w-10 h-10 flex items-center justify-center text-xl font-bold select-none touch-manipulation shadow-sm active:scale-95"
+                  style={{ minWidth: 40, minHeight: 40, backgroundColor: 'var(--danger)', color: 'black' }}
                   onClick={() => updateQty(it.id, Math.max(0, it.quantity - 1))}
                 >
                   -
@@ -251,19 +251,21 @@ export default function Inventory() {
                   type="number"
                   value={it.quantity}
                   onChange={(e) => updateQty(it.id, parseInt(e.target.value))}
-                  className="w-16 border border-[var(--border)] bg-transparent text-center"
+                  className="w-16 border border-[var(--border)] bg-transparent text-center rounded text-base sm:text-lg"
                   style={{ minWidth: 48 }}
+                  inputMode="numeric"
+                  pattern="[0-9]*"
                 />
                 <button
                   aria-label="Increase quantity"
-                  className="rounded-full w-8 h-8 flex items-center justify-center text-xl font-bold select-none touch-manipulation"
-                  style={{ minWidth: 32, minHeight: 32, backgroundColor: 'var(--success)', color: 'black' }}
+                  className="rounded-full w-10 h-10 flex items-center justify-center text-xl font-bold select-none touch-manipulation shadow-sm active:scale-95"
+                  style={{ minWidth: 40, minHeight: 40, backgroundColor: 'var(--success)', color: 'black' }}
                   onClick={() => updateQty(it.id, it.quantity + 1)}
                 >
                   +
                 </button>
               </div>
-              <button onClick={() => remove(it.id)} className="button-search ml-6">
+              <button onClick={() => remove(it.id)} className="button-search ml-0 sm:ml-6 mt-2 sm:mt-0 w-full sm:w-auto">
                 Delete
               </button>
             </li>
