@@ -5,7 +5,7 @@ Below is a step‑by‑step plan sliced into iterations.
 
 ## 1  |  Backend Foundation (FastAPI + SQLite)
 1. Create `backend/app/main.py` with “hello world” FastAPI and `/healthz`.  
-2. Add dependency manager (poetry or pip‑tools); commit lock‑file.  
+2. Add dependency manager using a `requirements.txt` file and commit it.
 3. Add **SQLAlchemy** & **pydantic**; create `Ingredient`, `Recipe`, `InventoryItem` models.  
 4. Implement DB session helper and CRUD layer.  
 5. Seed a tiny SQLite DB in `data/seed.sqlite`.  
