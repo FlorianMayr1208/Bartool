@@ -57,3 +57,7 @@ body {
 .chip-hover:hover {
   background-color: color-mix(in srgb, var(--accent) 10%, transparent);
 }
+
+.page-title {
+  @apply text-5xl font-bold font-display text-center my-8;
+}

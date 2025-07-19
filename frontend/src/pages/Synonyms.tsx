@@ -112,7 +112,7 @@ export default function Synonyms() {
 
   return (
     <div className="space-y-6">
-      <h1 className="text-4xl font-bold font-display">Synonyms</h1>
+      <h1 className="page-title">Synonyms</h1>
       <div className="space-x-2">
         <input
           placeholder="Alias"
