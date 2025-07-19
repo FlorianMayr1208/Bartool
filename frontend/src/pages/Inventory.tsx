@@ -236,7 +236,7 @@ export default function Inventory() {
               className="flex flex-col sm:flex-row items-stretch sm:items-center px-2 sm:px-4 py-2 gap-2 sm:gap-4 justify-between text-sm sm:text-base"
             >
               <span className="flex-1 min-w-[100px] break-words">
-                {it.ingredient?.name || it.ingredient_id}
+                {it.ingredient?.name || ingredients.find((ing) => ing.id === it.ingredient_id)?.name || it.ingredient_id}
               </span>
               <div className="flex items-center gap-2 justify-center mt-2 sm:mt-0">
                 <button
