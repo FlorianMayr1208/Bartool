@@ -87,7 +87,7 @@ export default function FindRecipes() {
         </div>
       </div>
       <div className="flex flex-col sm:flex-row flex-wrap gap-2 sm:gap-4 w-full items-stretch sm:items-center justify-center mt-2">
-        <label className="flex items-center gap-2 px-2 py-1 rounded bg-white/10 border border-[var(--border)] text-sm w-full sm:w-auto">
+        <label className="flex items-center gap-2 px-2 py-1 rounded bg-[var(--border)] border border-[var(--border)] text-sm w-full sm:w-auto">
           <input
             type="checkbox"
             checked={availableOnly}
@@ -96,7 +96,7 @@ export default function FindRecipes() {
           />
           Available only
         </label>
-        <label className="flex items-center gap-2 px-2 py-1 rounded bg-white/10 border border-[var(--border)] text-sm w-full sm:w-auto">
+        <label className="flex items-center gap-2 px-2 py-1 rounded bg-[var(--border)] border border-[var(--border)] text-sm w-full sm:w-auto">
           <input
             type="checkbox"
             checked={orderMissing}
@@ -108,12 +108,12 @@ export default function FindRecipes() {
         {/* Tag Filter Dropdown */}
         <Menu as="div" className="relative inline-block text-left w-full sm:w-auto">
           <div>
-            <MenuButton className="inline-flex w-full justify-center gap-x-1.5 rounded border border-[var(--border)] bg-transparent px-3 py-2 text-sm font-semibold text-[var(--text-primary)] hover:bg-[var(--accent)]/10">
+            <MenuButton className="inline-flex w-full justify-center gap-x-1.5 rounded border border-[var(--border)] bg-[var(--border)] px-3 py-2 text-sm font-semibold text-[var(--text-primary)] hover:bg-[var(--accent)]/10">
               {tagFilter ? tags.find((t) => t === tagFilter) : "All Tags"}
               <ChevronDownIcon aria-hidden="true" className="-mr-1 size-5 text-[var(--accent)]" />
             </MenuButton>
           </div>
-          <MenuItems className="absolute left-0 sm:left-auto right-0 z-10 mt-2 w-56 origin-top-right rounded-md bg-[var(--background)] border border-[var(--border)] shadow-lg ring-1 ring-black/5 focus:outline-none">
+          <MenuItems className="absolute left-0 sm:left-auto right-0 z-10 mt-2 w-56 origin-top-right rounded-md bg-white dark:bg-zinc-900 border border-[var(--border)] shadow-lg ring-1 ring-black/5 focus:outline-none">
             <div className="py-1">
               <MenuItem>
                 {({ active }) => (
@@ -143,12 +143,12 @@ export default function FindRecipes() {
         {/* Category Filter Dropdown */}
         <Menu as="div" className="relative inline-block text-left w-full sm:w-auto">
           <div>
-            <MenuButton className="inline-flex w-full justify-center gap-x-1.5 rounded border border-[var(--border)] bg-transparent px-3 py-2 text-sm font-semibold text-[var(--text-primary)] hover:bg-[var(--accent)]/10">
+            <MenuButton className="inline-flex w-full justify-center gap-x-1.5 rounded border border-[var(--border)] bg-[var(--border)] px-3 py-2 text-sm font-semibold text-[var(--text-primary)] hover:bg-[var(--accent)]/10">
               {categoryFilter ? categories.find((c) => c === categoryFilter) : "All Categories"}
               <ChevronDownIcon aria-hidden="true" className="-mr-1 size-5 text-[var(--accent)]" />
             </MenuButton>
           </div>
-          <MenuItems className="absolute left-0 sm:left-auto right-0 z-10 mt-2 w-56 origin-top-right rounded-md bg-[var(--background)] border border-[var(--border)] shadow-lg ring-1 ring-black/5 focus:outline-none">
+          <MenuItems className="absolute left-0 sm:left-auto right-0 z-10 mt-2 w-56 origin-top-right rounded-md bg-white dark:bg-zinc-900 border border-[var(--border)] shadow-lg ring-1 ring-black/5 focus:outline-none">
             <div className="py-1">
               <MenuItem>
                 {({ active }) => (
@@ -178,12 +178,12 @@ export default function FindRecipes() {
         {/* Alcoholic Filter Dropdown */}
         <Menu as="div" className="relative inline-block text-left w-full sm:w-auto">
           <div>
-            <MenuButton className="inline-flex w-full justify-center gap-x-1.5 rounded border border-[var(--border)] bg-transparent px-3 py-2 text-sm font-semibold text-[var(--text-primary)] hover:bg-[var(--accent)]/10">
+            <MenuButton className="inline-flex w-full justify-center gap-x-1.5 rounded border border-[var(--border)] bg-[var(--border)] px-3 py-2 text-sm font-semibold text-[var(--text-primary)] hover:bg-[var(--accent)]/10">
               {alcoholicFilter ? alcoholicFilter : "All"}
               <ChevronDownIcon aria-hidden="true" className="-mr-1 size-5 text-[var(--accent)]" />
             </MenuButton>
           </div>
-          <MenuItems className="absolute left-0 sm:left-auto right-0 z-10 mt-2 w-56 origin-top-right rounded-md bg-[var(--background)] border border-[var(--border)] shadow-lg ring-1 ring-black/5 focus:outline-none">
+          <MenuItems className="absolute left-0 sm:left-auto right-0 z-10 mt-2 w-56 origin-top-right rounded-md bg-white dark:bg-zinc-900 border border-[var(--border)] shadow-lg ring-1 ring-black/5 focus:outline-none">
             <div className="py-1">
               <MenuItem>
                 {({ active }) => (
