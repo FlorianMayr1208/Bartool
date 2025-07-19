@@ -1,0 +1,66 @@
+{
+  "title": "Code Commenting Guidelines",
+  "updated": "2025-07-18",
+  "guidelines": [
+    {
+      "number": 1,
+      "title": "Comment the Why, not the What",
+      "explanation": "Code already reveals what happens; use comments to capture intent, rationale, trade‑offs, and constraints.",
+      "example": "Binary search keeps look‑ups O(log n); linear scan was too slow for >10 k items"
+    },
+    {
+      "number": 2,
+      "title": "Keep Comments Close to the Code",
+      "explanation": "Place inline comments on tricky expressions, block comments directly above the code they describe, and use file/module headers for high‑level context."
+    },
+    {
+      "number": 3,
+      "title": "Use the Language’s Doc‑Comment Style",
+      "explanation": "Follow official formats (e.g., PEP 257, Javadoc, Doxygen, JSDoc) so IDEs and doc generators can parse them."
+    },
+    {
+      "number": 4,
+      "title": "Be Concise and Complete",
+      "explanation": "Write short, clear sentences and include details only where they save future time."
+    },
+    {
+      "number": 5,
+      "title": "Prefer Self‑Documenting Code",
+      "explanation": "Use meaningful names and small, purpose‑built functions to reduce the need for comments.",
+      "example": "sorted_users = sort_by_last_login(users)"
+    },
+    {
+      "number": 6,
+      "title": "Document Preconditions, Postconditions & Invariants",
+      "explanation": "Explicit constraints speed debugging and enable formal checks.",
+      "example": "Pre: len(nums) > 0 and nums is sorted"
+    },
+    {
+      "number": 7,
+      "title": "Track TODOs & Debt with Searchable Tags",
+      "explanation": "Use consistent tags like TODO(username): ... so tooling can surface unfinished work."
+    },
+    {
+      "number": 8,
+      "title": "Keep Comments Up to Date",
+      "explanation": "Review and update comments whenever the code changes to prevent misleading documentation."
+    },
+    {
+      "number": 9,
+      "title": "Mind Security & Privacy",
+      "explanation": "Do not place credentials, API keys, or personal data in comments."
+    },
+    {
+      "number": 10,
+      "title": "Automate Style Enforcement",
+      "explanation": "Use linters (pydocstyle, ESLint, clang‑tidy, etc.) to keep comment style consistent and visible in CI."
+    }
+  ],
+  "checklist": [
+    "Will a new teammate understand why this code exists?",
+    "Are all public APIs documented with usage notes?",
+    "Could a refactor make any comment unnecessary?",
+    "Have you updated comments after the last edits?",
+    "Do doc linters & generators pass?"
+  ]
+}
