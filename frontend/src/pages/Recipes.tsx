@@ -1,7 +1,6 @@
 // Recipes.tsx - Page for searching, saving, and viewing cocktail recipes
 import { useEffect, useState, useRef } from 'react';
 import { listRecipes, searchRecipes, createRecipe } from '../api';
-import { Link } from 'react-router-dom';
 import { Search } from 'lucide-react';
 import RecipeList, { type RecipeItem } from '../components/RecipeList';
 

@@ -11,7 +11,7 @@ export default function Suggestions({ limit = 4 }: SuggestionsProps) {
   const [suggestions, setSuggestions] = useState<RecipeItem[]>([]);
 
   useEffect(() => {
-    getSuggestions(limit)
+    getSuggestions({ limit })
       .then(setSuggestions)
       .catch(() => setSuggestions([]));
   }, [limit]);
