@@ -151,9 +151,22 @@ export default function Inventory() {
 
       <section className="card p-4">
         <h2 className="text-xl font-semibold mb-4">Barcode Lookup</h2>
-        <button onClick={() => setScanning(true)} className="button-send mb-4">
-          Scan Barcode
-        </button>
+        <div className="flex flex-col sm:flex-row gap-2 sm:gap-2 mb-4 w-full">
+          <input
+            placeholder="Enter barcode"
+            value={ean}
+            onChange={(e) => setEan(e.target.value)}
+            className="border border-[var(--border)] p-2 rounded w-full sm:w-48 max-w-full"
+          />
+          <div className="flex flex-row gap-2 w-full sm:w-auto">
+            <button onClick={() => runLookup(ean)} className="button-search w-full sm:w-auto">
+              Lookup
+            </button>
+            <button onClick={() => setScanning(true)} className="button-send w-full sm:w-auto">
+              Scan Barcode
+            </button>
+          </div>
+        </div>
         <Drawer open={scanning} onClose={() => setScanning(false)}>
           <div className="p-4 space-y-2">
             <button className="p-2 rounded" onClick={() => setScanning(false)}>
@@ -162,17 +175,6 @@ export default function Inventory() {
             <BarcodeScanner onDetected={onDetected} />
           </div>
         </Drawer>
-        <div className="flex gap-4 items-center">
-          <input
-            placeholder="Enter barcode"
-            value={ean}
-            onChange={(e) => setEan(e.target.value)}
-            className="border border-[var(--border)] p-2 rounded w-48 max-w-full"
-          />
-          <button onClick={() => runLookup(ean)} className="button-search">
-            Lookup
-          </button>
-        </div>
         {result && (
           <div className="card flex items-center gap-4">
             {result.image_url && (
@@ -198,6 +200,7 @@ export default function Inventory() {
       </section>
 
       <div className="card p-4">
+        <h2 className="text-xl font-semibold mb-4">Add Ingredient Manually</h2>
         <input
           placeholder="Name"
           value={name}
@@ -210,24 +213,28 @@ export default function Inventory() {
           onChange={(e) => setQuantity(parseInt(e.target.value))}
           className="w-20 border border-[var(--border)] p-1 mr-4"
         />
-        <button onClick={submit} className="button-search mr-4">
-          Add
-        </button>
-        <button
-          onClick={async () => {
-            const { debug } = await aggregateInventorySynonyms();
-            if (debug) addDebug(debug);
-            refresh();
-          }}
-          className="button-send"
-        >
-          Apply Synonyms
-        </button>
+        <div className="mt-2 flex flex-wrap gap-2">
+          <button onClick={submit} className="button-search mr-4">
+            Add
+          </button>
+          <button
+            onClick={async () => {
+              const { debug } = await aggregateInventorySynonyms();
+              if (debug) addDebug(debug);
+              refresh();
+            }}
+            className="button-send"
+          >
+            Apply Synonyms
+          </button>
+        </div>
       </div>
       <div className="card p-0">
+        <h2 className="text-xl font-semibold mb-4">Ingredient List</h2>
         <div className="flex items-center px-2 sm:px-4 py-2 font-semibold text-xs sm:text-base">
           <span className="flex-1">Name</span>
           <span className="w-16 sm:w-20 text-center">Qty</span>
+          <span className="w-16 sm:w-20 text-center">Delete</span>
         </div>
         <ul className="divide-y divide-[var(--border)] overflow-x-auto">
           {items.map((it) => (
