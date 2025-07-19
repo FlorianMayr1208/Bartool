@@ -59,31 +59,32 @@ export default function FindRecipes() {
     const category = searchParams.get("category") || undefined;
     const alc = searchParams.get("alcoholic") || undefined;
     const iba = searchParams.get("iba") || undefined;
-    if (q || tag || category || alc || iba) {
-      setQuery(q);
-      setTagFilter(tag);
-      setCategoryFilter(category);
-      setAlcoholicFilter(alc);
-      findRecipes({ q: q || undefined, tag, category, alcoholic: alc, iba }).then(
-        setResults,
-      );
-    }
+    setQuery(q);
+    setTagFilter(tag);
+    setCategoryFilter(category);
+    setAlcoholicFilter(alc);
+    // Always fetch results on mount, with or without filters
+    findRecipes({ q: q || undefined, tag, category, alcoholic: alc, iba }).then(
+      setResults,
+    );
   }, [searchParams]);
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 flex flex-col items-center w-full">
       <h1 className="page-title">Recipe Library</h1>
-      <Suggestions limit={4} />
-      <div className="flex max-w-md items-center overflow-hidden rounded border border-[var(--border)]">
-        <input
-          value={query}
-          onChange={(e) => setQuery(e.target.value)}
-          placeholder="Search saved recipes"
-          className="w-full bg-transparent p-2 focus:outline-none text-[var(--text-primary)] border-none"
-        />
-        <button onClick={runSearch} className="button-send" aria-label="Search">
-          <Search size={20} />
-        </button>
+      <Suggestions limit={3} />
+      <div className="flex items-center justify-center w-full mt-8">
+        <div className="flex w-full max-w-2xl items-center overflow-hidden rounded border border-[var(--border)] bg-white/5 shadow-lg">
+          <input
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            placeholder="Search saved recipes"
+            className="w-full bg-transparent p-4 text-lg focus:outline-none text-[var(--text-primary)] border-none"
+          />
+          <button onClick={runSearch} className="button-send px-6 py-3 text-lg mr-4" aria-label="Search">
+            <Search size={28} />
+          </button>
+        </div>
       </div>
       <div className="flex items-center gap-4">
         <label className="flex items-center gap-1">
@@ -217,22 +218,24 @@ export default function FindRecipes() {
         </Menu>
       </div>
       {results.length > 0 && (
-        <RecipeList
-          recipes={results}
-          showCounts
-          renderAction={(r) =>
-            r.id ? (
-              <span className="flex gap-2">
-                <Link to={`/recipes/${r.id}`} className="button-search">
-                  Open
-                </Link>
-                <button onClick={() => remove(r.id!)} className="button-search">
-                  Delete
-                </button>
-              </span>
-            ) : null
-          }
-        />
+        <div className="w-full max-w-2xl mx-auto">
+          <RecipeList
+            recipes={results}
+            showCounts
+            renderAction={(r) =>
+              r.id ? (
+                <span className="flex gap-2">
+                  <Link to={`/recipes/${r.id}`} className="button-search">
+                    Open
+                  </Link>
+                    <button onClick={() => remove(r.id!)} className="button-search">
+                    Delete
+                    </button>
+                </span>
+              ) : null
+            }
+          />
+        </div>
       )}
     </div>
   );

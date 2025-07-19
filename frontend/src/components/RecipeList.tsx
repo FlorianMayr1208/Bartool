@@ -107,7 +107,7 @@ export default function RecipeList({
                 {showCounts &&
                   typeof r.available_count === 'number' &&
                   typeof r.missing_count === 'number' && (
-                    <span className="text-sm text-[var(--text-secondary)]">
+                    <span className="text-sm text-[var(--text-secondary)] mr-8">
                       {r.available_count} available / {r.missing_count} missing
                     </span>
                   )}

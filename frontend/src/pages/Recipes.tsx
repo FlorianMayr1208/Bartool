@@ -44,31 +44,33 @@ export default function Recipes() {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 flex flex-col items-center w-full">
       {/* Page title */}
       <h1 className="page-title">New Recipes</h1>
       {/* Search bar */}
-      <div className="flex max-w-md items-center overflow-hidden rounded border border-[var(--border)]">
-        <input
-          ref={inputRef}
-          value={query}
-          onChange={(e) => setQuery(e.target.value)}
-          placeholder="Search cocktails"
-          className="w-full bg-transparent p-2 focus:outline-none text-[var(--text-primary)] border-none"
-          onClick={() => inputRef.current && inputRef.current.focus()}
-          onTouchStart={() => inputRef.current && inputRef.current.focus()}
-        />
-        <button
-          onClick={runSearch}
-          className="button-send"
-          aria-label="Search"
-        >
-          <Search size={20} />
-        </button>
+      <div className="flex items-center justify-center w-full">
+        <div className="flex w-full max-w-2xl items-center overflow-hidden rounded border border-[var(--border)] bg-white/5 shadow-lg">
+          <input
+            ref={inputRef}
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            placeholder="Search cocktails"
+            className="w-full bg-transparent p-4 text-lg focus:outline-none text-[var(--text-primary)] border-none"
+            onClick={() => inputRef.current && inputRef.current.focus()}
+            onTouchStart={() => inputRef.current && inputRef.current.focus()}
+          />
+          <button
+            onClick={runSearch}
+            className="button-send px-6 py-3 text-lg mr-4"
+            aria-label="Search"
+          >
+            <Search size={28} />
+          </button>
+        </div>
       </div>
       {/* Search results section */}
       {results.length > 0 && (
-        <div className="space-y-2">
+        <div className="space-y-2 w-full max-w-2xl mx-auto">
           <h2 className="text-2xl font-semibold mb-4 mt-8">Results ({results.length})</h2>
           <RecipeList
             recipes={results}
@@ -77,22 +79,6 @@ export default function Recipes() {
                 Add
               </button>
             )}
-          />
-        </div>
-      )}
-      {/* Saved recipes section */}
-      {saved.length > 0 && (
-        <div className="space-y-2">
-          <h2 className="text-2xl font-semibold mb-4 mt-8">Saved Recipes</h2>
-          <RecipeList
-            recipes={saved}
-            renderAction={(r) =>
-              r.id ? (
-                <Link to={`/recipes/${r.id}`} className="button-search">
-                  Open
-                </Link>
-              ) : null
-            }
           />
         </div>
       )}
