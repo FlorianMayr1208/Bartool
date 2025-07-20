@@ -561,7 +561,11 @@ def suggest_recipes(
     macros: list[str] | None = None,
     macro_mode: str = "and",
 ) -> list[schemas.RecipeWithInventory]:
-    """Return a few random recipe suggestions prioritising available ones."""
+    """Return a few random recipe suggestions prioritising available ones.
+
+    ``macro_mode`` controls how ``macros`` are applied and accepts ``"and"``,
+    ``"or"`` and ``"not"``.
+    """
     recipes = list_recipes(db)
     macros = [m.lower() for m in (macros or [])]
     data: list[tuple[models.Recipe, int, int]] = []
@@ -574,6 +578,8 @@ def suggest_recipes(
             if macro_mode == "and" and not all(m in r_macros for m in macros):
                 continue
             if macro_mode == "or" and not any(m in r_macros for m in macros):
+                continue
+            if macro_mode == "not" and any(m in r_macros for m in macros):
                 continue
         available = len(r.ingredients) - missing
         data.append((r, available, missing))
@@ -615,8 +621,8 @@ def suggest_recipes_by_ingredients(
 ) -> list[schemas.RecipeWithInventory]:
     """Return recipes filtered by selected ingredients.
 
-    When ``mode`` is ``"and"`` all selected ingredients must be present.
-    In ``"or"`` mode at least one of them must match.  The order of
+    ``mode`` applies to ``ingredients`` and accepts ``"and"``, ``"or"`` and
+    ``"not"``. ``macro_mode`` behaves the same for ``macros``. The order of
     ``ingredient_ids`` influences the score: earlier ids carry more weight
     when ranking results.
     """
@@ -643,12 +649,16 @@ def suggest_recipes_by_ingredients(
                 continue
             if mode == "or" and not any(i in r_ids for i in ingredient_ids):
                 continue
+            if mode == "not" and any(i in r_ids for i in ingredient_ids):
+                continue
 
         r_macros = macros_service.macros_for_recipe(r)
         if macros:
             if macro_mode == "and" and not all(m in r_macros for m in macros):
                 continue
             if macro_mode == "or" and not any(m in r_macros for m in macros):
+                continue
+            if macro_mode == "not" and any(m in r_macros for m in macros):
                 continue
 
         score = sum(weights.get(i, 0) for i in r_ids)

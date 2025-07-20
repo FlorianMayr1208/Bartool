@@ -1011,3 +1011,121 @@ async def test_suggestions_macro_filter(monkeypatch, async_client):
     assert resp.status_code == 200
     names = [r["name"] for r in resp.json()]
     assert names == ["Sweet"]
+
+
+@pytest.mark.asyncio
+async def test_suggestions_mode_not(monkeypatch, async_client):
+    async def fake_fetch(name: str):
+        if name == "vodka only":
+            return {
+                "name": "Vodka Only",
+                "alcoholic": "Alcoholic",
+                "instructions": "Mix",
+                "thumb": None,
+                "tags": [],
+                "categories": [],
+                "ibas": [],
+                "ingredients": [{"name": "Vodka", "measure": "1 oz"}],
+            }
+        if name == "vodka gin":
+            return {
+                "name": "Vodka Gin",
+                "alcoholic": "Alcoholic",
+                "instructions": "Mix",
+                "thumb": None,
+                "tags": [],
+                "categories": [],
+                "ibas": [],
+                "ingredients": [
+                    {"name": "Vodka", "measure": "1 oz"},
+                    {"name": "Gin", "measure": "1 oz"},
+                ],
+            }
+        return {
+            "name": "Rum Drink",
+            "alcoholic": "Alcoholic",
+            "instructions": "Mix",
+            "thumb": None,
+            "tags": [],
+            "categories": [],
+            "ibas": [],
+            "ingredients": [{"name": "Rum", "measure": "1 oz"}],
+        }
+
+    monkeypatch.setattr(
+        "backend.app.services.cocktaildb.fetch_recipe_details", fake_fetch
+    )
+    monkeypatch.setattr("backend.app.api.recipes.fetch_recipe_details", fake_fetch)
+
+    await async_client.post("/recipes/", json={"name": "vodka only"})
+    await async_client.post("/recipes/", json={"name": "vodka gin"})
+    await async_client.post("/recipes/", json={"name": "rum drink"})
+
+    resp = await async_client.post("/ingredients/", json={"name": "Vodka"})
+    vodka_id = resp.json()["id"]
+
+    resp = await async_client.get(
+        "/suggestions/by-ingredients",
+        params=[("ingredients", vodka_id), ("mode", "not")],
+    )
+    assert resp.status_code == 200
+    names = [r["name"] for r in resp.json()]
+    assert "Vodka Only" not in names
+    assert "Vodka Gin" not in names
+    assert "Rum Drink" in names
+
+
+@pytest.mark.asyncio
+async def test_suggestions_macro_mode_not(monkeypatch, async_client):
+    async def fake_fetch(name: str):
+        if name == "sweet":
+            return {
+                "name": "Sweet",
+                "alcoholic": "Alcoholic",
+                "instructions": "Mix",
+                "thumb": None,
+                "tags": [],
+                "categories": [],
+                "ibas": [],
+                "ingredients": [{"name": "Simple Syrup", "measure": "1 oz"}],
+            }
+        if name == "bitter":
+            return {
+                "name": "Bitter",
+                "alcoholic": "Alcoholic",
+                "instructions": "Mix",
+                "thumb": None,
+                "tags": [],
+                "categories": [],
+                "ibas": [],
+                "ingredients": [{"name": "Campari", "measure": "1 oz"}],
+            }
+        return {
+            "name": "Neutral",
+            "alcoholic": "Alcoholic",
+            "instructions": "Mix",
+            "thumb": None,
+            "tags": [],
+            "categories": [],
+            "ibas": [],
+            "ingredients": [{"name": "Vodka", "measure": "1 oz"}],
+        }
+
+    monkeypatch.setattr(
+        "backend.app.services.cocktaildb.fetch_recipe_details", fake_fetch
+    )
+    monkeypatch.setattr("backend.app.api.recipes.fetch_recipe_details", fake_fetch)
+
+    await async_client.post("/recipes/", json={"name": "sweet"})
+    await async_client.post("/recipes/", json={"name": "bitter"})
+    await async_client.post("/recipes/", json={"name": "neutral"})
+
+    resp = await async_client.get(
+        "/suggestions/by-ingredients",
+        params=[("macros", "sweet"), ("macro_mode", "not")],
+    )
+    assert resp.status_code == 200
+    names = [r["name"] for r in resp.json()]
+    assert "Sweet" not in names
+    assert "Bitter" in names
+    assert "Neutral" in names

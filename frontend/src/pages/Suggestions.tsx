@@ -10,8 +10,8 @@ import RecipeList, { type RecipeItem } from '../components/RecipeList';
 export default function SuggestionsPage() {
   const [items, setItems] = useState<InventoryItem[]>([]);
   const [selected, setSelected] = useState<number[]>([]);
-  const [mode, setMode] = useState<'and' | 'or'>('and');
-  const [macroMode, setMacroMode] = useState<'and' | 'or'>('or');
+  const [mode, setMode] = useState<'and' | 'or' | 'not'>('and');
+  const [macroMode, setMacroMode] = useState<'and' | 'or' | 'not'>('or');
   const [maxMissing, setMaxMissing] = useState(3); // Default to 'egal'
   const [recipes, setRecipes] = useState<RecipeItem[]>([]);
   const [drag, setDrag] = useState<number | null>(null);
@@ -140,6 +140,13 @@ export default function SuggestionsPage() {
               >
                 OR
               </button>
+              <button
+                onClick={() => setMode('not')}
+                className={buttonClass(mode === 'not')}
+                title="None of the selected ingredients may be present"
+              >
+                NOT
+              </button>
             </div>
           </>
         )}
@@ -178,6 +185,13 @@ export default function SuggestionsPage() {
                 title="Any selected macro may be present"
               >
                 OR
+              </button>
+              <button
+                onClick={() => setMacroMode('not')}
+                className={buttonClass(macroMode === 'not')}
+                title="Selected macros must not be present"
+              >
+                NOT
               </button>
             </div>
           </section>
