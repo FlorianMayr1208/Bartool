@@ -246,7 +246,7 @@ export async function getSuggestions(options: {
   limit?: number;
   max_missing?: number;
   macros?: string[];
-  macro_mode?: 'and' | 'or';
+  macro_mode?: 'and' | 'or' | 'not';
 } = {}) {
   const params = new URLSearchParams();
   if (options.limit !== undefined) params.append('limit', String(options.limit));
@@ -263,9 +263,9 @@ export async function getSuggestions(options: {
 
 export async function getSuggestionsByIngredients(options: {
   ingredients: number[];
-  mode?: 'and' | 'or';
+  mode?: 'and' | 'or' | 'not';
   macros?: string[];
-  macro_mode?: 'and' | 'or';
+  macro_mode?: 'and' | 'or' | 'not';
   max_missing?: number;
   limit?: number;
 }) {

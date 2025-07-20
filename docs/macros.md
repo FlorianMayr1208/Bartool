@@ -22,4 +22,4 @@ The YAML file can be extended to refine the classification.
 
 ``GET /macros`` returns the list of available macro names. The suggestions
 endpoints accept ``macros`` and ``macro_mode`` query parameters to filter
-recipes by those flavour tags.
+recipes by those flavour tags. ``macro_mode`` can be ``and``, ``or`` or ``not``.
