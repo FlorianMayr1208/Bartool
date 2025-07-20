@@ -21,14 +21,6 @@ from .api import (
 
 app = FastAPI(title="Bar Management")
 
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["*"],
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
-
 
 @app.middleware("http")
 async def error_middleware(request: Request, call_next):
@@ -39,6 +31,14 @@ async def error_middleware(request: Request, call_next):
     except Exception:
         logging.exception("Unhandled error")
         return JSONResponse(status_code=500, content={"detail": "Internal Server Error"})
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 @app.get("/healthz")
 async def health_check():
