@@ -210,5 +210,5 @@ class ShoppingListItem(ShoppingListItemBase):
 
 
 class ShoppingListItemWithIngredient(ShoppingListItem):
-    ingredient: Ingredient
+    ingredient: Ingredient | None = None
     recipe: Recipe | None = None
