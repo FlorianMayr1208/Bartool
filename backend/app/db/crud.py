@@ -277,16 +277,41 @@ def update_inventory_item(
     return db_obj
 
 
-def list_inventory_items(db: Session, skip: int = 0, limit: int = 100):
+def list_inventory_items(
+    db: Session,
+    skip: int = 0,
+    limit: int = 100,
+    search: str | None = None,
+    sort: str = "name",
+    order: str = "asc",
+):
+    """Return inventory items optionally filtered and sorted."""
     from sqlalchemy.orm import selectinload
+    from sqlalchemy import asc, desc
 
-    return (
-        db.query(models.InventoryItem)
-        .options(selectinload(models.InventoryItem.ingredient))
-        .offset(skip)
-        .limit(limit)
-        .all()
+    q = db.query(models.InventoryItem).options(
+        selectinload(models.InventoryItem.ingredient)
     )
+
+    if search or sort == "name":
+        q = q.join(models.Ingredient)
+    if search:
+        q = q.filter(models.Ingredient.name.ilike(f"%{search}%"))
+
+    if sort == "quantity":
+        q = q.order_by(
+            asc(models.InventoryItem.quantity)
+            if order == "asc"
+            else desc(models.InventoryItem.quantity)
+        )
+    else:
+        q = q.order_by(
+            asc(models.Ingredient.name)
+            if order == "asc"
+            else desc(models.Ingredient.name)
+        )
+
+    return q.offset(skip).limit(limit).all()
 
 
 def aggregate_inventory_by_synonyms(db: Session) -> None:

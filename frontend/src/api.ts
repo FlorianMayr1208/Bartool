@@ -83,8 +83,33 @@ export async function healthCheck() {
   return res.json();
 }
 
-export async function listInventory() {
-  return fetchJson<InventoryItem[]>(`${API_BASE}/inventory/`);
+export interface InventoryListOptions {
+  search?: string;
+  sort?: string;
+  order?: string;
+  skip?: number;
+  limit?: number;
+}
+
+export async function listInventory(options: InventoryListOptions = {}) {
+  const params = new URLSearchParams();
+  if (options.search) params.append('search', options.search);
+  if (options.sort) params.append('sort', options.sort);
+  if (options.order) params.append('order', options.order);
+  if (options.skip !== undefined) params.append('skip', String(options.skip));
+  if (options.limit !== undefined) params.append('limit', String(options.limit));
+  const query = params.toString();
+  return fetchJson<InventoryItem[]>(
+    `${API_BASE}/inventory/${query ? `?${query}` : ''}`,
+  );
+}
+
+export async function searchInventory(search: string) {
+  return listInventory({ search });
+}
+
+export async function sortInventory(sort: string, order: string = 'asc') {
+  return listInventory({ sort, order });
 }
 
 export async function createIngredient(data: { name: string }) {
