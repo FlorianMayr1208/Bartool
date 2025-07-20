@@ -330,6 +330,34 @@ async def test_inventory_create_increment(async_client):
 
 
 @pytest.mark.asyncio
+async def test_inventory_search_and_sort(async_client):
+    resp = await async_client.post("/ingredients/", json={"name": "VodkaTest"})
+    vodka_id = resp.json()["id"]
+    resp = await async_client.post("/ingredients/", json={"name": "GinTest"})
+    gin_id = resp.json()["id"]
+
+    await async_client.post(
+        "/inventory/", json={"ingredient_id": vodka_id, "quantity": 2}
+    )
+    await async_client.post(
+        "/inventory/", json={"ingredient_id": gin_id, "quantity": 1}
+    )
+
+    resp = await async_client.get("/inventory/", params={"search": "VodkaTest"})
+    assert resp.status_code == 200
+    data = resp.json()
+    assert len(data) == 1
+    assert data[0]["ingredient"]["name"] == "Vodkatest"
+
+    resp = await async_client.get(
+        "/inventory/", params={"sort": "quantity", "order": "desc"}
+    )
+    assert resp.status_code == 200
+    data = resp.json()
+    assert data[0]["quantity"] >= data[-1]["quantity"]
+
+
+@pytest.mark.asyncio
 async def test_recipe_import_adds_inventory(monkeypatch, async_client):
     async def fake_fetch(name: str):
         return {

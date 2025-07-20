@@ -32,6 +32,9 @@ export default function Inventory() {
   const [synonyms, setSynonyms] = useState<Synonym[]>([])
   const [suggested, setSuggested] = useState<Ingredient | null>(null)
   const [showDebug, setShowDebug] = useState(false)
+  const [search, setSearch] = useState('')
+  const [sort, setSort] = useState<'name' | 'quantity'>('name')
+  const [order, setOrder] = useState<'asc' | 'desc'>('asc')
 
   const synonymsMap = Object.fromEntries(
     synonyms.map((s) => [s.alias.toLowerCase(), s.canonical]),
@@ -63,7 +66,7 @@ export default function Inventory() {
     setDebugLog((d) => [...d, formatDebug(dbg)])
 
   const refresh = () => {
-    listInventory().then(({ data, debug }) => {
+    listInventory({ search, sort, order }).then(({ data, debug }) => {
       if (debug) addDebug(debug)
       if (data) setItems(data)
     })
@@ -71,6 +74,9 @@ export default function Inventory() {
 
   useEffect(() => {
     refresh()
+  }, [search, sort, order])
+
+  useEffect(() => {
     listIngredients().then(({ data, debug }) => {
       if (debug) addDebug(debug)
       if (data) setIngredients(data)
@@ -231,6 +237,30 @@ export default function Inventory() {
       </div>
       <div className="card p-0">
         <h2 className="text-xl font-semibold mb-4">Ingredient List</h2>
+        <div className="flex flex-col sm:flex-row gap-2 px-2 sm:px-4 mb-2">
+          <input
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            placeholder="Search"
+            className="border border-[var(--border)] p-2 flex-1"
+          />
+          <select
+            value={sort}
+            onChange={(e) => setSort(e.target.value as 'name' | 'quantity')}
+            className="border border-[var(--border)] p-2"
+          >
+            <option value="name">Name</option>
+            <option value="quantity">Quantity</option>
+          </select>
+          <select
+            value={order}
+            onChange={(e) => setOrder(e.target.value as 'asc' | 'desc')}
+            className="border border-[var(--border)] p-2"
+          >
+            <option value="asc">Asc</option>
+            <option value="desc">Desc</option>
+          </select>
+        </div>
         <div className="flex items-center px-2 sm:px-4 py-2 font-semibold text-xs sm:text-base">
           <span className="flex-1">Name</span>
           <span className="w-16 sm:w-20 text-center">Qty</span>

@@ -7,8 +7,17 @@ router = APIRouter()
 
 
 @router.get("/", response_model=list[schemas.InventoryItemWithIngredient])
-def list_items(skip: int = 0, limit: int = 100, db: Session = Depends(session.get_db)):
-    return crud.list_inventory_items(db, skip=skip, limit=limit)
+def list_items(
+    skip: int = 0,
+    limit: int = 100,
+    search: str | None = None,
+    sort: str = "name",
+    order: str = "asc",
+    db: Session = Depends(session.get_db),
+):
+    return crud.list_inventory_items(
+        db, skip=skip, limit=limit, search=search, sort=sort, order=order
+    )
 
 
 @router.post("/aggregate-synonyms", status_code=200)
