@@ -45,12 +45,14 @@ export default function FindRecipes() {
   };
 
   useEffect(() => {
-    listTags().then((t: Array<string | { name: string }>) =>
-      setTags(t.map((x) => (typeof x === "string" ? x : x.name)))
-    );
-    listCategories().then((c: Array<string | { name: string }>) =>
-      setCategories(c.map((x) => (typeof x === "string" ? x : x.name)))
-    );
+    listTags().then((t: unknown) => {
+      const tags = t as Array<string | { name: string }>;
+      setTags(tags.map((x) => (typeof x === "string" ? x : x.name)));
+    });
+    listCategories().then((c: unknown) => {
+      const categories = c as Array<string | { name: string }>;
+      setCategories(categories.map((x) => (typeof x === "string" ? x : x.name)));
+    });
   }, []);
 
   useEffect(() => {

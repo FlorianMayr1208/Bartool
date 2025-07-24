@@ -5,7 +5,9 @@ import {
   getSuggestionsByIngredients,
   listMacros,
 } from '../api';
-import RecipeList, { type RecipeItem } from '../components/RecipeList';
+import { type RecipeItem } from '../components/RecipeList';
+import EnhancedSuggestions from '../components/EnhancedSuggestions';
+import { useDebounce } from '../hooks/useDebounce';
 
 export default function SuggestionsPage() {
   const [items, setItems] = useState<InventoryItem[]>([]);
@@ -19,6 +21,11 @@ export default function SuggestionsPage() {
   const [selectedMacros, setSelectedMacros] = useState<string[]>([]);
   const [showIngredients, setShowIngredients] = useState<boolean>(false);
 
+  // Debounce values to reduce API calls
+  const debouncedSelected = useDebounce(selected, 300);
+  const debouncedMaxMissing = useDebounce(maxMissing, 300);
+  const debouncedSelectedMacros = useDebounce(selectedMacros, 300);
+
   useEffect(() => {
     listInventory().then(({ data }) => {
       if (Array.isArray(data)) {
@@ -27,16 +34,16 @@ export default function SuggestionsPage() {
         setItems([]);
       }
     });
-    listMacros().then(setMacros).catch(() => setMacros([]));
+    listMacros().then((data: unknown) => setMacros(data as string[])).catch(() => setMacros([]));
   }, []);
 
   useEffect(() => {
     getSuggestionsByIngredients({
-      ingredients: selected,
+      ingredients: debouncedSelected,
       mode,
-      macros: selectedMacros,
+      macros: debouncedSelectedMacros,
       macro_mode: macroMode,
-      max_missing: maxMissing === 3 ? undefined : maxMissing,
+      max_missing: debouncedMaxMissing === 3 ? undefined : debouncedMaxMissing,
     })
       .then((results: RecipeItem[]) => {
         // Remove duplicates by id (or by name if id is missing)
@@ -50,7 +57,7 @@ export default function SuggestionsPage() {
         setRecipes(unique);
       })
       .catch(() => setRecipes([]));
-  }, [selected, mode, maxMissing, selectedMacros, macroMode]);
+  }, [debouncedSelected, mode, debouncedMaxMissing, debouncedSelectedMacros, macroMode]);
 
   const toggle = (id: number) => {
     setSelected((s) =>
@@ -226,7 +233,7 @@ export default function SuggestionsPage() {
 
       {/* Recipe Results */}
       {recipes.length > 0 && (
-          <RecipeList
+          <EnhancedSuggestions
             recipes={recipes}
             showCounts
             renderAction={(r) =>
