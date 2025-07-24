@@ -8,23 +8,22 @@ import {
 import { type RecipeItem } from '../components/RecipeList';
 import EnhancedSuggestions from '../components/EnhancedSuggestions';
 import { useDebounce } from '../hooks/useDebounce';
+import { useFilter, useFilterActions } from '../contexts/FilterContext';
 
 export default function SuggestionsPage() {
   const [items, setItems] = useState<InventoryItem[]>([]);
-  const [selected, setSelected] = useState<number[]>([]);
-  const [mode, setMode] = useState<'and' | 'or' | 'not'>('and');
-  const [macroMode, setMacroMode] = useState<'and' | 'or' | 'not'>('or');
-  const [maxMissing, setMaxMissing] = useState(3); // Default to 'egal'
   const [recipes, setRecipes] = useState<RecipeItem[]>([]);
   const [drag, setDrag] = useState<number | null>(null);
   const [macros, setMacros] = useState<string[]>([]);
-  const [selectedMacros, setSelectedMacros] = useState<string[]>([]);
-  const [showIngredients, setShowIngredients] = useState<boolean>(false);
+
+  // Use FilterContext for all filter state
+  const { state } = useFilter();
+  const filterActions = useFilterActions();
 
   // Debounce values to reduce API calls
-  const debouncedSelected = useDebounce(selected, 300);
-  const debouncedMaxMissing = useDebounce(maxMissing, 300);
-  const debouncedSelectedMacros = useDebounce(selectedMacros, 300);
+  const debouncedSelected = useDebounce(state.selectedIngredients, 300);
+  const debouncedMaxMissing = useDebounce(state.maxMissing, 300);
+  const debouncedSelectedMacros = useDebounce(state.selectedMacros, 300);
 
   useEffect(() => {
     listInventory().then(({ data }) => {
@@ -40,9 +39,9 @@ export default function SuggestionsPage() {
   useEffect(() => {
     getSuggestionsByIngredients({
       ingredients: debouncedSelected,
-      mode,
+      mode: state.mode,
       macros: debouncedSelectedMacros,
-      macro_mode: macroMode,
+      macro_mode: state.macroMode,
       max_missing: debouncedMaxMissing === 3 ? undefined : debouncedMaxMissing,
     })
       .then((results: RecipeItem[]) => {
@@ -57,29 +56,17 @@ export default function SuggestionsPage() {
         setRecipes(unique);
       })
       .catch(() => setRecipes([]));
-  }, [debouncedSelected, mode, debouncedMaxMissing, debouncedSelectedMacros, macroMode]);
-
-  const toggle = (id: number) => {
-    setSelected((s) =>
-      s.includes(id) ? s.filter((x) => x !== id) : [...s, id],
-    );
-  };
-
-  const toggleMacro = (name: string) => {
-    setSelectedMacros((s) =>
-      s.includes(name) ? s.filter((x) => x !== name) : [...s, name],
-    );
-  };
+  }, [debouncedSelected, state.mode, debouncedMaxMissing, debouncedSelectedMacros, state.macroMode]);
 
   const handleDrop = (target: number) => {
     if (drag === null || drag === target) return;
-    const from = selected.indexOf(drag);
-    const to = selected.indexOf(target);
+    const from = state.selectedIngredients.indexOf(drag);
+    const to = state.selectedIngredients.indexOf(target);
     if (from === -1 || to === -1) return;
-    const arr = [...selected];
+    const arr = [...state.selectedIngredients];
     arr.splice(from, 1);
     arr.splice(to, 0, drag);
-    setSelected(arr);
+    filterActions.reorderIngredients(arr);
     setDrag(null);
   };
 
@@ -107,25 +94,25 @@ export default function SuggestionsPage() {
         <div className="flex items-center justify-between mb-2">
           <h2 className="font-semibold text-lg mb-2">Ingredients</h2>
           <button
-            onClick={() => setShowIngredients((v) => !v)}
-            className={buttonClass(showIngredients) + ' ml-2'}
-            title={showIngredients ? 'Hide ingredients' : 'Show ingredients'}
+            onClick={filterActions.toggleIngredientsVisibility}
+            className={buttonClass(state.showIngredients) + ' ml-2'}
+            title={state.showIngredients ? 'Hide ingredients' : 'Show ingredients'}
           >
-            {showIngredients ? 'Hide' : 'Show'}
+            {state.showIngredients ? 'Hide' : 'Show'}
           </button>
         </div>
-        {showIngredients && (
+        {state.showIngredients && (
           <>
             <div className="flex flex-wrap gap-2">
               {items.map((it) => (
                 <div
                   key={it.id}
-                  draggable={selected.includes(it.ingredient_id)}
+                  draggable={state.selectedIngredients.includes(it.ingredient_id)}
                   onDragStart={() => setDrag(it.ingredient_id)}
                   onDragOver={(e) => e.preventDefault()}
                   onDrop={() => handleDrop(it.ingredient_id)}
-                  onClick={() => toggle(it.ingredient_id)}
-                  className={chipClass(selected.includes(it.ingredient_id))}
+                  onClick={() => filterActions.toggleIngredient(it.ingredient_id)}
+                  className={chipClass(state.selectedIngredients.includes(it.ingredient_id))}
                   title="Select ingredient (drag to reorder)"
                 >
                   {it.ingredient?.name}
@@ -134,22 +121,22 @@ export default function SuggestionsPage() {
             </div>
             <div className="flex gap-1 mt-6">
               <button
-                onClick={() => setMode('and')}
-                className={buttonClass(mode === 'and')}
+                onClick={() => filterActions.setMode('and')}
+                className={buttonClass(state.mode === 'and')}
                 title="All selected ingredients must be present"
               >
                 AND
               </button>
               <button
-                onClick={() => setMode('or')}
-                className={buttonClass(mode === 'or')}
+                onClick={() => filterActions.setMode('or')}
+                className={buttonClass(state.mode === 'or')}
                 title="Any selected ingredient may be present"
               >
                 OR
               </button>
               <button
-                onClick={() => setMode('not')}
-                className={buttonClass(mode === 'not')}
+                onClick={() => filterActions.setMode('not')}
+                className={buttonClass(state.mode === 'not')}
                 title="None of the selected ingredients may be present"
               >
                 NOT
@@ -170,8 +157,8 @@ export default function SuggestionsPage() {
               {macros.map((m) => (
                 <div
                   key={m}
-                  onClick={() => toggleMacro(m)}
-                  className={chipClass(selectedMacros.includes(m))}
+                  onClick={() => filterActions.toggleMacro(m)}
+                  className={chipClass(state.selectedMacros.includes(m))}
                   title="Select taste filter"
                 >
                   {m}
@@ -180,22 +167,22 @@ export default function SuggestionsPage() {
             </div>
             <div className="flex gap-1 mt-6">
               <button
-                onClick={() => setMacroMode('and')}
-                className={buttonClass(macroMode === 'and')}
+                onClick={() => filterActions.setMacroMode('and')}
+                className={buttonClass(state.macroMode === 'and')}
                 title="All selected macros must be present"
               >
                 AND
               </button>
               <button
-                onClick={() => setMacroMode('or')}
-                className={buttonClass(macroMode === 'or')}
+                onClick={() => filterActions.setMacroMode('or')}
+                className={buttonClass(state.macroMode === 'or')}
                 title="Any selected macro may be present"
               >
                 OR
               </button>
               <button
-                onClick={() => setMacroMode('not')}
-                className={buttonClass(macroMode === 'not')}
+                onClick={() => filterActions.setMacroMode('not')}
+                className={buttonClass(state.macroMode === 'not')}
                 title="Selected macros must not be present"
               >
                 NOT
@@ -216,14 +203,14 @@ export default function SuggestionsPage() {
                   type="range"
                   min={0}
                   max={3}
-                  value={maxMissing}
-                  onChange={(e) => setMaxMissing(parseInt(e.target.value))}
+                  value={state.maxMissing}
+                  onChange={(e) => filterActions.setMaxMissing(parseInt(e.target.value))}
                   className="accent-[var(--accent)] h-8 w-full max-w-xs sm:max-w-md md:max-w-lg touch-manipulation"
                   title="Maximum number of missing ingredients allowed"
                   style={{ maxWidth: '100%' }}
                 />
                 <span className="text-base mt-2 font-semibold">
-                  {maxMissing === 3 ? 'max' : maxMissing}
+                  {state.maxMissing === 3 ? 'max' : state.maxMissing}
                 </span>
               </div>
             </div>
