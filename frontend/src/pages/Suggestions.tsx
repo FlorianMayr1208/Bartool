@@ -7,18 +7,26 @@ import {
 } from '../api';
 import { type RecipeItem } from '../components/RecipeList';
 import EnhancedSuggestions from '../components/EnhancedSuggestions';
+import TouchSlider from '../components/TouchSlider';
+import TouchChip from '../components/TouchChip';
 import { useDebounce } from '../hooks/useDebounce';
 import { useFilter, useFilterActions } from '../contexts/FilterContext';
+import { useMobileDragDrop } from '../hooks/useMobileDragDrop';
 
 export default function SuggestionsPage() {
   const [items, setItems] = useState<InventoryItem[]>([]);
   const [recipes, setRecipes] = useState<RecipeItem[]>([]);
-  const [drag, setDrag] = useState<number | null>(null);
   const [macros, setMacros] = useState<string[]>([]);
 
   // Use FilterContext for all filter state
   const { state } = useFilter();
   const filterActions = useFilterActions();
+
+  // Enhanced mobile drag and drop
+  const mobileDragDrop = useMobileDragDrop({
+    items: state.selectedIngredients,
+    onReorder: filterActions.reorderIngredients,
+  });
 
   // Debounce values to reduce API calls
   const debouncedSelected = useDebounce(state.selectedIngredients, 300);
@@ -58,24 +66,9 @@ export default function SuggestionsPage() {
       .catch(() => setRecipes([]));
   }, [debouncedSelected, state.mode, debouncedMaxMissing, debouncedSelectedMacros, state.macroMode]);
 
-  const handleDrop = (target: number) => {
-    if (drag === null || drag === target) return;
-    const from = state.selectedIngredients.indexOf(drag);
-    const to = state.selectedIngredients.indexOf(target);
-    if (from === -1 || to === -1) return;
-    const arr = [...state.selectedIngredients];
-    arr.splice(from, 1);
-    arr.splice(to, 0, drag);
-    filterActions.reorderIngredients(arr);
-    setDrag(null);
-  };
+  // Old drag handler removed - now using enhanced mobile drag and drop
 
-  const chipClass = (active: boolean) =>
-    `px-3 py-2 rounded-full border text-sm cursor-pointer select-none transition ${
-      active
-        ? 'bg-[var(--accent)] text-black'
-        : 'border-[var(--border)] text-[var(--text-primary)]'
-    } chip-hover`;
+  // Remove old chipClass as we're using TouchChip component now
 
   // Unified button style
   const buttonClass = (active: boolean) =>
@@ -86,16 +79,35 @@ export default function SuggestionsPage() {
     }`;
 
   return (
-    <div className="space-y-6">
-      <h1 className="page-title mb-8">Suggestions</h1>
+    <div className="space-y-4 sm:space-y-6">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <h1 className="page-title text-2xl sm:text-3xl">Suggestions</h1>
+        
+        {/* Mobile-friendly filter summary */}
+        <div className="flex flex-wrap gap-2 text-sm text-[var(--text-muted)]">
+          {state.selectedIngredients.length > 0 && (
+            <span className="bg-[var(--bg-elevated)] px-2 py-1 rounded">
+              {state.selectedIngredients.length} ingredients
+            </span>
+          )}
+          {state.selectedMacros.length > 0 && (
+            <span className="bg-[var(--bg-elevated)] px-2 py-1 rounded">
+              {state.selectedMacros.length} tastes
+            </span>
+          )}
+          <span className="bg-[var(--bg-elevated)] px-2 py-1 rounded">
+            ≤{state.maxMissing === 3 ? '∞' : state.maxMissing} missing
+          </span>
+        </div>
+      </div>
 
       {/* Ingredients Section (Hideable) */}
       <section className="card p-0">
-        <div className="flex items-center justify-between mb-2">
-          <h2 className="font-semibold text-lg mb-2">Ingredients</h2>
+        <div className="flex items-center justify-between p-4">
+          <h2 className="font-semibold text-lg">Ingredients</h2>
           <button
             onClick={filterActions.toggleIngredientsVisibility}
-            className={buttonClass(state.showIngredients) + ' ml-2'}
+            className={buttonClass(state.showIngredients)}
             title={state.showIngredients ? 'Hide ingredients' : 'Show ingredients'}
           >
             {state.showIngredients ? 'Hide' : 'Show'}
@@ -103,117 +115,124 @@ export default function SuggestionsPage() {
         </div>
         {state.showIngredients && (
           <>
-            <div className="flex flex-wrap gap-2">
-              {items.map((it) => (
-                <div
-                  key={it.id}
-                  draggable={state.selectedIngredients.includes(it.ingredient_id)}
-                  onDragStart={() => setDrag(it.ingredient_id)}
-                  onDragOver={(e) => e.preventDefault()}
-                  onDrop={() => handleDrop(it.ingredient_id)}
-                  onClick={() => filterActions.toggleIngredient(it.ingredient_id)}
-                  className={chipClass(state.selectedIngredients.includes(it.ingredient_id))}
-                  title="Select ingredient (drag to reorder)"
-                >
-                  {it.ingredient?.name}
-                </div>
-              ))}
+            <div className="flex flex-wrap gap-2 p-4">
+              {items.map((it) => {
+                const isSelected = state.selectedIngredients.includes(it.ingredient_id);
+                const itemState = mobileDragDrop.getItemState(it.ingredient_id);
+                const dragProps = mobileDragDrop.getDragProps(it.ingredient_id);
+                
+                return (
+                  <TouchChip
+                    key={it.id}
+                    active={isSelected}
+                    onClick={() => filterActions.toggleIngredient(it.ingredient_id)}
+                    draggable={isSelected}
+                    isDragging={itemState.isDragging}
+                    isDraggedOver={itemState.isDraggedOver}
+                    dragProps={isSelected ? dragProps : {}}
+                    title={`${it.ingredient?.name} - Tap to ${isSelected ? 'remove' : 'select'}${isSelected ? ' (drag to reorder)' : ''}`}
+                  >
+                    {it.ingredient?.name}
+                  </TouchChip>
+                );
+              })}
             </div>
-            <div className="flex gap-1 mt-6">
-              <button
-                onClick={() => filterActions.setMode('and')}
-                className={buttonClass(state.mode === 'and')}
-                title="All selected ingredients must be present"
-              >
-                AND
-              </button>
-              <button
-                onClick={() => filterActions.setMode('or')}
-                className={buttonClass(state.mode === 'or')}
-                title="Any selected ingredient may be present"
-              >
-                OR
-              </button>
-              <button
-                onClick={() => filterActions.setMode('not')}
-                className={buttonClass(state.mode === 'not')}
-                title="None of the selected ingredients may be present"
-              >
-                NOT
-              </button>
+            <div className="border-t border-[var(--border)] p-4">
+              <p className="text-sm text-[var(--text-muted)] mb-3">Filter Logic:</p>
+              <div className="grid grid-cols-3 gap-2 sm:flex sm:gap-1">
+                <button
+                  onClick={() => filterActions.setMode('and')}
+                  className={`${buttonClass(state.mode === 'and')} min-h-[44px] flex-1`}
+                  title="All selected ingredients must be present"
+                >
+                  ALL
+                </button>
+                <button
+                  onClick={() => filterActions.setMode('or')}
+                  className={`${buttonClass(state.mode === 'or')} min-h-[44px] flex-1`}
+                  title="Any selected ingredient may be present"
+                >
+                  ANY
+                </button>
+                <button
+                  onClick={() => filterActions.setMode('not')}
+                  className={`${buttonClass(state.mode === 'not')} min-h-[44px] flex-1`}
+                  title="None of the selected ingredients may be present"
+                >
+                  NONE
+                </button>
+              </div>
             </div>
           </>
         )}
       </section>
 
 
-      {/* Macros and Filter Options Side by Side */}
-      <div className="flex flex-col md:flex-row gap-4">
+      {/* Macros and Filter Options Responsive Layout */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
         {/* Macros Section */}
         {macros.length > 0 && (
-          <section className="card p-0 flex-1 min-w-[250px]">
-            <h2 className="font-semibold text-lg mb-2">Taste</h2>
-            <div className="flex flex-wrap gap-2">
-              {macros.map((m) => (
-                <div
-                  key={m}
-                  onClick={() => filterActions.toggleMacro(m)}
-                  className={chipClass(state.selectedMacros.includes(m))}
-                  title="Select taste filter"
-                >
-                  {m}
+          <section className="card p-0">
+            <div className="p-4">
+              <h2 className="font-semibold text-lg mb-2">Taste Filters</h2>
+              <div className="flex flex-wrap gap-2 mb-4">
+                {macros.map((m) => (
+                  <TouchChip
+                    key={m}
+                    active={state.selectedMacros.includes(m)}
+                    onClick={() => filterActions.toggleMacro(m)}
+                    title={`${m} - Tap to ${state.selectedMacros.includes(m) ? 'remove' : 'select'} taste filter`}
+                  >
+                    {m}
+                  </TouchChip>
+                ))}
+              </div>
+              
+              <div className="border-t border-[var(--border)] pt-4">
+                <p className="text-sm text-[var(--text-muted)] mb-3">Taste Logic:</p>
+                <div className="grid grid-cols-3 gap-2 sm:flex sm:gap-1">
+                  <button
+                    onClick={() => filterActions.setMacroMode('and')}
+                    className={`${buttonClass(state.macroMode === 'and')} min-h-[44px] flex-1`}
+                    title="All selected tastes must be present"
+                  >
+                    ALL
+                  </button>
+                  <button
+                    onClick={() => filterActions.setMacroMode('or')}
+                    className={`${buttonClass(state.macroMode === 'or')} min-h-[44px] flex-1`}
+                    title="Any selected taste may be present"
+                  >
+                    ANY
+                  </button>
+                  <button
+                    onClick={() => filterActions.setMacroMode('not')}
+                    className={`${buttonClass(state.macroMode === 'not')} min-h-[44px] flex-1`}
+                    title="Selected tastes must not be present"
+                  >
+                    NONE
+                  </button>
                 </div>
-              ))}
-            </div>
-            <div className="flex gap-1 mt-6">
-              <button
-                onClick={() => filterActions.setMacroMode('and')}
-                className={buttonClass(state.macroMode === 'and')}
-                title="All selected macros must be present"
-              >
-                AND
-              </button>
-              <button
-                onClick={() => filterActions.setMacroMode('or')}
-                className={buttonClass(state.macroMode === 'or')}
-                title="Any selected macro may be present"
-              >
-                OR
-              </button>
-              <button
-                onClick={() => filterActions.setMacroMode('not')}
-                className={buttonClass(state.macroMode === 'not')}
-                title="Selected macros must not be present"
-              >
-                NOT
-              </button>
+              </div>
             </div>
           </section>
         )}
 
         {/* Missing Ingredients Section */}
-        <section className="card p-0 flex-1 min-w-[250px] flex flex-col gap-4">
-          <h2 className="font-semibold text-lg mb-1">Missing Ingredients</h2>
-          <span className="text-xs font-medium text-gray-500">Maximum number of missing ingredients</span>
-          <div className="flex flex-wrap gap-4 items-center">
-            <div className="flex flex-col items-start gap-1">
-
-              <div className="flex flex-col items-center w-full mt-2">
-                <input
-                  type="range"
-                  min={0}
-                  max={3}
-                  value={state.maxMissing}
-                  onChange={(e) => filterActions.setMaxMissing(parseInt(e.target.value))}
-                  className="accent-[var(--accent)] h-8 w-full max-w-xs sm:max-w-md md:max-w-lg touch-manipulation"
-                  title="Maximum number of missing ingredients allowed"
-                  style={{ maxWidth: '100%' }}
-                />
-                <span className="text-base mt-2 font-semibold">
-                  {state.maxMissing === 3 ? 'max' : state.maxMissing}
-                </span>
-              </div>
-            </div>
+        <section className="card p-0">
+          <div className="p-4">
+            <h2 className="font-semibold text-lg mb-2">Missing Ingredients</h2>
+            <p className="text-sm text-[var(--text-muted)] mb-4">
+              Maximum number of missing ingredients allowed
+            </p>
+            <TouchSlider
+              min={0}
+              max={3}
+              value={state.maxMissing}
+              onChange={filterActions.setMaxMissing}
+              formatValue={(v) => v === 3 ? 'unlimited' : String(v)}
+              className="w-full"
+            />
           </div>
         </section>
       </div>
