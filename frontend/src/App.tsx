@@ -10,9 +10,12 @@ import Synonyms from "./pages/Synonyms";
 import SuggestionsPage from "./pages/Suggestions";
 import Navbar from "./components/Navbar";
 import { FilterProvider } from "./contexts/FilterContext";
+import { useKeepAwake } from "./hooks/useKeepAwake";
 import "./App.css";
 
 export default function App() {
+
+  useKeepAwake();
 
   return (
     <FilterProvider>
