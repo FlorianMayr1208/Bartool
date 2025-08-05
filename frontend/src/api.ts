@@ -1,3 +1,5 @@
+import { apiCache, performanceTracker } from './utils/cache';
+
 const API_BASE = import.meta.env.VITE_API_BASE || "";
 
 export interface FetchDebug {
@@ -16,6 +18,31 @@ async function fetchJson<T>(
     data: res.ok ? (body as T) : null,
     debug: { url, status: res.status, body },
   };
+}
+
+// Cached fetch wrapper for GET requests
+async function cachedFetch<T>(url: string, cacheKey: string): Promise<T> {
+  // Check cache first
+  const cached = apiCache.get(cacheKey);
+  if (cached) {
+    console.log(`📦 Cache hit for: ${cacheKey}`);
+    return cached as T;
+  }
+
+  // Start performance tracking
+  performanceTracker.start(`API call: ${cacheKey}`);
+  
+  const res = await fetch(url);
+  const data = await res.json();
+  
+  // End performance tracking
+  performanceTracker.end(`API call: ${cacheKey}`);
+  
+  // Cache the result
+  apiCache.set(cacheKey, data);
+  console.log(`💾 Cached: ${cacheKey}`);
+  
+  return data;
 }
 
 export interface Ingredient {
@@ -190,13 +217,11 @@ export async function listRecipes() {
 }
 
 export async function listTags() {
-  const res = await fetch(`${API_BASE}/tags`);
-  return res.json();
+  return cachedFetch(`${API_BASE}/tags`, 'tags');
 }
 
 export async function listCategories() {
-  const res = await fetch(`${API_BASE}/categories`);
-  return res.json();
+  return cachedFetch(`${API_BASE}/categories`, 'categories');
 }
 
 export async function searchRecipes(q: string): Promise<RecipeSearchResult[]> {
@@ -238,8 +263,7 @@ export async function findRecipes(options: FindRecipesOptions = {}) {
 }
 
 export async function listMacros() {
-  const res = await fetch(`${API_BASE}/macros`);
-  return res.json();
+  return cachedFetch(`${API_BASE}/macros`, 'macros');
 }
 
 export async function getSuggestions(options: {
