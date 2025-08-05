@@ -1,4 +1,5 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { useEffect } from "react";
 import Dashboard from "./pages/Dashboard";
 import Inventory from "./pages/Inventory";
 import Recipes from "./pages/Recipes";
@@ -12,6 +13,20 @@ import Navbar from "./components/Navbar";
 import "./App.css";
 
 export default function App() {
+  useEffect(() => {
+    const preventScreenTimeout = () => {
+      const body = document.body;
+      const currentTransform = body.style.transform;
+      
+      body.style.transform = currentTransform === 'translateX(1px)' 
+        ? 'translateX(0px)' 
+        : 'translateX(1px)';
+    };
+
+    const interval = setInterval(preventScreenTimeout, 30000);
+    
+    return () => clearInterval(interval);
+  }, []);
 
   return (
     <Router>
