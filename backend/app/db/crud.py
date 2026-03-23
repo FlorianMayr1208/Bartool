@@ -1,7 +1,5 @@
 from sqlalchemy.orm import Session
 from sqlalchemy import func
-import json
-from datetime import datetime
 
 from ..services import synonyms
 
@@ -64,6 +62,45 @@ def create_recipe(db: Session, recipe: schemas.RecipeCreate):
     db.commit()
     db.refresh(db_obj)
     return db_obj
+
+
+def update_recipe(db: Session, recipe_id: int, recipe_update: schemas.RecipeUpdate):
+    db_obj = get_recipe(db, recipe_id)
+    if not db_obj:
+        return None
+
+    data = recipe_update.model_dump(exclude_unset=True)
+    tags = data.pop("tags", None)
+    categories = data.pop("categories", None)
+    ibas = data.pop("ibas", None)
+    ingredients = data.pop("ingredients", None)
+
+    for field, value in data.items():
+        setattr(db_obj, field, value)
+
+    if tags is not None:
+        db_obj.tags = [models.Tag(name=t) for t in tags]
+    if categories is not None:
+        db_obj.categories = [models.Category(name=c) for c in categories]
+    if ibas is not None:
+        db_obj.ibas = [models.Iba(name=i) for i in ibas]
+    if ingredients is not None:
+        db_obj.ingredients = [
+            models.RecipeIngredient(name=i["name"], measure=i.get("measure")) for i in ingredients
+        ]
+
+    db.commit()
+    db.refresh(db_obj)
+    return db_obj
+
+
+def delete_recipe(db: Session, recipe_id: int) -> bool:
+    db_obj = get_recipe(db, recipe_id)
+    if not db_obj:
+        return False
+    db.delete(db_obj)
+    db.commit()
+    return True
 
 
 def list_recipes(db: Session, skip: int = 0, limit: int = 100):
@@ -138,22 +175,3 @@ def delete_inventory_item(db: Session, item_id: int) -> bool:
     db.delete(item)
     db.commit()
     return True
-
-
-# Barcode cache CRUD
-def get_barcode_cache(db: Session, ean: str):
-    return db.query(models.BarcodeCache).filter(models.BarcodeCache.ean == ean).first()
-
-
-def upsert_barcode_cache(db: Session, ean: str, data: dict) -> models.BarcodeCache:
-    json_data = json.dumps(data)
-    entry = get_barcode_cache(db, ean)
-    if entry:
-        entry.data = json_data
-        entry.fetched_at = datetime.utcnow()
-    else:
-        entry = models.BarcodeCache(ean=ean, data=json_data, fetched_at=datetime.utcnow())
-        db.add(entry)
-    db.commit()
-    db.refresh(entry)
-    return entry

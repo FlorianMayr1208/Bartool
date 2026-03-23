@@ -1,12 +1,10 @@
 import { useEffect, useState } from 'react'
-import BarcodeScanner from '../components/BarcodeScanner'
 import {
   listInventory,
   createIngredient,
   createInventory,
   updateInventory,
-  deleteInventory,
-  lookupBarcode
+  deleteInventory
 } from '../api'
 
 interface Ingredient {
@@ -24,7 +22,6 @@ interface InventoryItem {
 
 export default function Inventory() {
   const [items, setItems] = useState<InventoryItem[]>([])
-  const [scanning, setScanning] = useState(false)
   const [name, setName] = useState('')
   const [quantity, setQuantity] = useState(1)
 
@@ -35,14 +32,6 @@ export default function Inventory() {
   useEffect(() => {
     refresh()
   }, [])
-
-  const onDetected = async (code: string) => {
-    setScanning(false)
-    const res = await lookupBarcode(code)
-    if (res?.name) {
-      setName(res.name)
-    }
-  }
 
   const submit = async () => {
     if (!name) return
@@ -66,18 +55,6 @@ export default function Inventory() {
   return (
     <div className="space-y-4">
       <h1 className="text-2xl font-bold">Inventory</h1>
-      {scanning ? (
-        <div>
-          <BarcodeScanner onDetected={onDetected} />
-          <button onClick={() => setScanning(false)} className="mt-2 rounded bg-gray-200 px-2 py-1">
-            Cancel
-          </button>
-        </div>
-      ) : (
-        <button onClick={() => setScanning(true)} className="rounded bg-gray-200 px-2 py-1">
-          Scan Barcode
-        </button>
-      )}
       <div className="space-x-2">
         <input
           placeholder="Name"

@@ -17,17 +17,9 @@ paths:
             type: integer
     post:
       summary: Create ingredient
-  /recipes/search:
-    get:
-      summary: Search recipes from CocktailDB
-      parameters:
-        - in: query
-          name: q
-          schema:
-            type: string
   /recipes:
     get:
-      summary: List recipes
+      summary: List locally stored recipes
       parameters:
         - in: query
           name: skip
@@ -38,10 +30,26 @@ paths:
           schema:
             type: integer
     post:
-      summary: Add recipe from CocktailDB
+      summary: Create a local recipe
   /recipes/{recipe_id}:
     get:
-      summary: Get recipe
+      summary: Get one local recipe
+      parameters:
+        - in: path
+          name: recipe_id
+          required: true
+          schema:
+            type: integer
+    patch:
+      summary: Update one local recipe
+      parameters:
+        - in: path
+          name: recipe_id
+          required: true
+          schema:
+            type: integer
+    delete:
+      summary: Delete one local recipe
       parameters:
         - in: path
           name: recipe_id
@@ -55,8 +63,8 @@ paths:
         - in: path
           name: id
           required: true
-      schema:
-        type: integer
+          schema:
+            type: integer
   /synonyms:
     get:
       summary: List synonyms
@@ -65,11 +73,3 @@ paths:
   /synonyms/{alias}:
     delete:
       summary: Delete synonym
-    patch:
-      summary: Update inventory item
-      parameters:
-        - in: path
-          name: id
-          required: true
-          schema:
-            type: integer

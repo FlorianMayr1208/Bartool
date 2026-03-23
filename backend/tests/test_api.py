@@ -1,8 +1,6 @@
-import asyncio
 from typing import AsyncGenerator
 
 import pytest
-import pytest_asyncio
 from httpx import AsyncClient
 import httpx
 from sqlalchemy import create_engine
@@ -34,14 +32,14 @@ def override_get_db():
 app.dependency_overrides[db_session.get_db] = override_get_db
 
 
-@pytest_asyncio.fixture
+@pytest.fixture
 async def async_client() -> AsyncGenerator[AsyncClient, None]:
     transport = httpx.ASGITransport(app=app)
     async with AsyncClient(transport=transport, base_url="http://test") as c:
         yield c
 
 
-@pytest.mark.asyncio
+@pytest.mark.anyio
 async def test_create_and_list_ingredient(async_client):
     data = {"name": "Rum"}
     resp = await async_client.post("/ingredients/", json=data)
@@ -54,88 +52,58 @@ async def test_create_and_list_ingredient(async_client):
     assert len(resp.json()) == 1
 
 
-@pytest.mark.asyncio
-async def test_create_recipe(monkeypatch, async_client):
-    async def fake_fetch(name: str):
-        return {
-            "name": "Mojito",
-            "alcoholic": "Alcoholic",
-            "instructions": "Mix it",
-            "thumb": "http://example.com/mojito.jpg",
-            "tags": ["Classic"],
-            "categories": ["Cocktail"],
-            "ibas": ["New Era"],
-            "ingredients": [{"name": "Rum", "measure": "2 oz"}],
-        }
+@pytest.mark.anyio
+async def test_recipe_crud(async_client):
+    payload = {
+        "name": "Mojito",
+        "alcoholic": "Alcoholic",
+        "instructions": "Mix it",
+        "thumb": "http://example.com/mojito.jpg",
+        "tags": ["Classic"],
+        "categories": ["Cocktail"],
+        "ibas": ["New Era"],
+        "ingredients": [{"name": "Rum", "measure": "2 oz"}],
+    }
 
-    monkeypatch.setattr("backend.app.services.cocktaildb.fetch_recipe_details", fake_fetch)
-    resp = await async_client.post("/recipes/", json={"name": "mojito"})
+    resp = await async_client.post("/recipes/", json=payload)
     assert resp.status_code == 201
-    assert resp.json()["name"] == "Mojito"
+    created = resp.json()
+    assert created["name"] == "Mojito"
+    assert created["ingredients"][0]["name"] == "Rum"
 
-
-@pytest.mark.asyncio
-async def test_get_recipe(monkeypatch, async_client):
-    async def fake_fetch(name: str):
-        return {
-            "name": "Mojito",
-            "alcoholic": "Alcoholic",
-            "instructions": "Mix it",
-            "thumb": "http://example.com/mojito.jpg",
-            "tags": ["Classic"],
-            "categories": ["Cocktail"],
-            "ibas": ["New Era"],
-            "ingredients": [{"name": "Rum", "measure": "2 oz"}],
-        }
-
-    monkeypatch.setattr(
-        "backend.app.services.cocktaildb.fetch_recipe_details", fake_fetch
-    )
-    resp = await async_client.post("/recipes/", json={"name": "mojito"})
-    recipe_id = resp.json()["id"]
+    recipe_id = created["id"]
 
     resp = await async_client.get(f"/recipes/{recipe_id}")
     assert resp.status_code == 200
     assert resp.json()["name"] == "Mojito"
 
-
-@pytest.mark.asyncio
-async def test_recipe_search(monkeypatch, async_client):
-    async def fake_search(name: str):
-        return [
-            {
-                "name": "Margarita",
-                "alcoholic": "Alcoholic",
-                "instructions": "Mix",
-                "thumb": "http://example.com/margarita.jpg",
-            },
-            {
-                "name": "Blue Margarita",
-                "alcoholic": "Alcoholic",
-                "instructions": "Mix blue",
-                "thumb": "http://example.com/blue.jpg",
-            },
-        ]
-
-    monkeypatch.setattr(
-        "backend.app.services.cocktaildb.search_recipes_details", fake_search
+    resp = await async_client.patch(
+        f"/recipes/{recipe_id}",
+        json={
+            "name": "Updated Mojito",
+            "ingredients": [{"name": "Mint", "measure": "8 leaves"}],
+        },
     )
-    monkeypatch.setattr(
-        "backend.app.api.recipes.search_recipes_details", fake_search
-    )
-    resp = await async_client.get("/recipes/search", params={"q": "margarita"})
     assert resp.status_code == 200
-    assert resp.json() == await fake_search("")
+    updated = resp.json()
+    assert updated["name"] == "Updated Mojito"
+    assert updated["ingredients"][0]["name"] == "Mint"
+
+    resp = await async_client.delete(f"/recipes/{recipe_id}")
+    assert resp.status_code == 204
+
+    resp = await async_client.get(f"/recipes/{recipe_id}")
+    assert resp.status_code == 404
 
 
-@pytest.mark.asyncio
+@pytest.mark.anyio
 async def test_inventory_patch(async_client):
-    # seed ingredient and item
     resp = await async_client.post("/ingredients/", json={"name": "Vodka"})
     ing_id = resp.json()["id"]
-    resp = await async_client.post("/ingredients/", json={"name": "Gin"})
-    # create inventory
+    await async_client.post("/ingredients/", json={"name": "Gin"})
+
     from backend.app.db import crud, schemas
+
     db = next(override_get_db())
     item = crud.create_inventory_item(db, schemas.InventoryItemCreate(ingredient_id=ing_id, quantity=1))
     db.close()
@@ -148,18 +116,7 @@ async def test_inventory_patch(async_client):
     assert resp.json()["quantity"] == 5
 
 
-@pytest.mark.asyncio
-async def test_barcode_lookup(monkeypatch, async_client):
-    async def fake_lookup(ean: str, db):
-        return {"name": "Test"}
-
-    monkeypatch.setattr("backend.app.services.barcode.fetch_barcode", fake_lookup)
-    resp = await async_client.get("/barcode/123456")
-    assert resp.status_code == 200
-    assert resp.json()["name"] == "Test"
-
-
-@pytest.mark.asyncio
+@pytest.mark.anyio
 async def test_inventory_create_delete(async_client):
     resp = await async_client.post("/ingredients/", json={"name": "Tequila"})
     ing_id = resp.json()["id"]
@@ -170,22 +127,15 @@ async def test_inventory_create_delete(async_client):
     assert resp.status_code == 204
 
 
-@pytest.mark.asyncio
-async def test_recipe_import_adds_inventory(monkeypatch, async_client):
-    async def fake_fetch(name: str):
-        return {
+@pytest.mark.anyio
+async def test_recipe_create_adds_inventory(async_client):
+    resp = await async_client.post(
+        "/recipes/",
+        json={
             "name": "Mule",
-            "alcoholic": "Alcoholic",
-            "instructions": "Mix",
-            "thumb": "http://example.com/mule.jpg",
-            "tags": [],
-            "categories": [],
-            "ibas": [],
             "ingredients": [{"name": "Vodka", "measure": "2 oz"}],
-        }
-
-    monkeypatch.setattr("backend.app.services.cocktaildb.fetch_recipe_details", fake_fetch)
-    resp = await async_client.post("/recipes/", json={"name": "mule"})
+        },
+    )
     assert resp.status_code == 201
     resp = await async_client.get("/inventory/")
     items = resp.json()
@@ -193,25 +143,18 @@ async def test_recipe_import_adds_inventory(monkeypatch, async_client):
     assert vodka_items
 
 
-@pytest.mark.asyncio
-async def test_ingredient_deduplication(monkeypatch, async_client):
+@pytest.mark.anyio
+async def test_ingredient_deduplication(async_client):
     resp = await async_client.post("/ingredients/", json={"name": "Rum"})
     assert resp.status_code == 201
 
-    async def fake_fetch(name: str):
-        return {
+    resp = await async_client.post(
+        "/recipes/",
+        json={
             "name": "Dark Drink",
-            "alcoholic": "Alcoholic",
-            "instructions": "Mix",
-            "thumb": "http://example.com/dark.jpg",
-            "tags": [],
-            "categories": [],
-            "ibas": [],
             "ingredients": [{"name": "Dark Rum", "measure": "1 oz"}],
-        }
-
-    monkeypatch.setattr("backend.app.services.cocktaildb.fetch_recipe_details", fake_fetch)
-    resp = await async_client.post("/recipes/", json={"name": "dark drink"})
+        },
+    )
     assert resp.status_code == 201
     resp = await async_client.get("/ingredients/")
     ingredients = resp.json()
@@ -220,7 +163,7 @@ async def test_ingredient_deduplication(monkeypatch, async_client):
     assert "Rum" in names
 
 
-@pytest.mark.asyncio
+@pytest.mark.anyio
 async def test_synonym_crud(async_client):
     resp = await async_client.get("/synonyms/")
     assert resp.status_code == 200

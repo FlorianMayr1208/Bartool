@@ -1,6 +1,5 @@
 from pydantic import BaseModel
 from typing import Optional, List
-from datetime import datetime
 
 class IngredientBase(BaseModel):
     name: str
@@ -64,6 +63,17 @@ class RecipeCreate(RecipeBase):
     ibas: List[str] = []
     ingredients: List[RecipeIngredientCreate] = []
 
+
+class RecipeUpdate(BaseModel):
+    name: Optional[str] = None
+    alcoholic: Optional[str] = None
+    instructions: Optional[str] = None
+    thumb: Optional[str] = None
+    tags: Optional[List[str]] = None
+    categories: Optional[List[str]] = None
+    ibas: Optional[List[str]] = None
+    ingredients: Optional[List[RecipeIngredientCreate]] = None
+
 class Recipe(RecipeBase):
     id: int
     tags: List[Tag] = []
@@ -100,12 +110,3 @@ class InventoryItemWithIngredient(InventoryItem):
 class Synonym(BaseModel):
     alias: str
     canonical: str
-
-
-class BarcodeCache(BaseModel):
-    ean: str
-    data: str
-    fetched_at: datetime
-
-    class Config:
-        orm_mode = True

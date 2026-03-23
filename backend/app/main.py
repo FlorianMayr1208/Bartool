@@ -3,7 +3,7 @@ from fastapi.responses import JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
 import logging
 
-from .api import ingredients, recipes, inventory, barcode, synonyms
+from .api import ingredients, recipes, inventory, synonyms
 
 app = FastAPI(title="Bar Management")
 
@@ -30,6 +30,4 @@ async def error_middleware(request: Request, call_next):
 app.include_router(ingredients.router, prefix="/ingredients")
 app.include_router(recipes.router, prefix="/recipes")
 app.include_router(inventory.router, prefix="/inventory")
-app.include_router(barcode.router, prefix="/barcode")
 app.include_router(synonyms.router, prefix="/synonyms")
-

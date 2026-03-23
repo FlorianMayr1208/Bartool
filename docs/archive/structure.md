@@ -1,47 +1,39 @@
-barmanagement/
+# Current repository structure overview
+
+This snapshot reflects the local-only application scope that is currently implemented in the repo.
+
+```text
+Bartool/
 ├── backend/
 │   ├── app/
-│   │   ├── api/                # API-Endpunkte (z.B. /inventory, /recipes, /users)
+│   │   ├── api/                # FastAPI routes for ingredients, inventory, recipes, and synonyms
 │   │   │   ├── __init__.py
+│   │   │   ├── ingredients.py
 │   │   │   ├── inventory.py
 │   │   │   ├── recipes.py
-│   │   │   ├── users.py
-│   │   │   └── shoppinglist.py
-│   │   ├── core/               # Zentrale Logik, Einstellungen, Hilfsfunktionen
+│   │   │   └── synonyms.py
+│   │   ├── db/                 # SQLAlchemy models, Pydantic schemas, CRUD helpers, DB setup
 │   │   │   ├── __init__.py
-│   │   │   ├── config.py
-│   │   │   └── utils.py
-│   │   ├── db/                 # Datenbankmodelle und Verbindung
-│   │   │   ├── __init__.py
+│   │   │   ├── crud.py
 │   │   │   ├── models.py
-│   │   │   ├── schemas.py      # Pydantic Schemas für Validierung
-│   │   │   └── crud.py
-│   │   ├── services/           # Externe Services (z.B. Barcode, Rezeptdatenbank)
+│   │   │   ├── schemas.py
+│   │   │   ├── seed_db.py
+│   │   │   └── session.py
+│   │   ├── services/           # Local service helpers (for example synonym normalization)
 │   │   │   ├── __init__.py
-│   │   │   └── barcode.py
-│   │   ├── static/             # Statische Dateien (Bilder, Export-Dateien)
-│   │   ├── templates/          # Für Jinja2, falls notwendig (z.B. E-Mail-Vorlagen)
-│   │   ├── main.py             # FastAPI App-Entry-Point
-│   │   └── requirements.txt    # Python Abhängigkeiten
-│   ├── alembic/                # DB-Migrationen (optional)
-│   ├── tests/                  # Unit- und Integrationstests
-│   └── Dockerfile              # Für Container-Deployment (optional)
-│
+│   │   │   ├── synonyms.json
+│   │   │   └── synonyms.py
+│   │   └── main.py             # FastAPI application entry point
+│   └── tests/                  # API tests
 ├── frontend/
-│   ├── public/
 │   ├── src/
-│   │   ├── components/         # Wiederverwendbare UI-Komponenten
-│   │   ├── pages/              # Seiten (Home, Inventar, Rezepte, Statistik, etc.)
-│   │   ├── api/                # JS-Fetches zur Backend-API
-│   │   ├── utils/              # Hilfsfunktionen
-│   │   ├── styles/             # CSS/Tailwind/Bootstrap
-│   │   └── App.jsx             # Haupteinstieg für React
-│   ├── package.json            # JS-Abhängigkeiten
-│   └── vite.config.js          # (oder webpack.config.js)
-│
-├── data/                       # (Initiale) Datenbank, Import/Export-Dateien, Backups
-│   └── barmanagement.db
-│
-├── README.md
-├── .gitignore
-└── docker-compose.yml          # Für gemeinsames Starten von Backend & Frontend (optional)
+│   │   ├── components/         # Shared UI such as navigation
+│   │   ├── pages/              # Inventory, recipes, recipe detail, and synonyms pages
+│   │   ├── api.ts              # Frontend API client wrappers
+│   │   ├── App.tsx             # React router setup
+│   │   └── main.tsx            # Frontend entry point
+│   ├── package.json
+│   └── package-lock.json
+├── docs/archive/               # Historical planning/spec material and lightweight architecture notes
+└── README.md                   # Source of truth for current product scope
+```

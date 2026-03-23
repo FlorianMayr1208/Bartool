@@ -1,5 +1,21 @@
 const API_BASE = import.meta.env.VITE_API_BASE || '';
 
+export interface RecipeIngredientPayload {
+  name: string;
+  measure?: string | null;
+}
+
+export interface RecipePayload {
+  name: string;
+  alcoholic?: string | null;
+  instructions?: string | null;
+  thumb?: string | null;
+  tags?: string[];
+  categories?: string[];
+  ibas?: string[];
+  ingredients?: RecipeIngredientPayload[];
+}
+
 export async function listInventory() {
   const res = await fetch(`${API_BASE}/inventory/`);
   return res.json();
@@ -36,19 +52,8 @@ export async function deleteInventory(id: number) {
   await fetch(`${API_BASE}/inventory/${id}`, { method: 'DELETE' });
 }
 
-export async function lookupBarcode(ean: string) {
-  const res = await fetch(`${API_BASE}/barcode/${ean}`);
-  if (!res.ok) return null;
-  return res.json();
-}
-
 export async function listRecipes() {
   const res = await fetch(`${API_BASE}/recipes/`);
-  return res.json();
-}
-
-export async function searchRecipes(q: string) {
-  const res = await fetch(`${API_BASE}/recipes/search?q=${encodeURIComponent(q)}`);
   return res.json();
 }
 
@@ -60,13 +65,32 @@ export async function getRecipe(id: number) {
   return res.json();
 }
 
-export async function createRecipe(data: { name: string }) {
+export async function createRecipe(data: RecipePayload) {
   const res = await fetch(`${API_BASE}/recipes/`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(data),
   });
   return res.json();
+}
+
+export async function updateRecipe(id: number, data: Partial<RecipePayload>) {
+  const res = await fetch(`${API_BASE}/recipes/${id}`, {
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(data),
+  });
+  if (!res.ok) {
+    throw new Error('Failed to update recipe');
+  }
+  return res.json();
+}
+
+export async function deleteRecipe(id: number) {
+  const res = await fetch(`${API_BASE}/recipes/${id}`, { method: 'DELETE' });
+  if (!res.ok) {
+    throw new Error('Failed to delete recipe');
+  }
 }
 
 export async function listSynonyms() {
