@@ -1,27 +1,113 @@
 # BarTool
 
-BarTool is a lightweight bar management system intended to run even on a small device such as a Raspberry Pi.  The backend is implemented with [FastAPI](https://fastapi.tiangolo.com/) and stores its data in a local SQLite database.  A simple React + Tailwind CSS frontend provides pages to browse your inventory, manage recipes and keep track of a shopping list.
+BarTool is a small full-stack cocktail workspace built around a FastAPI backend and a React/Vite frontend. The current product scope is intentionally narrow: contributors should treat this README as the primary reference for what the app actually does today.
 
-## Features
+## Current product scope
 
-- **Inventory management** – keep an overview of all bottles and ingredients
-- **Recipe storage** – save your favourite cocktails and browse suggestions
-- **Shopping list** – collect missing items you need to buy
-- **Statistics dashboard** – view usage data and upcoming expiries
+The repository currently supports these implemented workflows:
 
-The project is still in an early stage and focuses on a clean API structure and a minimal, responsive UI.
+- Maintain an ingredient inventory with create, list, update, and delete operations.
+- Look up a barcode and prefill an ingredient name when adding inventory items.
+- Search CocktailDB for recipes, save recipes locally, and view saved recipe details.
+- Manage ingredient-name synonyms that help recipe imports map variant names onto existing ingredients.
+- Show lightweight placeholder pages for a dashboard, shopping list, and stats so the navigation structure is stable while those areas are not yet feature-complete.
 
-## Running the project
+## Frontend pages that currently exist
+
+The frontend router exposes these pages:
+
+| Route | Page | Status |
+| --- | --- | --- |
+| `/` | Dashboard | Intro/welcome page only |
+| `/inventory` | Inventory | Fully wired to inventory and barcode APIs |
+| `/recipes` | Recipes | Search remote recipes and save them locally |
+| `/recipes/:id` | Recipe detail | View one saved recipe |
+| `/shopping-list` | Shopping List | Placeholder page |
+| `/stats` | Stats | Placeholder page |
+| `/synonyms` | Synonyms | Fully wired to synonym management APIs |
+
+## Backend API routes that currently exist
+
+The FastAPI app mounts these routes today:
+
+### Core
+
+- `GET /healthz` — health check used by the frontend shell.
+- `GET /` — simple root message.
+
+### Ingredients
+
+- `GET /ingredients/` — list ingredients.
+- `POST /ingredients/` — create an ingredient.
+
+### Inventory
+
+- `GET /inventory/` — list inventory items with ingredient data.
+- `POST /inventory/` — create an inventory item.
+- `GET /inventory/{item_id}` — fetch one inventory item.
+- `PATCH /inventory/{item_id}` — update quantity or status.
+- `DELETE /inventory/{item_id}` — delete an inventory item.
+
+### Recipes
+
+- `GET /recipes/search?q=...` — search CocktailDB-backed recipe results.
+- `GET /recipes/` — list locally saved recipes.
+- `GET /recipes/{recipe_id}` — fetch one saved recipe.
+- `POST /recipes/` — import/save a recipe by name.
+
+### Barcode
+
+- `GET /barcode/{ean}` — look up a barcode.
+
+### Synonyms
+
+- `GET /synonyms/` — list configured synonyms.
+- `POST /synonyms/` — create a synonym.
+- `DELETE /synonyms/{alias}` — delete a synonym.
+
+## What is intentionally out of scope right now
+
+The repo still contains code scaffolding and historical documents for broader bar-management ideas, but the following are **not** implemented as real end-user features today:
+
+- Shopping-list generation logic.
+- Statistics or analytics beyond the placeholder page.
+- User profiles, favorites, advanced filtering, or deployment automation.
+- A maintained standalone OpenAPI design document separate from the FastAPI code.
+
+Historical planning/spec files were moved to `docs/archive/` so they remain available for context without competing with the current implementation.
+
+## Repository layout
+
+```text
+backend/   FastAPI app, SQLAlchemy models, and API tests
+frontend/  React/Vite UI with page-level routing
+docs/archive/  Historical specs, use cases, and planning notes
+```
+
+## Local development
+
+### Backend
+
+Create a Python environment, install dependencies, and run the FastAPI app:
 
 ```bash
-# install Python dependencies
 pip install -r requirements.txt
-
-# start the backend
 uvicorn backend.app.main:app --reload
 ```
 
-For the frontend, install the npm packages and run Vite:
+The API will be available at `http://localhost:8000` by default.
+
+### Seed data
+
+To generate the local SQLite seed database used by the backend:
+
+```bash
+python backend/app/db/seed_db.py
+```
+
+### Frontend
+
+In a separate terminal:
 
 ```bash
 cd frontend
@@ -29,21 +115,12 @@ npm install
 npm run dev
 ```
 
-## Database initialization
-
-Before using the app you can create the local SQLite database with a small
-seeding script:
+If your backend is not running on the same origin, set `VITE_API_BASE` when starting the frontend. Example:
 
 ```bash
-python backend/app/db/seed_db.py
+VITE_API_BASE=http://localhost:8000 npm run dev
 ```
 
-This will generate `data/seed.sqlite` and insert a few example records so the
-API has initial data to work with.
+## Contributor guidance
 
-Afterwards open `http://localhost:5173` in your browser.  If the backend runs on a different port, set the environment variable `VITE_API_BASE` when starting the
-frontend, e.g. `VITE_API_BASE=http://localhost:8000 npm run dev`.
-
----
-
-This repository also contains a collection of documents (`technical_specification.md`, `usecases.md`) describing the planned functionality and architecture.
+When updating docs, keep this README aligned with the actual router pages in `frontend/src/App.tsx` and the mounted FastAPI routers in `backend/app/main.py`. If the implemented scope expands materially, update this README first and only add extra documentation when contributors actively need it.
