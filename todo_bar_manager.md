@@ -19,7 +19,6 @@ Below is a step‑by‑step plan sliced into iterations.
    - `GET/POST /recipes` (import from CocktailDB)  
    - `GET/PATCH /inventory/{id}`  
 2. Add pagination & error middleware.  
-3. Write unit tests with **pytest** + **httpx** (≥ 80 % coverage).
 
 ---
 
@@ -35,7 +34,6 @@ Below is a step‑by‑step plan sliced into iterations.
 1. Integrate QuaggaJS barcode scanner; fallback to manual form.  
 2. Inventory table with editable quantity & delete.  
 3. Backend barcode lookup route `GET /barcode/{ean}` with cache.  
-4. Cypress E2E test: add & delete item.
 
 ---
 
