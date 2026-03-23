@@ -42,13 +42,6 @@ async def async_client() -> AsyncGenerator[AsyncClient, None]:
 
 
 @pytest.mark.asyncio
-async def test_healthz(async_client):
-    resp = await async_client.get("/healthz")
-    assert resp.status_code == 200
-    assert resp.json() == {"status": "ok"}
-
-
-@pytest.mark.asyncio
 async def test_create_and_list_ingredient(async_client):
     data = {"name": "Rum"}
     resp = await async_client.post("/ingredients/", json=data)

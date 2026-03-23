@@ -26,15 +26,6 @@ async def error_middleware(request: Request, call_next):
         logging.exception("Unhandled error")
         return JSONResponse(status_code=500, content={"detail": "Internal Server Error"})
 
-@app.get("/healthz")
-async def health_check():
-    return {"status": "ok"}
-
-
-@app.get("/")
-async def root():
-    return {"message": "hello world"}
-
 
 app.include_router(ingredients.router, prefix="/ingredients")
 app.include_router(recipes.router, prefix="/recipes")

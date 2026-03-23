@@ -10,7 +10,6 @@ The repository currently supports these implemented workflows:
 - Look up a barcode and prefill an ingredient name when adding inventory items.
 - Search CocktailDB for recipes, save recipes locally, and view saved recipe details.
 - Manage ingredient-name synonyms that help recipe imports map variant names onto existing ingredients.
-- Show lightweight placeholder pages for a dashboard, shopping list, and stats so the navigation structure is stable while those areas are not yet feature-complete.
 
 ## Frontend pages that currently exist
 
@@ -18,22 +17,15 @@ The frontend router exposes these pages:
 
 | Route | Page | Status |
 | --- | --- | --- |
-| `/` | Dashboard | Intro/welcome page only |
+| `/` | Redirect | Immediately redirects to `/inventory` |
 | `/inventory` | Inventory | Fully wired to inventory and barcode APIs |
 | `/recipes` | Recipes | Search remote recipes and save them locally |
 | `/recipes/:id` | Recipe detail | View one saved recipe |
-| `/shopping-list` | Shopping List | Placeholder page |
-| `/stats` | Stats | Placeholder page |
 | `/synonyms` | Synonyms | Fully wired to synonym management APIs |
 
 ## Backend API routes that currently exist
 
 The FastAPI app mounts these routes today:
-
-### Core
-
-- `GET /healthz` — health check used by the frontend shell.
-- `GET /` — simple root message.
 
 ### Ingredients
 
@@ -69,8 +61,8 @@ The FastAPI app mounts these routes today:
 
 The repo still contains code scaffolding and historical documents for broader bar-management ideas, but the following are **not** implemented as real end-user features today:
 
-- Shopping-list generation logic.
-- Statistics or analytics beyond the placeholder page.
+- Shopping-list generation logic or a dedicated shopping-list UI.
+- Statistics or analytics pages.
 - User profiles, favorites, advanced filtering, or deployment automation.
 - A maintained standalone OpenAPI design document separate from the FastAPI code.
 
@@ -123,4 +115,4 @@ VITE_API_BASE=http://localhost:8000 npm run dev
 
 ## Contributor guidance
 
-When updating docs, keep this README aligned with the actual router pages in `frontend/src/App.tsx` and the mounted FastAPI routers in `backend/app/main.py`. If the implemented scope expands materially, update this README first and only add extra documentation when contributors actively need it.
+When updating docs, keep this README aligned with the actual router pages in `frontend/src/App.tsx` and the mounted FastAPI routers in `backend/app/main.py`. Avoid documenting demo-only routes or placeholder flows that are not part of the current product experience. If the implemented scope expands materially, update this README first and only add extra documentation when contributors actively need it.
