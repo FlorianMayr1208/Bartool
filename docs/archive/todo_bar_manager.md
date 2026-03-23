@@ -4,7 +4,7 @@ Below is a step‑by‑step plan sliced into iterations.
 
 
 ## 1  |  Backend Foundation (FastAPI + SQLite)
-1. Create `backend/app/main.py` with “hello world” FastAPI and `/healthz`.  
+1. Create `backend/app/main.py` with the production API entrypoint and shared middleware.  
 2. Add dependency manager (poetry or pip‑tools); commit lock‑file.  
 3. Add **SQLAlchemy** & **pydantic**; create `Ingredient`, `Recipe`, `InventoryItem` models.  
 4. Implement DB session helper and CRUD layer.  
@@ -27,7 +27,7 @@ Below is a step‑by‑step plan sliced into iterations.
 1. `npm create vite@latest frontend --template react-ts`.  
 2. Install **React‑Router** and TailwindCSS.  
 3. Create page shells: Dashboard, Inventory, Recipes, Shopping List, Stats.  
-4. Add API client and fetch `/healthz` to verify backend.
+4. Add an API client that calls the inventory, recipes, barcode, and synonyms endpoints used by the product UI.
 
 ---
 
