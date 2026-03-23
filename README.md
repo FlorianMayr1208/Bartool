@@ -9,7 +9,7 @@ BarTool is a lightweight bar management system intended to run even on a small d
 - **Shopping list** – collect missing items you need to buy
 - **Statistics dashboard** – view usage data and upcoming expiries
 
-The project is still in an early stage and focuses on a clean API structure and a minimal, responsive UI.
+The project focuses on a clean API structure and a minimal, responsive UI for managing inventory, recipes, shopping lists, and stats.
 
 ## Running the project
 
@@ -41,8 +41,7 @@ python backend/app/db/seed_db.py
 This will generate `data/seed.sqlite` and insert a few example records so the
 API has initial data to work with.
 
-Afterwards open `http://localhost:5173` in your browser.  If the backend runs on a different port, set the environment variable `VITE_API_BASE` when starting the
-frontend, e.g. `VITE_API_BASE=http://localhost:8000 npm run dev`.
+Afterwards open `http://localhost:5173` in your browser to use the frontend. If the backend runs on a different host or port, set the environment variable `VITE_API_BASE` when starting the frontend, for example `VITE_API_BASE=http://localhost:8000 npm run dev`.
 
 ---
 

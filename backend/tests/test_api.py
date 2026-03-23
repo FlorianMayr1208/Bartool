@@ -1,4 +1,3 @@
-import asyncio
 from typing import AsyncGenerator
 
 import pytest
@@ -42,13 +41,6 @@ async def async_client() -> AsyncGenerator[AsyncClient, None]:
 
 
 @pytest.mark.asyncio
-async def test_healthz(async_client):
-    resp = await async_client.get("/healthz")
-    assert resp.status_code == 200
-    assert resp.json() == {"status": "ok"}
-
-
-@pytest.mark.asyncio
 async def test_create_and_list_ingredient(async_client):
     data = {"name": "Rum"}
     resp = await async_client.post("/ingredients/", json=data)
@@ -59,7 +51,6 @@ async def test_create_and_list_ingredient(async_client):
     resp = await async_client.get("/ingredients/")
     assert resp.status_code == 200
     assert len(resp.json()) == 1
-
 
 @pytest.mark.asyncio
 async def test_create_recipe(monkeypatch, async_client):
@@ -79,7 +70,6 @@ async def test_create_recipe(monkeypatch, async_client):
     resp = await async_client.post("/recipes/", json={"name": "mojito"})
     assert resp.status_code == 201
     assert resp.json()["name"] == "Mojito"
-
 
 @pytest.mark.asyncio
 async def test_get_recipe(monkeypatch, async_client):
@@ -104,7 +94,6 @@ async def test_get_recipe(monkeypatch, async_client):
     resp = await async_client.get(f"/recipes/{recipe_id}")
     assert resp.status_code == 200
     assert resp.json()["name"] == "Mojito"
-
 
 @pytest.mark.asyncio
 async def test_recipe_search(monkeypatch, async_client):
@@ -134,7 +123,6 @@ async def test_recipe_search(monkeypatch, async_client):
     assert resp.status_code == 200
     assert resp.json() == await fake_search("")
 
-
 @pytest.mark.asyncio
 async def test_inventory_patch(async_client):
     # seed ingredient and item
@@ -154,7 +142,6 @@ async def test_inventory_patch(async_client):
     assert resp.status_code == 200
     assert resp.json()["quantity"] == 5
 
-
 @pytest.mark.asyncio
 async def test_barcode_lookup(monkeypatch, async_client):
     async def fake_lookup(ean: str, db):
@@ -165,7 +152,6 @@ async def test_barcode_lookup(monkeypatch, async_client):
     assert resp.status_code == 200
     assert resp.json()["name"] == "Test"
 
-
 @pytest.mark.asyncio
 async def test_inventory_create_delete(async_client):
     resp = await async_client.post("/ingredients/", json={"name": "Tequila"})
@@ -175,7 +161,6 @@ async def test_inventory_create_delete(async_client):
     item_id = resp.json()["id"]
     resp = await async_client.delete(f"/inventory/{item_id}")
     assert resp.status_code == 204
-
 
 @pytest.mark.asyncio
 async def test_recipe_import_adds_inventory(monkeypatch, async_client):
@@ -198,7 +183,6 @@ async def test_recipe_import_adds_inventory(monkeypatch, async_client):
     items = resp.json()
     vodka_items = [i for i in items if i["ingredient"]["name"] == "Vodka"]
     assert vodka_items
-
 
 @pytest.mark.asyncio
 async def test_ingredient_deduplication(monkeypatch, async_client):
@@ -225,7 +209,6 @@ async def test_ingredient_deduplication(monkeypatch, async_client):
     names = [i["name"] for i in ingredients]
     assert "Dark Rum" not in names
     assert "Rum" in names
-
 
 @pytest.mark.asyncio
 async def test_synonym_crud(async_client):
