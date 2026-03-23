@@ -1,13 +1,13 @@
 # BarTool
 
-BarTool is a lightweight bar management system intended to run even on a small device such as a Raspberry Pi.  The backend is implemented with [FastAPI](https://fastapi.tiangolo.com/) and stores its data in a local SQLite database.  A simple React + Tailwind CSS frontend provides pages to browse your inventory, manage recipes and keep track of a shopping list.
+BarTool is a lightweight bar management system intended to run even on a small device such as a Raspberry Pi. The backend is implemented with [FastAPI](https://fastapi.tiangolo.com/) and stores its data in a local SQLite database. A simple React + Tailwind CSS frontend provides focused workflows for inventory, recipes, recipe details, and ingredient synonym management.
 
 ## Features
 
 - **Inventory management** – keep an overview of all bottles and ingredients
 - **Recipe storage** – save your favourite cocktails and browse suggestions
-- **Shopping list** – collect missing items you need to buy
-- **Statistics dashboard** – view usage data and upcoming expiries
+- **Recipe detail views** – inspect individual cocktails and their ingredient requirements
+- **Ingredient synonyms** – manage editable normalization rules for ingredient names
 
 The project is still in an early stage and focuses on a clean API structure and a minimal, responsive UI.
 
