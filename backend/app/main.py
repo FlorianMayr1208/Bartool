@@ -1,23 +1,10 @@
-from fastapi import FastAPI, Request, HTTPException
-from fastapi.responses import JSONResponse
-from fastapi.middleware.cors import CORSMiddleware
 import logging
 
-from .api import (
-    ingredients,
-    recipes,
-    inventory,
-    barcode,
-    search,
-    tags,
-    categories,
-    synonyms,
-    unit_synonyms,
-    shopping_list,
-    macros as macros_api,
-    suggestions,
-    db_admin,
-)
+from fastapi import FastAPI, HTTPException, Request
+from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import JSONResponse
+
+from .api import ingredients, inventory, recipes, synonyms
 
 app = FastAPI(title="Bar Management")
 
@@ -32,6 +19,7 @@ async def error_middleware(request: Request, call_next):
         logging.exception("Unhandled error")
         return JSONResponse(status_code=500, content={"detail": "Internal Server Error"})
 
+
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -39,6 +27,7 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
 
 @app.get("/healthz")
 async def health_check():
@@ -53,14 +42,4 @@ async def root():
 app.include_router(ingredients.router, prefix="/ingredients")
 app.include_router(recipes.router, prefix="/recipes")
 app.include_router(inventory.router, prefix="/inventory")
-app.include_router(barcode.router, prefix="/barcode")
-app.include_router(search.router, prefix="/search")
-app.include_router(tags.router, prefix="/tags")
-app.include_router(categories.router, prefix="/categories")
 app.include_router(synonyms.router, prefix="/synonyms")
-app.include_router(unit_synonyms.router, prefix="/unit-synonyms")
-app.include_router(shopping_list.router, prefix="/shopping-list")
-app.include_router(db_admin.router, prefix="/db")
-app.include_router(suggestions.router, prefix="/suggestions")
-app.include_router(macros_api.router, prefix="/macros")
-

@@ -2,18 +2,8 @@ from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 
 from ..db import crud, schemas, session
-from ..services.cocktaildb import (
-    fetch_recipe_details,
-    search_recipes_details,
-)
 
 router = APIRouter()
-
-
-@router.get("/search", response_model=list[schemas.RecipePreview])
-async def search_recipes_endpoint(q: str):
-    return await search_recipes_details(q)
-
 
 
 @router.get("/", response_model=list[schemas.Recipe])
@@ -30,10 +20,7 @@ def get_recipe(recipe_id: int, db: Session = Depends(session.get_db)):
 
 
 @router.post("/", response_model=schemas.Recipe, status_code=201)
-async def create_recipe(recipe: schemas.RecipeCreate, db: Session = Depends(session.get_db)):
-    details = await fetch_recipe_details(recipe.name)
-    if details:
-        recipe = schemas.RecipeCreate(**details)
+def create_recipe(recipe: schemas.RecipeCreate, db: Session = Depends(session.get_db)):
     db_recipe = crud.create_recipe(db, recipe)
     crud.ensure_inventory_for_ingredients(db, recipe.ingredients)
     return db_recipe

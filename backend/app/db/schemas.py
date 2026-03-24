@@ -1,27 +1,11 @@
+from typing import List, Optional
+
 from pydantic import BaseModel
-from typing import Optional, List
-
-
-class UnitBase(BaseModel):
-    name: str
-    symbol: Optional[str] = None
-
-
-class UnitCreate(UnitBase):
-    pass
-
-
-class Unit(UnitBase):
-    id: int
-
-    class Config:
-        orm_mode = True
 
 
 class IngredientBase(BaseModel):
     name: str
     type: Optional[str] = None
-    barcode: Optional[str] = None
     notes: Optional[str] = None
 
 
@@ -38,8 +22,6 @@ class Ingredient(IngredientBase):
 
 class RecipeBase(BaseModel):
     name: str
-    alcoholic: Optional[str] = None
-    glass: Optional[str] = None
     instructions: Optional[str] = None
     thumb: Optional[str] = None
 
@@ -60,94 +42,24 @@ class RecipeIngredient(RecipeIngredientBase):
         orm_mode = True
 
 
-class Tag(BaseModel):
-    id: int
-    name: str
-
-    class Config:
-        orm_mode = True
-
-
-class Category(BaseModel):
-    id: int
-    name: str
-
-    class Config:
-        orm_mode = True
-
-
-class Iba(BaseModel):
-    id: int
-    name: str
-
-    class Config:
-        orm_mode = True
-
-
-class Glass(BaseModel):
-    id: int
-    name: str
-
-    class Config:
-        orm_mode = True
-
-
-class Alcoholic(BaseModel):
-    id: int
-    name: str
-
-    class Config:
-        orm_mode = True
-
-
 class RecipeCreate(RecipeBase):
-    tags: List[str] = []
-    categories: List[str] = []
-    ibas: List[str] = []
     ingredients: List[RecipeIngredientCreate] = []
-
-
-class RecipePreview(RecipeBase):
-    """Basic recipe info including tags used for search results."""
-
-    tags: List[str] = []
-    categories: List[str] = []
-    ibas: List[str] = []
 
 
 class Recipe(RecipeBase):
     id: int
-    glass: Glass | None = None
-    alcoholic: Alcoholic | None = None
-    tags: List[Tag] = []
-    categories: List[Category] = []
-    ibas: List[Iba] = []
     ingredients: List[RecipeIngredient] = []
 
     class Config:
         orm_mode = True
 
 
-class RecipeWithInventory(Recipe):
-    """Recipe details along with inventory availability info."""
-
-    available_count: int
-    missing_count: int
-
-    class Config:
-        orm_mode = True
-
-
 class RecipeIngredientWithInventory(RecipeIngredient):
-    """Recipe ingredient including current inventory quantity."""
-
     inventory_item_id: int | None = None
     inventory_quantity: int = 0
 
 
 class RecipeDetail(Recipe):
-    """Full recipe data with inventory info for each ingredient."""
-
     ingredients: List[RecipeIngredientWithInventory] = []
 
 
@@ -180,35 +92,3 @@ class InventoryItemWithIngredient(InventoryItem):
 class Synonym(BaseModel):
     alias: str
     canonical: str
-
-
-class BarcodeCache(BaseModel):
-    ean: str
-    timestamp: int
-    json: str
-
-    class Config:
-        orm_mode = True
-
-
-class ShoppingListItemBase(BaseModel):
-    ingredient_id: int
-    quantity: int = 1
-    recipe_id: int | None = None
-    unit: str | None = None
-
-
-class ShoppingListItemCreate(ShoppingListItemBase):
-    pass
-
-
-class ShoppingListItem(ShoppingListItemBase):
-    id: int
-
-    class Config:
-        orm_mode = True
-
-
-class ShoppingListItemWithIngredient(ShoppingListItem):
-    ingredient: Ingredient | None = None
-    recipe: Recipe | None = None

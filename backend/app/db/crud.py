@@ -1,29 +1,14 @@
-from sqlalchemy.orm import Session
 from sqlalchemy import func
+from sqlalchemy.orm import Session
 
-from ..services import synonyms, unit_synonyms, unit_conversion, macros as macros_service
+from ..services import synonyms
 from . import models, schemas
-
-
-def _extract_unit(measure: str | None) -> str | None:
-    if not measure:
-        return None
-    parts = measure.strip().split()
-    if len(parts) < 2:
-        return None
-    return " ".join(parts[1:]).strip()
-
 
 
 # Ingredient CRUD
 
-
 def get_ingredient(db: Session, ingredient_id: int):
-    return (
-        db.query(models.Ingredient)
-        .filter(models.Ingredient.id == ingredient_id)
-        .first()
-    )
+    return db.query(models.Ingredient).filter(models.Ingredient.id == ingredient_id).first()
 
 
 def create_ingredient(db: Session, ingredient: schemas.IngredientCreate):
@@ -35,6 +20,7 @@ def create_ingredient(db: Session, ingredient: schemas.IngredientCreate):
     )
     if existing:
         return existing
+
     data = ingredient.model_dump()
     data["name"] = canonical
     db_obj = models.Ingredient(**data)
@@ -46,28 +32,6 @@ def create_ingredient(db: Session, ingredient: schemas.IngredientCreate):
 
 def list_ingredients(db: Session, skip: int = 0, limit: int = 100):
     return db.query(models.Ingredient).offset(skip).limit(limit).all()
-
-
-def list_tags(db: Session, skip: int = 0, limit: int = 100):
-    """Return all tags sorted by name."""
-    return (
-        db.query(models.Tag)
-        .order_by(models.Tag.name)
-        .offset(skip)
-        .limit(limit)
-        .all()
-    )
-
-
-def list_categories(db: Session, skip: int = 0, limit: int = 100):
-    """Return all categories sorted by name."""
-    return (
-        db.query(models.Category)
-        .order_by(models.Category.name)
-        .offset(skip)
-        .limit(limit)
-        .all()
-    )
 
 
 def get_ingredient_by_name(db: Session, name: str):
@@ -86,116 +50,45 @@ def get_or_create_ingredient(db: Session, ingredient: schemas.IngredientCreate):
     return create_ingredient(db, ingredient)
 
 
-# Unit CRUD
-
-
-def get_unit_by_name(db: Session, name: str):
-    canonical = unit_synonyms.canonical_name(name)
-    return (
-        db.query(models.Unit)
-        .filter(func.lower(models.Unit.name) == canonical.lower())
-        .first()
-    )
-
-
-def create_unit(db: Session, unit: schemas.UnitCreate):
-    canonical = unit_synonyms.canonical_name(unit.name)
-    existing = (
-        db.query(models.Unit)
-        .filter(func.lower(models.Unit.name) == canonical.lower())
-        .first()
-    )
-    if existing:
-        return existing
-    data = unit.model_dump()
-    data["name"] = canonical
-    if not data.get("symbol"):
-        data["symbol"] = canonical
-    db_obj = models.Unit(**data)
-    db.add(db_obj)
-    db.commit()
-    db.refresh(db_obj)
-    return db_obj
-
-
-def get_or_create_unit(db: Session, unit: schemas.UnitCreate):
-    existing = get_unit_by_name(db, unit.name)
-    if existing:
-        return existing
-    return create_unit(db, unit)
-
-
 # Recipe CRUD
-
 
 def get_recipe(db: Session, recipe_id: int):
     return db.query(models.Recipe).filter(models.Recipe.id == recipe_id).first()
 
 
 def get_recipe_with_inventory(db: Session, recipe_id: int):
-    """Return recipe details including inventory quantities."""
     recipe = get_recipe(db, recipe_id)
     if not recipe:
         return None
+
     ingredients: list[schemas.RecipeIngredientWithInventory] = []
     for r_ing in recipe.ingredients:
         canonical = synonyms.canonical_name(r_ing.name)
         ing = get_or_create_ingredient(db, schemas.IngredientCreate(name=canonical))
         item = get_inventory_by_ingredient(db, ing.id)
-        measure = unit_conversion.with_metric(r_ing.measure)
         ingredients.append(
             schemas.RecipeIngredientWithInventory(
                 id=r_ing.id,
                 name=r_ing.name,
-                measure=measure,
+                measure=r_ing.measure,
                 inventory_item_id=item.id if item else None,
                 inventory_quantity=item.quantity if item else 0,
             )
         )
+
     base = schemas.Recipe.model_validate(recipe, from_attributes=True).model_dump(
         exclude={"ingredients"}
     )
     return schemas.RecipeDetail(**base, ingredients=ingredients)
 
 
-def _get_or_create_by_name(db: Session, model, name: str):
-    obj = db.query(model).filter(func.lower(model.name) == name.lower()).first()
-    if obj:
-        return obj
-    obj = model(name=name)
-    db.add(obj)
-    db.flush()
-    return obj
-
-
 def create_recipe(db: Session, recipe: schemas.RecipeCreate):
-    data = recipe.model_dump(
-        exclude={"tags", "categories", "ibas", "ingredients", "glass", "alcoholic"}
-    )
+    data = recipe.model_dump(exclude={"ingredients"})
     db_obj = models.Recipe(**data)
-    db.add(db_obj)
-    db.flush()
-
-    if recipe.glass:
-        db_obj.glass = _get_or_create_by_name(db, models.Glass, recipe.glass)
-    if recipe.alcoholic:
-        db_obj.alcoholic = _get_or_create_by_name(db, models.Alcoholic, recipe.alcoholic)
-
-    db_obj.tags = [_get_or_create_by_name(db, models.Tag, t) for t in recipe.tags]
-    db_obj.categories = [
-        _get_or_create_by_name(db, models.Category, c) for c in recipe.categories
-    ]
-    db_obj.ibas = [_get_or_create_by_name(db, models.Iba, i) for i in recipe.ibas]
     db_obj.ingredients = [
-        models.RecipeIngredient(name=i.name, measure=i.measure)
-        for i in recipe.ingredients
+        models.RecipeIngredient(name=i.name, measure=i.measure) for i in recipe.ingredients
     ]
-
-    for ing in recipe.ingredients:
-        unit_name = _extract_unit(ing.measure)
-        if unit_name:
-            get_or_create_unit(db, schemas.UnitCreate(name=unit_name))
-
+    db.add(db_obj)
     db.commit()
     db.refresh(db_obj)
     return db_obj
@@ -216,13 +109,8 @@ def delete_recipe(db: Session, recipe_id: int) -> bool:
 
 # InventoryItem CRUD
 
-
 def get_inventory_item(db: Session, item_id: int):
-    return (
-        db.query(models.InventoryItem)
-        .filter(models.InventoryItem.id == item_id)
-        .first()
-    )
+    return db.query(models.InventoryItem).filter(models.InventoryItem.id == item_id).first()
 
 
 def get_inventory_by_ingredient(db: Session, ingredient_id: int):
@@ -250,7 +138,6 @@ def create_inventory_item(db: Session, item: schemas.InventoryItemCreate):
 def ensure_inventory_for_ingredients(
     db: Session, ingredients: list[schemas.RecipeIngredientCreate]
 ) -> None:
-    """Add missing ingredients to inventory with quantity 0."""
     for ing in ingredients:
         db_ing = get_or_create_ingredient(db, schemas.IngredientCreate(name=ing.name))
         if not get_inventory_by_ingredient(db, db_ing.id):
@@ -264,9 +151,7 @@ def ensure_inventory_for_ingredients(
     db.commit()
 
 
-def update_inventory_item(
-    db: Session, item_id: int, item_update: schemas.InventoryItemUpdate
-):
+def update_inventory_item(db: Session, item_id: int, item_update: schemas.InventoryItemUpdate):
     db_obj = get_inventory_item(db, item_id)
     if not db_obj:
         return None
@@ -285,13 +170,10 @@ def list_inventory_items(
     sort: str = "name",
     order: str = "asc",
 ):
-    """Return inventory items optionally filtered and sorted."""
-    from sqlalchemy.orm import selectinload
     from sqlalchemy import asc, desc
+    from sqlalchemy.orm import selectinload
 
-    q = db.query(models.InventoryItem).options(
-        selectinload(models.InventoryItem.ingredient)
-    )
+    q = db.query(models.InventoryItem).options(selectinload(models.InventoryItem.ingredient))
 
     if search or sort == "name":
         q = q.join(models.Ingredient)
@@ -306,16 +188,13 @@ def list_inventory_items(
         )
     else:
         q = q.order_by(
-            asc(models.Ingredient.name)
-            if order == "asc"
-            else desc(models.Ingredient.name)
+            asc(models.Ingredient.name) if order == "asc" else desc(models.Ingredient.name)
         )
 
     return q.offset(skip).limit(limit).all()
 
 
 def aggregate_inventory_by_synonyms(db: Session) -> None:
-    """Merge items whose ingredient name is now a synonym."""
     from sqlalchemy.orm import selectinload
 
     items = (
@@ -327,9 +206,7 @@ def aggregate_inventory_by_synonyms(db: Session) -> None:
         canonical = synonyms.canonical_name(item.ingredient.name)
         if canonical == item.ingredient.name:
             continue
-        canon_ing = get_or_create_ingredient(
-            db, schemas.IngredientCreate(name=canonical)
-        )
+        canon_ing = get_or_create_ingredient(db, schemas.IngredientCreate(name=canonical))
         if item.ingredient_id == canon_ing.id:
             continue
         existing = get_inventory_by_ingredient(db, canon_ing.id)
@@ -340,7 +217,6 @@ def aggregate_inventory_by_synonyms(db: Session) -> None:
             item.ingredient_id = canon_ing.id
     db.commit()
 
-    # remove ingredients without inventory
     for ing in db.query(models.Ingredient).all():
         used = (
             db.query(models.InventoryItem)
@@ -359,319 +235,3 @@ def delete_inventory_item(db: Session, item_id: int) -> bool:
     db.delete(item)
     db.commit()
     return True
-
-
-def recipe_missing_count(db: Session, recipe: models.Recipe) -> int:
-    """Return how many ingredients of the recipe are missing in the inventory."""
-    missing = 0
-    for r_ing in recipe.ingredients:
-        canonical = synonyms.canonical_name(r_ing.name)
-        ing = get_ingredient_by_name(db, canonical)
-        if not ing:
-            missing += 1
-            continue
-        item = get_inventory_by_ingredient(db, ing.id)
-        if not item or item.quantity <= 0:
-            missing += 1
-    return missing
-
-
-def recipe_missing_ingredients(
-    db: Session, recipe: models.Recipe
-) -> list[tuple[models.Ingredient, str | None]]:
-    """Return missing ingredients along with their units."""
-    missing: list[tuple[models.Ingredient, str | None]] = []
-    for r_ing in recipe.ingredients:
-        canonical = synonyms.canonical_name(r_ing.name)
-        ing = get_or_create_ingredient(db, schemas.IngredientCreate(name=canonical))
-        item = get_inventory_by_ingredient(db, ing.id)
-        if not item or item.quantity <= 0:
-            unit = _extract_unit(r_ing.measure)
-            if unit:
-                unit = unit_synonyms.canonical_name(unit)
-            missing.append((ing, unit))
-    return missing
-
-
-def search_local_recipes(
-    db: Session,
-    query: str | None = None,
-    tag: str | None = None,
-    category: str | None = None,
-    alcoholic: str | None = None,
-    iba: str | None = None,
-    available_only: bool = False,
-    order_missing: bool = False,
-    skip: int = 0,
-    limit: int = 100,
-):
-    """Search recipes stored in the DB with optional inventory filters."""
-    q = db.query(models.Recipe)
-
-    if tag:
-        q = q.join(models.recipe_tag).join(models.Tag).filter(
-            func.lower(models.Tag.name) == tag.lower()
-        )
-    if category:
-        q = q.join(models.recipe_category).join(models.Category).filter(
-            func.lower(models.Category.name) == category.lower()
-        )
-    if iba:
-        q = q.join(models.recipe_iba).join(models.Iba).filter(
-            func.lower(models.Iba.name) == iba.lower()
-        )
-    if alcoholic:
-        q = q.join(models.Alcoholic).filter(
-            func.lower(models.Alcoholic.name) == alcoholic.lower()
-        )
-    if query:
-        q = q.filter(models.Recipe.name.ilike(f"%{query}%"))
-
-    q = q.offset(skip).limit(limit)
-    recipes = q.all()
-    results: list[tuple[models.Recipe, int, int]] = []
-    for recipe in recipes:
-        missing = recipe_missing_count(db, recipe)
-        if available_only and missing > 0:
-            continue
-        available = len(recipe.ingredients) - missing
-        results.append((recipe, available, missing))
-    if order_missing:
-        results.sort(key=lambda t: t[2])
-    return [
-        schemas.RecipeWithInventory(
-            **schemas.Recipe.model_validate(r, from_attributes=True).model_dump(),
-            available_count=a,
-            missing_count=m,
-        )
-        for r, a, m in results
-    ]
-
-
-# Barcode cache CRUD
-def get_barcode_cache(db: Session, ean: str):
-    return db.query(models.BarcodeCache).filter(models.BarcodeCache.ean == ean).first()
-
-
-def store_barcode_cache(db: Session, ean: str, data: dict):
-    import json
-    from datetime import datetime
-
-    entry = get_barcode_cache(db, ean)
-    serialized = json.dumps(data)
-    ts = int(datetime.utcnow().timestamp())
-    if entry:
-        entry.json = serialized
-        entry.timestamp = ts
-    else:
-        entry = models.BarcodeCache(ean=ean, json=serialized, timestamp=ts)
-        db.add(entry)
-    db.commit()
-    return entry
-
-
-# Shopping list CRUD
-def get_shopping_list_item_by_ingredient(
-    db: Session, ingredient_id: int, recipe_id: int | None = None
-):
-    query = db.query(models.ShoppingListItem).filter(
-        models.ShoppingListItem.ingredient_id == ingredient_id
-    )
-    if recipe_id is None:
-        query = query.filter(models.ShoppingListItem.recipe_id.is_(None))
-    else:
-        query = query.filter(models.ShoppingListItem.recipe_id == recipe_id)
-    return query.first()
-
-
-def add_to_shopping_list(
-    db: Session,
-    ingredient: models.Ingredient,
-    quantity: int = 1,
-    recipe_id: int | None = None,
-    unit: str | None = None,
-):
-    item = get_shopping_list_item_by_ingredient(db, ingredient.id, recipe_id)
-    if item:
-        item.quantity += quantity
-        if unit and not item.unit:
-            item.unit = unit
-    else:
-        item = models.ShoppingListItem(
-            ingredient_id=ingredient.id,
-            quantity=quantity,
-            recipe_id=recipe_id,
-            unit=unit,
-        )
-        db.add(item)
-    db.flush()
-    db.refresh(item)
-    return item
-
-
-def list_shopping_list_items(db: Session, skip: int = 0, limit: int = 100):
-    from sqlalchemy.orm import selectinload
-
-    return (
-        db.query(models.ShoppingListItem)
-        .options(
-            selectinload(models.ShoppingListItem.ingredient),
-            selectinload(models.ShoppingListItem.recipe),
-        )
-        .offset(skip)
-        .limit(limit)
-        .all()
-    )
-
-
-def add_missing_ingredients_to_shopping_list(db: Session, recipe_id: int):
-    recipe = get_recipe(db, recipe_id)
-    if not recipe:
-        return None
-    missing = recipe_missing_ingredients(db, recipe)
-    item_ids = []
-    for ing, unit in missing:
-        item = add_to_shopping_list(db, ing, 1, recipe_id, unit)
-        item_ids.append(item.id)
-    db.commit()
-
-    from sqlalchemy.orm import selectinload
-
-    return (
-        db.query(models.ShoppingListItem)
-        .filter(models.ShoppingListItem.id.in_(item_ids))
-        .options(
-            selectinload(models.ShoppingListItem.ingredient),
-            selectinload(models.ShoppingListItem.recipe),
-        )
-        .all()
-    )
-
-
-def clear_shopping_list(db: Session):
-    db.query(models.ShoppingListItem).delete()
-    db.commit()
-
-
-def suggest_recipes(
-    db: Session,
-    limit: int = 3,
-    max_missing: int | None = None,
-    *,
-    macros: list[str] | None = None,
-    macro_mode: str = "and",
-) -> list[schemas.RecipeWithInventory]:
-    """Return a few random recipe suggestions prioritising available ones.
-
-    ``macro_mode`` controls how ``macros`` are applied and accepts ``"and"``,
-    ``"or"`` and ``"not"``.
-    """
-    recipes = list_recipes(db)
-    macros = [m.lower() for m in (macros or [])]
-    data: list[tuple[models.Recipe, int, int]] = []
-    for r in recipes:
-        missing = recipe_missing_count(db, r)
-        if max_missing is not None and missing > max_missing:
-            continue
-        r_macros = macros_service.macros_for_recipe(r)
-        if macros:
-            if macro_mode == "and" and not all(m in r_macros for m in macros):
-                continue
-            if macro_mode == "or" and not any(m in r_macros for m in macros):
-                continue
-            if macro_mode == "not" and any(m in r_macros for m in macros):
-                continue
-        available = len(r.ingredients) - missing
-        data.append((r, available, missing))
-
-    if not data:
-        return []
-
-    # sort recipes by number of missing ingredients
-    data.sort(key=lambda t: t[2])
-    results: list[tuple[models.Recipe, int, int]] = []
-    import random
-    while len(results) < limit and data:
-        current_missing = data[0][2]
-        same = [t for t in data if t[2] == current_missing]
-        random.shuffle(same)
-        take = same[: max(0, limit - len(results))]
-        results.extend(take)
-        data = [t for t in data if t[2] != current_missing]
-
-    return [
-        schemas.RecipeWithInventory(
-            **schemas.Recipe.model_validate(r, from_attributes=True).model_dump(),
-            available_count=a,
-            missing_count=m,
-        )
-        for r, a, m in results[:limit]
-    ]
-
-
-def suggest_recipes_by_ingredients(
-    db: Session,
-    ingredient_ids: list[int] | None = None,
-    *,
-    mode: str = "and",
-    macros: list[str] | None = None,
-    macro_mode: str = "and",
-    max_missing: int | None = None,
-    limit: int = 100,
-) -> list[schemas.RecipeWithInventory]:
-    """Return recipes filtered by selected ingredients.
-
-    ``mode`` applies to ``ingredients`` and accepts ``"and"``, ``"or"`` and
-    ``"not"``. ``macro_mode`` behaves the same for ``macros``. The order of
-    ``ingredient_ids`` influences the score: earlier ids carry more weight
-    when ranking results.
-    """
-
-    ingredient_ids = ingredient_ids or []
-    macros = [m.lower() for m in (macros or [])]
-    weights = {iid: len(ingredient_ids) - idx for idx, iid in enumerate(ingredient_ids)}
-
-    recipes = list_recipes(db)
-    data: list[tuple[float, models.Recipe, int, int]] = []
-    for r in recipes:
-        missing = recipe_missing_count(db, r)
-        if max_missing is not None and missing > max_missing:
-            continue
-
-        r_ids: list[int] = []
-        for ri in r.ingredients:
-            ing = get_ingredient_by_name(db, synonyms.canonical_name(ri.name))
-            if ing:
-                r_ids.append(ing.id)
-
-        if ingredient_ids:
-            if mode == "and" and not all(i in r_ids for i in ingredient_ids):
-                continue
-            if mode == "or" and not any(i in r_ids for i in ingredient_ids):
-                continue
-            if mode == "not" and any(i in r_ids for i in ingredient_ids):
-                continue
-
-        r_macros = macros_service.macros_for_recipe(r)
-        if macros:
-            if macro_mode == "and" and not all(m in r_macros for m in macros):
-                continue
-            if macro_mode == "or" and not any(m in r_macros for m in macros):
-                continue
-            if macro_mode == "not" and any(m in r_macros for m in macros):
-                continue
-
-        score = sum(weights.get(i, 0) for i in r_ids)
-        available = len(r.ingredients) - missing
-        data.append((score, r, available, missing))
-
-    data.sort(key=lambda t: (-t[0], t[3]))
-
-    return [
-        schemas.RecipeWithInventory(
-            **schemas.Recipe.model_validate(r, from_attributes=True).model_dump(),
-            available_count=a,
-            missing_count=m,
-        )
-        for _, r, a, m in data[:limit]
-    ]

@@ -102,7 +102,7 @@ export interface RecipeDetail {
   ingredients: RecipeIngredient[];
 }
 
-export async function healthCheck() {
+export async function checkBackendHealth() {
   const res = await fetch(`${API_BASE}/healthz`);
   if (!res.ok) {
     throw new Error("Network error");

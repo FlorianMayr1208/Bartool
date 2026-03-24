@@ -9,14 +9,14 @@ import {
   Download,
   Upload,
 } from 'lucide-react';
-import { exportDatabase, importDatabase, healthCheck } from '../api';
+import { exportDatabase, importDatabase, checkBackendHealth } from '../api';
 import { useRef, useEffect, useState } from 'react';
 import Suggestions from '../components/Suggestions';
 
 export default function Dashboard() {
   const [health, setHealth] = useState<string | null>(null);
   useEffect(() => {
-    healthCheck()
+    checkBackendHealth()
       .then((res) => setHealth(res.status))
       .catch(() => setHealth('error'));
   }, []);
