@@ -45,12 +45,3 @@ npm run build
 
 The generated files in `frontend/dist` can then be copied to any web server. The backend can be run with a process manager such as systemd or within a container.
 
-## Running Tests
-
-Backend tests can be executed with `pytest`:
-
-```bash
-pytest
-```
-
-They use an in-memory SQLite database so they do not affect your local data.

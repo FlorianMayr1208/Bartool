@@ -12,6 +12,8 @@ BarTool is a lightweight bar management system intended to run even on a small d
 
 The project is still in an early stage and focuses on a clean API structure and a minimal, responsive UI.
 
+The repository currently focuses on development and runtime workflows; legacy automated test scaffolding has been removed from the setup instructions.
+
 ## Documentation
 
 Additional documentation is available in the `docs/` directory:

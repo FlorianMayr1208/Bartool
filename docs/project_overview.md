@@ -33,4 +33,4 @@ Bartool/
 
 ## Development Workflow
 
-Typical development consists of running the backend and frontend locally. The frontend communicates with the backend via the API base URL defined in `frontend/.env`. See `docs/running_guide.md` for the full instructions. Unit tests for the backend reside in `backend/tests` and can be executed with `pytest`.
+Typical development consists of running the backend and frontend locally. The frontend communicates with the backend via the API base URL defined in `frontend/.env`. See `docs/running_guide.md` for the full instructions.

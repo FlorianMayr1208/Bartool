@@ -19,7 +19,7 @@ Below is a step‑by‑step plan sliced into iterations.
    - `GET/POST /recipes` (import from CocktailDB)  
    - `GET/PATCH /inventory/{id}`  
 2. Add pagination & error middleware.  
-3. Write unit tests with **pytest** + **httpx** (≥ 80 % coverage).
+3. Validate API behavior with manual endpoint checks during development.
 
 ---
 
