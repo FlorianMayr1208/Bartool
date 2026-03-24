@@ -235,3 +235,111 @@ def delete_inventory_item(db: Session, item_id: int) -> bool:
     db.delete(item)
     db.commit()
     return True
+
+
+def get_suggestions(
+    db: Session,
+    limit: int = 20,
+    max_missing: int | None = None,
+) -> list[dict]:
+    from sqlalchemy.orm import selectinload
+
+    inventory = (
+        db.query(models.InventoryItem)
+        .options(selectinload(models.InventoryItem.ingredient))
+        .filter(models.InventoryItem.quantity > 0)
+        .all()
+    )
+    available = {synonyms.canonical_name(item.ingredient.name).lower() for item in inventory}
+
+    all_recipes = (
+        db.query(models.Recipe)
+        .options(selectinload(models.Recipe.ingredients))
+        .all()
+    )
+
+    results = []
+    for recipe in all_recipes:
+        if not recipe.ingredients:
+            continue
+        total = len(recipe.ingredients)
+        avail_count = sum(
+            1 for ing in recipe.ingredients
+            if synonyms.canonical_name(ing.name).lower() in available
+        )
+        missing = total - avail_count
+        if max_missing is not None and missing > max_missing:
+            continue
+        results.append({
+            "id": recipe.id,
+            "name": recipe.name,
+            "thumb": recipe.thumb,
+            "missing_count": missing,
+            "available_count": avail_count,
+        })
+
+    results.sort(key=lambda r: (r["missing_count"], r["name"]))
+    return results[:limit]
+
+
+def get_suggestions_by_ingredients(
+    db: Session,
+    ingredient_ids: list[int],
+    mode: str = "and",
+    max_missing: int = 3,
+    limit: int = 50,
+) -> list[dict]:
+    from sqlalchemy.orm import selectinload
+
+    selected_ings = (
+        db.query(models.Ingredient)
+        .filter(models.Ingredient.id.in_(ingredient_ids))
+        .all()
+    )
+    selected_names = {synonyms.canonical_name(ing.name).lower() for ing in selected_ings}
+
+    inventory = (
+        db.query(models.InventoryItem)
+        .options(selectinload(models.InventoryItem.ingredient))
+        .filter(models.InventoryItem.quantity > 0)
+        .all()
+    )
+    available = {synonyms.canonical_name(item.ingredient.name).lower() for item in inventory}
+
+    all_recipes = (
+        db.query(models.Recipe)
+        .options(selectinload(models.Recipe.ingredients))
+        .all()
+    )
+
+    results = []
+    for recipe in all_recipes:
+        if not recipe.ingredients:
+            continue
+        recipe_names = {synonyms.canonical_name(i.name).lower() for i in recipe.ingredients}
+
+        if selected_names:
+            if mode == "and" and not selected_names.issubset(recipe_names):
+                continue
+            elif mode == "or" and not (selected_names & recipe_names):
+                continue
+            elif mode == "not" and (selected_names & recipe_names):
+                continue
+
+        total = len(recipe.ingredients)
+        avail_count = sum(1 for name in recipe_names if name in available)
+        missing = total - avail_count
+
+        if missing > max_missing:
+            continue
+
+        results.append({
+            "id": recipe.id,
+            "name": recipe.name,
+            "thumb": recipe.thumb,
+            "missing_count": missing,
+            "available_count": avail_count,
+        })
+
+    results.sort(key=lambda r: (r["missing_count"], r["name"]))
+    return results[:limit]

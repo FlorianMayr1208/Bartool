@@ -89,6 +89,14 @@ class InventoryItemWithIngredient(InventoryItem):
     ingredient: Ingredient
 
 
+class RecipeSuggestion(BaseModel):
+    id: int
+    name: str
+    thumb: Optional[str] = None
+    missing_count: int = 0
+    available_count: int = 0
+
+
 class Synonym(BaseModel):
     alias: str
     canonical: str

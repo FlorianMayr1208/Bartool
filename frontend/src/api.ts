@@ -282,7 +282,9 @@ export async function getSuggestions(options: {
     params.append('macro_mode', options.macro_mode);
   const query = params.toString();
   const res = await fetch(`${API_BASE}/suggestions${query ? `?${query}` : ''}`);
-  return res.json();
+  if (!res.ok) return [];
+  const data = await res.json();
+  return Array.isArray(data) ? data : [];
 }
 
 export async function getSuggestionsByIngredients(options: {
@@ -309,7 +311,9 @@ export async function getSuggestionsByIngredients(options: {
   const res = await fetch(
     `${API_BASE}/suggestions/by-ingredients${query ? `?${query}` : ''}`,
   );
-  return res.json();
+  if (!res.ok) return [];
+  const data = await res.json();
+  return Array.isArray(data) ? data : [];
 }
 
 export async function getRecipe(id: number): Promise<RecipeDetail> {

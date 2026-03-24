@@ -4,7 +4,7 @@ from fastapi import FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 
-from .api import ingredients, inventory, recipes, synonyms
+from .api import ingredients, inventory, recipes, suggestions, synonyms
 
 app = FastAPI(title="Bar Management")
 
@@ -43,3 +43,4 @@ app.include_router(ingredients.router, prefix="/ingredients")
 app.include_router(recipes.router, prefix="/recipes")
 app.include_router(inventory.router, prefix="/inventory")
 app.include_router(synonyms.router, prefix="/synonyms")
+app.include_router(suggestions.router, prefix="/suggestions")
