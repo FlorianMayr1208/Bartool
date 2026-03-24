@@ -1,47 +1,34 @@
 # Running BarTool
 
-This document describes how to set up and launch both the backend and the frontend. The steps assume a Unix-like environment with Python and Node.js installed.
+Minimal setup for local development.
 
-## Backend Setup
-
-1. Install the Python dependencies:
-   ```bash
-   pip install -r requirements.txt
-   ```
-2. Create and seed the SQLite database (optional but recommended for demo data):
-   ```bash
-   python backend/app/db/seed_db.py
-   ```
-3. Start the FastAPI application:
-   ```bash
-   uvicorn backend.app.main:app --reload
-   ```
-   The API will be reachable at `http://localhost:8000` and you can explore the docs at `/docs`.
-
-## Frontend Setup
-
-1. Navigate to the `frontend` directory:
-   ```bash
-   cd frontend
-   ```
-2. Install the npm dependencies:
-   ```bash
-   npm install
-   ```
-3. Ensure that `frontend/.env` contains the correct API base URL. The default is `VITE_API_BASE=http://localhost:8000`.
-4. Start the development server:
-   ```bash
-   npm run dev
-   ```
-   This will open the application in your browser at `http://localhost:5173`.
-
-## Production Build
-
-To build the frontend for production and serve the compiled assets you can run:
+## 1) Backend (FastAPI)
 
 ```bash
+pip install -r requirements.txt
+python backend/app/db/seed_db.py   # optional sample data
+uvicorn backend.app.main:app --reload
+```
+
+- API: `http://localhost:8000`
+- Swagger UI: `http://localhost:8000/docs`
+
+## 2) Frontend (React + Vite)
+
+```bash
+cd frontend
+npm install
+npm run dev
+```
+
+- App: `http://localhost:5173`
+- API base URL is read from `frontend/.env` (`VITE_API_BASE`).
+
+## 3) Production notes
+
+```bash
+cd frontend
 npm run build
 ```
 
-The generated files in `frontend/dist` can then be copied to any web server. The backend can be run with a process manager such as systemd or within a container.
-
+Build output is written to `frontend/dist` and can be served by any static web server.

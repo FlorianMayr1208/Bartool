@@ -16,12 +16,11 @@ The repository currently focuses on development and runtime workflows; legacy au
 
 ## Documentation
 
-Additional documentation is available in the `docs/` directory:
+Additional documentation is intentionally minimal and lives in `docs/`:
 
-- `project_overview.md` – general information about the architecture
-- `backend.md` – details about the FastAPI backend
-- `frontend.md` – description of the React frontend
-- `running_guide.md` – step-by-step guide for launching the application
+- `running_guide.md` – concise setup and launch steps
+- `macros.md` – ingredient macro classification notes
+- `docs/README.md` – documentation index
 
 ## Quickstart
 
