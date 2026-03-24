@@ -7,9 +7,8 @@ BarTool is a small full-stack cocktail workspace built around a FastAPI backend 
 The repository currently supports these implemented workflows:
 
 - Maintain an ingredient inventory with create, list, update, and delete operations.
-- Create, edit, view, and delete recipes stored locally in the app database.
-- Keep recipe ingredients synchronized with local inventory records.
-- Manage ingredient-name synonyms that help local recipe and inventory data map variant names onto existing ingredients.
+- Search CocktailDB for recipes, save recipes locally, and view saved recipe details.
+- Manage ingredient-name synonyms that help recipe imports map variant names onto existing ingredients.
 
 ## Frontend pages that currently exist
 
@@ -19,8 +18,8 @@ The frontend router exposes these pages:
 | --- | --- | --- |
 | `/` | Redirect | Immediately redirects to `/inventory` |
 | `/inventory` | Inventory | Fully wired to local inventory APIs |
-| `/recipes` | Recipes | Create recipes locally and manage saved records |
-| `/recipes/:id` | Recipe detail | Edit or delete one saved recipe |
+| `/recipes` | Recipes | Search remote recipes and save them locally |
+| `/recipes/:id` | Recipe detail | View one saved recipe |
 | `/synonyms` | Synonyms | Fully wired to synonym management APIs |
 
 ## Backend API routes that currently exist
@@ -42,11 +41,10 @@ The FastAPI app mounts these routes today:
 
 ### Recipes
 
+- `GET /recipes/search?q=...` — search CocktailDB-backed recipe results.
 - `GET /recipes/` — list locally saved recipes.
 - `GET /recipes/{recipe_id}` — fetch one saved recipe.
-- `POST /recipes/` — create a locally stored recipe.
-- `PATCH /recipes/{recipe_id}` — update a locally stored recipe.
-- `DELETE /recipes/{recipe_id}` — delete a locally stored recipe.
+- `POST /recipes/` — import/save a recipe by name.
 
 ### Synonyms
 
@@ -59,7 +57,7 @@ The FastAPI app mounts these routes today:
 The repo still contains code scaffolding and historical documents for broader bar-management ideas, but the following are **not** implemented as real end-user features today:
 
 - Barcode scanning or barcode lookup integrations.
-- Remote recipe search or recipe import from third-party services.
+- Fully local recipe authoring or recipe editing flows.
 - Shopping-list generation logic or a dedicated shopping-list UI.
 - Statistics or analytics pages.
 - User profiles, favorites, advanced filtering, or deployment automation.

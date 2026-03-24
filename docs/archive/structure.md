@@ -1,6 +1,6 @@
 # Current repository structure overview
 
-This snapshot reflects the local-only application scope that is currently implemented in the repo.
+This snapshot reflects the currently implemented application scope, including remote recipe search/import and local storage for saved records.
 
 ```text
 Bartool/
@@ -19,8 +19,9 @@ Bartool/
 │   │   │   ├── schemas.py
 │   │   │   ├── seed_db.py
 │   │   │   └── session.py
-│   │   ├── services/           # Local service helpers (for example synonym normalization)
+│   │   ├── services/           # External and local service helpers
 │   │   │   ├── __init__.py
+│   │   │   ├── cocktaildb.py
 │   │   │   ├── synonyms.json
 │   │   │   └── synonyms.py
 │   │   └── main.py             # FastAPI application entry point
