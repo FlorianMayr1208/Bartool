@@ -41,12 +41,3 @@ Each router in `backend/app/api` corresponds to a domain of the application:
 
 Models are defined in `backend/app/db/models.py` and the Pydantic schemas reside in `backend/app/db/schemas.py`.
 
-### Tests
-
-Unit and integration tests are located in `backend/tests`. They can be executed with:
-
-```bash
-pytest
-```
-
-The tests spin up the FastAPI app with an in-memory SQLite database to verify the behaviour of the API endpoints.
