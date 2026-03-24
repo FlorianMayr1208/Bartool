@@ -14,27 +14,20 @@ The project is still in an early stage and focuses on a clean API structure and 
 
 The repository currently focuses on development and runtime workflows; legacy automated test scaffolding has been removed from the setup instructions.
 
-## Documentation
+## Running
 
-Additional documentation is intentionally minimal and lives in `docs/`:
-
-- `running_guide.md` – concise setup and launch steps
-- `macros.md` – ingredient macro classification notes
-- `docs/README.md` – documentation index
-
-## Quickstart
-
-The following commands will launch the backend and frontend in development mode. See `docs/running_guide.md` for a more detailed explanation.
+### 1) Backend (FastAPI)
 
 ```bash
-# install Python dependencies
 pip install -r requirements.txt
-
-# start the backend
+python backend/app/db/seed_db.py   # optional sample data
 uvicorn backend.app.main:app --reload
 ```
 
-For the frontend, install the npm packages and run Vite:
+- API: `http://localhost:8000`
+- Swagger UI: `http://localhost:8000/docs`
+
+### 2) Frontend (React + Vite)
 
 ```bash
 cd frontend
@@ -42,20 +35,20 @@ npm install
 npm run dev
 ```
 
-### Database initialization
+- App: `http://localhost:5173`
+- API base URL is read from `frontend/.env` (`VITE_API_BASE`, default `http://localhost:8000`). Adjust if your backend runs on a different host or port.
 
-Before using the app you can create the local SQLite database with a small seeding script:
+### 3) Production
 
 ```bash
-python backend/app/db/seed_db.py
+cd frontend
+npm run build
 ```
 
-This will generate `data/seed.sqlite` and insert a few example records so the API has initial data to work with. Afterwards open `http://localhost:5173` in your browser. The frontend reads the API base URL from `frontend/.env`, which by default contains `VITE_API_BASE=http://localhost:8000`. If your backend runs on a different host or port, adjust this value before starting the frontend.
+Build output is written to `frontend/dist` and can be served by any static web server.
 
-### Barcode lookup
+## Notes
 
-Scanning a bottle in the inventory page sends a request to `/barcode/{EAN}`. The backend queries the public **Open Food Facts** API and returns the product name, brand and image URL if available.
-
----
-
-This repository also contains a collection of documents (`technical_specification.md`, `usecases.md`) describing the planned functionality and architecture.
+- **Database**: `seed_db.py` generates `data/seed.sqlite` with a few example records so the API has initial data to work with.
+- **Barcode lookup**: Scanning a bottle sends a request to `/barcode/{EAN}`. The backend queries the public **Open Food Facts** API and returns the product name, brand and image URL if available.
+- **Docs**: `docs/macros.md` contains ingredient macro classification notes.
